@@ -1,10 +1,9 @@
-﻿namespace Leuze_AGV_Robot_API.ApiModels
+﻿namespace Leuze_AGV_Robot_API.Models
 {
-    public class TodoItem
+    public class TodoItemDTO
     {
         public long Id { get; set; }
         public string? Name { get; set; }
         public bool IsComplete { get; set; }
-        public string? SomeSecret { get; set; }
     }
 }

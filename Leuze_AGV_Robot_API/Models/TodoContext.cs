@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Leuze_AGV_Robot_API.ApiModels
+namespace Leuze_AGV_Robot_API.Models
 {
     public class TodoContext : DbContext
     {

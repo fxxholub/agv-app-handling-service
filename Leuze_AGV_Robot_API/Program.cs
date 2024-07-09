@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Leuze_AGV_Robot_API.ApiModels;
 using Asp.Versioning;
+using Realms;
+using Leuze_AGV_Robot_API.Models;
 
 namespace Leuze_AGV_Robot_API
 {
@@ -10,10 +11,9 @@ namespace Leuze_AGV_Robot_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Configure Swagger (https://aka.ms/aspnetcore/swashbuckle)
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddApiVersioning(options =>
             {
@@ -29,8 +29,20 @@ namespace Leuze_AGV_Robot_API
                 options.SubstituteApiVersionInUrl = true;
             });
             builder.Services.AddSwaggerGen();
+
+            // COnfigure inMemory DB
             builder.Services.AddDbContext<TodoContext>(opt =>
                 opt.UseInMemoryDatabase("TodoList"));
+
+            // Configure Realm
+            builder.Services.AddSingleton(provider =>
+            {
+                var config = new RealmConfiguration("default.realm")
+                {
+                    SchemaVersion = 1
+                };
+                return Realm.GetInstance(config);
+            });
 
             var app = builder.Build();
 
@@ -43,6 +55,7 @@ namespace Leuze_AGV_Robot_API
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
                 });
             }
+
 
             app.UseHttpsRedirection();
 

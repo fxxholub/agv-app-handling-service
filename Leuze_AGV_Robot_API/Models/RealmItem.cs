@@ -16,15 +16,15 @@ namespace Leuze_AGV_Robot_API.Models
         [MapTo("_id")]
         public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
 
-        [MapTo("name")]
-        public string? Name { get; set; }
+        [MapTo("state")]
+        public string? State { get; set; }
 
         [MapTo("assignee")]
         public string Assignee { get; set; }
 
 
-        [MapTo("status")]
-        public string? Status { get; set; }
+        [MapTo("name")]
+        public string? Name { get; set; }
 
         public RealmItemDTO ToDTO()
         {

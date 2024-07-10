@@ -4,7 +4,7 @@ using Realms;
 
 namespace Leuze_AGV_Robot_API.RealmDB
 {
-    public class RealmControllerBase : ControllerBase
+    public abstract class RealmControllerBase : ControllerBase
     {
         private readonly RealmConfiguration _realmConfig;
 

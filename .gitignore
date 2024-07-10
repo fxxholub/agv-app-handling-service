@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Leuze_AGV_Robot_API/Documents/default.realm
+/Leuze_AGV_Robot_API/Documents/default.realm.lock
+/Leuze_AGV_Robot_API/Documents/default.realm.note

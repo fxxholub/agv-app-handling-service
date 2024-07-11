@@ -18,7 +18,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var sessionDTOs = SessionDatabaseHandler.GetAllSessions(realm)
+            var sessionDTOs = SessionDatabaseHandler.GetSessions(realm)
                 .Select(s => ToSessionGetDTO(s)).ToList();
             return Ok(sessionDTOs);
         }
@@ -27,7 +27,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public IActionResult GetSession(string sessionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.FindSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
             if (session == null)
             {
                 return NotFound();
@@ -61,7 +61,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public IActionResult DeleteSession(string sessionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.FindSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
             if (session == null)
             {
                 return NotFound();
@@ -82,13 +82,13 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public ActionResult<IEnumerable<ActionGetDTO>> GetActionAll(string sessionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.FindSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
             if (session == null)
             {
                 return NotFound();
             }
 
-            var actionDTOs = SessionDatabaseHandler.GetActionsFromSession(session)
+            var actionDTOs = SessionDatabaseHandler.GetSessionActions(session)
                 .Select(a => ToActionGetDTO(a)).ToList();
             return Ok(actionDTOs);
         }
@@ -97,7 +97,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.FindSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
             if (session == null)
             {
                 return NotFound();
@@ -111,7 +111,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             try
             {
                 var action = FromActionPostDTO(actionDTO);
-                SessionDatabaseHandler.AddActionToSession(realm, session, action);
+                SessionDatabaseHandler.AddSessionAction(realm, session, action);
 
                 return Ok("Action created successfully.");
             }
@@ -125,13 +125,13 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public IActionResult DeleteAction(string sessionId, string actionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.FindSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
             if (session == null)
             {
                 return NotFound("Session not found.");
             }
 
-            var action = SessionDatabaseHandler.FindActionById(session, actionId);
+            var action = SessionDatabaseHandler.GetSessionAction(session, actionId);
             if (action == null)
             {
                 return NotFound("Action not found.");
@@ -139,7 +139,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
 
             try
             {
-                SessionDatabaseHandler.RemoveActionFromSession(realm, session, action);
+                SessionDatabaseHandler.RemoveSessionAction(realm, session, action);
                 return NoContent();
             }
             catch (Exception ex)

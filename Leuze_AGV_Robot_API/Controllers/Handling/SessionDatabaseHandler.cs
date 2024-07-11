@@ -6,30 +6,16 @@ namespace Leuze_AGV_Robot_API.RealmDB
 {
     public static class SessionDatabaseHandler
     {
-        public static IList<SessionModel> GetAllSessions(Realm realm)
+        // Session handling methods
+        public static IList<SessionModel> GetSessions(Realm realm)
         {
             return realm.All<SessionModel>().ToList();
         }
 
-        public static SessionModel FindSession(Realm realm, string sessionId)
+        public static SessionModel GetSession(Realm realm, string sessionId)
         {
             return realm.Find<SessionModel>(ObjectId.Parse(sessionId));
         }
-
-        public static ActionModel FindActionById(SessionModel session, string actionId)
-        {
-            return session.Actions.FirstOrDefault(a => a.Id == ObjectId.Parse(actionId));
-        }
-
-        public static void RemoveActionFromSession(Realm realm, SessionModel session, ActionModel action)
-        {
-            realm.Write(() =>
-            {
-                session.Actions.Remove(action);
-                realm.Remove(action);
-            });
-        }
-
         public static void AddSession(Realm realm, SessionModel session)
         {
             realm.Write(() => realm.Add(session));
@@ -47,14 +33,28 @@ namespace Leuze_AGV_Robot_API.RealmDB
             });
         }
 
-        public static void AddActionToSession(Realm realm, SessionModel session, ActionModel action)
+        // Session Action handling methods
+        public static IList<ActionModel> GetSessionActions(SessionModel session)
+        {
+            return session.Actions.AsQueryable().ToList();
+        }
+
+        public static ActionModel GetSessionAction(SessionModel session, string actionId)
+        {
+            return session.Actions.FirstOrDefault(a => a.Id == ObjectId.Parse(actionId));
+        }
+        public static void AddSessionAction(Realm realm, SessionModel session, ActionModel action)
         {
             realm.Write(() => session.Actions.Add(action));
         }
 
-        public static IList<ActionModel> GetActionsFromSession(SessionModel session)
+        public static void RemoveSessionAction(Realm realm, SessionModel session, ActionModel action)
         {
-            return session.Actions.AsQueryable().ToList();
+            realm.Write(() =>
+            {
+                session.Actions.Remove(action);
+                realm.Remove(action);
+            });
         }
     }
 }

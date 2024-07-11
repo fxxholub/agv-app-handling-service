@@ -14,11 +14,7 @@ namespace Leuze_AGV_Robot_API.Models.Handling
         public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
 
         [MapTo("mode")]
-        public SessionMode Mode
-        {
-            get => Enum.Parse<SessionMode>(_Mode);
-            set => _Mode = value.ToString();
-        }
+        public string Mode { get; set; }
 
         [MapTo("state")]
         public SessionState State

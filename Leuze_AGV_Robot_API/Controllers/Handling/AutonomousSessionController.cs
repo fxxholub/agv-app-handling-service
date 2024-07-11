@@ -12,6 +12,14 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
     [ApiController]
     public class AutonomousSessionController(IServiceProvider serviceProvider) : SessionControllerBase(serviceProvider)
     {
+        [HttpGet]
+        public override ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
+        {
+            using var realm = serviceProvider.GetRequiredService<Realm>();
+            var sessionDTOs = SessionDatabaseHandler.GetSessions(realm, "AUTONOMOUS")
+                .Select(s => ToSessionGetDTO(s)).ToList();
+            return Ok(sessionDTOs);
+        }
 
         [HttpPost]
         public override IActionResult PostSession([FromBody] SessionPostDTO sessionDTO)
@@ -25,7 +33,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             {
                 using var realm = serviceProvider.GetRequiredService<Realm>();
                 var session = FromSessionPostDTO(sessionDTO);
-                session.Mode = SessionMode.AUTONOMOUS;
+                session.Mode = "AUTONOMOUS";
                 SessionDatabaseHandler.AddSession(realm, session);
 
                 return Ok("Session created successfully.");

@@ -13,13 +13,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         protected readonly IServiceProvider serviceProvider = serviceProvider;
 
         [HttpGet]
-        public ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
-        {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
-            var sessionDTOs = SessionDatabaseHandler.GetSessions(realm)
-                .Select(s => ToSessionGetDTO(s)).ToList();
-            return Ok(sessionDTOs);
-        }
+        public abstract ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll();
 
         [HttpGet("{sessionId}")]
         public IActionResult GetSession(string sessionId)
@@ -62,7 +56,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             return new SessionGetDTO
             {
                 Id = session.Id.ToString(),
-                Mode = session.Mode.ToString(),
+                Mode = session.Mode,
                 State = session.State.ToString(),
                 StateMessage = session.StateMessage,
                 Actions = session.Actions.Select(a => ToActionGetDTO(a)).ToList(),

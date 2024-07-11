@@ -7,9 +7,9 @@ namespace Leuze_AGV_Robot_API.RealmDB
     public static class SessionDatabaseHandler
     {
         // Session handling methods
-        public static IList<SessionModel> GetSessions(Realm realm)
+        public static IList<SessionModel> GetSessions(Realm realm, string mode)
         {
-            return realm.All<SessionModel>().ToList();
+            return realm.All<SessionModel>().Where(s => s.Mode == mode).ToList();
         }
 
         public static SessionModel GetSession(Realm realm, string sessionId)

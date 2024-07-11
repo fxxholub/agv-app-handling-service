@@ -6,11 +6,19 @@ namespace Leuze_AGV_Robot_API.Models.Handling
     
     public partial class SessionModel : IRealmObject
     {
+        private string? _Mode { get; set; }
         private string _State { get; set; } = SessionState.IDLE.ToString();
 
         [PrimaryKey]
         [MapTo("_id")]
         public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
+
+        [MapTo("mode")]
+        public SessionMode Mode
+        {
+            get => Enum.Parse<SessionMode>(_Mode);
+            set => _Mode = value.ToString();
+        }
 
         [MapTo("state")]
         public SessionState State

@@ -7,6 +7,8 @@ namespace Leuze_AGV_Robot_API.Models.Handling
         [Required]
         public string Id { get; set; }
         [Required]
+        public string Mode { get; set; }
+        [Required]
         public string State { get; set; }
         [Required]
         [StringLength(int.MaxValue, MinimumLength = 0)]

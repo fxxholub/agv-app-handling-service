@@ -5,6 +5,7 @@ using Leuze_AGV_Robot_API.RealmDB;
 using Microsoft.AspNetCore.Mvc;
 using Mono.TextTemplating;
 using Realms;
+using MongoDB.Bson;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,23 +18,29 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
     {
         // GET: api/<ManualSessionController>
         [HttpGet]
-        public ActionResult<IEnumerable<SessionDTO>> Get()
+        public ActionResult<IEnumerable<SessionGetDTO>> Get()
         {
             using var realm = GetRealmInstance();
-            var items = realm.All<SessionModel>().ToList().Select(item => item.ToDTO()).ToList();
-            return Ok(items);
+            var sessionDTOs = realm.All<SessionModel>().ToList().Select(s => ToGetDTO(s)).ToList();
+            return Ok(sessionDTOs);
         }
 
-        // GET api/<ManualSessionController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
+        //GET api/<ManualSessionController>/5
+        [HttpGet("{id}")]
+        public IActionResult Get(string id)
+        {
+            using var realm = GetRealmInstance();
+            var session = realm.Find<SessionModel>(ObjectId.Parse(id));
+            if (session == null)
+            {
+                return NotFound();
+            }
+            return Ok(ToGetDTO(session));
+        }
 
         // POST api/<ManualSessionController>
         [HttpPost]
-        public IActionResult Post([FromBody] SessionDTO sessionDTO)
+        public IActionResult Post([FromBody] SessionPostDTO sessionDTO)
         {
             if (sessionDTO == null)
             {
@@ -45,15 +52,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
                 using var realm = GetRealmInstance();
                 realm.Write(() =>
                 {
-                    var sessionModel = new SessionModel
-                    {
-                        MappingEnabled = sessionDTO.MappingEnabled,
-                        MapInputId = sessionDTO.MapInputId,
-                        MapOutputName = sessionDTO.MapOutputName,
-                        MapOutputId = sessionDTO.MapOutputId
-                    };
-
-                    realm.Add(sessionModel);
+                    realm.Add(FromPostDTO(sessionDTO));
                 });
 
                 return Ok("Session created successfully.");
@@ -75,5 +74,33 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         //public void Delete(int id)
         //{
         //}
+
+        private static SessionGetDTO ToGetDTO(SessionModel session)
+        {
+            return new SessionGetDTO
+            {
+                Id =                session.Id.ToString(),
+                State =             session.State.ToString(),
+                Status =            session.Status.ToString(),
+                CreatedDate =       session.CreatedDate,
+                ModifiedDate =      session.ModifiedDate,
+                Processes =         session.Processes.Select(p => p.ToString()).ToList(),
+                MappingEnabled =    session.MappingEnabled,
+                MapInputId =        session.MapInputId.ToString(),
+                MapOutputName =     session.MapOutputName,
+                MapOutputId =       session.MapOutputId.ToString(),
+            };
+        }
+
+        private static SessionModel FromPostDTO(SessionPostDTO session)
+        {
+            return new SessionModel
+            {
+                MappingEnabled =    session.MappingEnabled,
+                MapInputId =        !string.IsNullOrEmpty(session.MapInputId) ? ObjectId.Parse(session.MapInputId) : null,
+                MapOutputName =     session.MapOutputName,
+                MapOutputId =       !string.IsNullOrEmpty(session.MapInputId) ? ObjectId.Parse(session.MapOutputId) : null,
+            };
+        }
     }
 }

@@ -6,7 +6,7 @@ using Realms;
 namespace Leuze_AGV_Robot_API.Models.Handling
 {
     
-    public partial class SessionModel : IRealmObject, IDTO<SessionDTO>
+    public partial class SessionModel : IRealmObject
     {
         private string _State { get; set; } = SessionState.IDLE.ToString();
         private string _Status { get; set; } = SessionStatus.NONE.ToString();
@@ -52,22 +52,5 @@ namespace Leuze_AGV_Robot_API.Models.Handling
 
         [MapTo("mapOutputId")]
         public ObjectId? MapOutputId { get; set; }
-
-        public SessionDTO ToDTO()
-        {
-            return new SessionDTO
-            {
-                Id = Id.ToString(),
-                State = State.ToString(),
-                Status = Status.ToString(),
-                CreatedDate = CreatedDate,
-                ModifiedDate = ModifiedDate,
-                Processes = Processes,
-                MappingEnabled = MappingEnabled,
-                MapInputId = MapInputId,
-                MapOutputName = MapOutputName,
-                MapOutputId = MapOutputId,
-            };
-        }
     }
 }

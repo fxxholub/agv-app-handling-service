@@ -24,6 +24,9 @@ namespace Leuze_AGV_Robot_API.Models.Handling
         [MapTo("stateMessage")]
         public string StateMessage { get; set; } = "";
 
+        [MapTo("actions")]
+        public IList<ActionModel> Actions { get; }
+
         [MapTo("createdDate")]
         public DateTimeOffset CreatedDate { get; set; } = DateTimeOffset.UtcNow;
 

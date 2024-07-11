@@ -37,7 +37,7 @@ namespace Leuze_AGV_Robot_API
             // Configure Realm
             builder.Services.AddSingleton(provider =>
             {
-                var config = new RealmConfiguration("default.realm")
+                var config = new RealmConfiguration("robotDB.realm")
                 {
                     SchemaVersion = 1
                 };

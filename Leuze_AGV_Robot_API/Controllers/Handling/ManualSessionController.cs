@@ -12,14 +12,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
     [ApiController]
     public class ManualSessionController(IServiceProvider serviceProvider) : SessionControllerBase(serviceProvider)
     {
-        [HttpGet]
-        public override ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
-        {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
-            var sessionDTOs = SessionDatabaseHandler.GetSessions(realm, "MANUAL")
-                .Select(s => ToSessionGetDTO(s)).ToList();
-            return Ok(sessionDTOs);
-        }
+        protected override string HandlingMode { get; } = "MANUAL";
 
         [HttpPost]
         public override IActionResult PostSession([FromBody] SessionPostDTO sessionDTO)
@@ -33,8 +26,8 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             {
                 using var realm = serviceProvider.GetRequiredService<Realm>();
                 var session = FromSessionPostDTO(sessionDTO);
-                session.Mode = "MANUAL";
-                SessionDatabaseHandler.AddSession(realm, session);
+                session.Mode = HandlingMode;
+                SessionDatabaseHandler.AddSession(realm, session, HandlingMode);
 
                 return Ok("Session created successfully.");
             }

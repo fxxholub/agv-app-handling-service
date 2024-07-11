@@ -12,14 +12,22 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
     {
         protected readonly IServiceProvider serviceProvider = serviceProvider;
 
+        protected abstract string HandlingMode { get; }
+
         [HttpGet]
-        public abstract ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll();
+        public ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
+        {
+            using var realm = serviceProvider.GetRequiredService<Realm>();
+            var sessionDTOs = SessionDatabaseHandler.GetSessions(realm, HandlingMode)
+                .Select(s => ToSessionGetDTO(s)).ToList();
+            return Ok(sessionDTOs);
+        }
 
         [HttpGet("{sessionId}")]
         public IActionResult GetSession(string sessionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
                 return NotFound();
@@ -34,7 +42,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         public IActionResult DeleteSession(string sessionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.GetSession(realm, sessionId);
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
                 return NotFound();
@@ -42,7 +50,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
 
             try
             {
-                SessionDatabaseHandler.RemoveSession(realm, session);
+                SessionDatabaseHandler.RemoveSession(realm, sessionId, HandlingMode);
                 return NoContent();
             }
             catch (Exception ex)

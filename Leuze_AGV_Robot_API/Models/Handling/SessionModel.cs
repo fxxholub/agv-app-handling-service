@@ -9,7 +9,6 @@ namespace Leuze_AGV_Robot_API.Models.Handling
     public partial class SessionModel : IRealmObject
     {
         private string _State { get; set; } = SessionState.IDLE.ToString();
-        private string _Status { get; set; } = SessionStatus.NONE.ToString();
 
         [PrimaryKey]
         [MapTo("_id")]
@@ -22,15 +21,8 @@ namespace Leuze_AGV_Robot_API.Models.Handling
             set => _State = value.ToString();
         }
 
-        [MapTo("status")]
-        public SessionStatus Status
-        {
-            get => Enum.Parse<SessionStatus>(_Status);
-            set => _Status = value.ToString();
-        }
-
-        [MapTo("statusMessage")]
-        public string StatusMessage { get; set; } = "";
+        [MapTo("stateMessage")]
+        public string StateMessage { get; set; } = "";
 
         [MapTo("createdDate")]
         public DateTimeOffset CreatedDate { get; set; } = DateTimeOffset.UtcNow;

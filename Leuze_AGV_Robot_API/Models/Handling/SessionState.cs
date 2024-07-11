@@ -4,6 +4,7 @@
     {
         IDLE,
         RUNNING,
-        ENDED
+        STOPPED,
+        ERROR
     }
 }

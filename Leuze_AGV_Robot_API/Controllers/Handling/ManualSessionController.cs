@@ -70,10 +70,30 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         //}
 
         // DELETE api/<ManualSessionController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            using var realm = GetRealmInstance();
+            var session = realm.Find<SessionModel>(ObjectId.Parse(id));
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                realm.Write(() =>
+                {
+                    realm.Remove(session);
+                });
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting session: {ex.Message}");
+            }
+        }
 
         private static SessionGetDTO ToGetDTO(SessionModel session)
         {
@@ -81,7 +101,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             {
                 Id =                session.Id.ToString(),
                 State =             session.State.ToString(),
-                Status =            session.Status.ToString(),
+                StateMessage =      session.StateMessage,
                 CreatedDate =       session.CreatedDate,
                 ModifiedDate =      session.ModifiedDate,
                 Processes =         session.Processes.Select(p => p.ToString()).ToList(),

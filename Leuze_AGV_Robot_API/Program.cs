@@ -1,7 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Asp.Versioning;
 using Realms;
-using Leuze_AGV_Robot_API.Models;
 
 namespace Leuze_AGV_Robot_API
 {
@@ -29,10 +27,6 @@ namespace Leuze_AGV_Robot_API
                 options.SubstituteApiVersionInUrl = true;
             });
             builder.Services.AddSwaggerGen();
-
-            // COnfigure inMemory DB
-            builder.Services.AddDbContext<TodoContext>(opt =>
-                opt.UseInMemoryDatabase("TodoList"));
 
             // Configure Realm
             builder.Services.AddScoped(provider =>

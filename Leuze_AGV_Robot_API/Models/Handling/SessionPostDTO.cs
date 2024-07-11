@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson;
-using Mono.TextTemplating;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Leuze_AGV_Robot_API.Models.Handling
 {

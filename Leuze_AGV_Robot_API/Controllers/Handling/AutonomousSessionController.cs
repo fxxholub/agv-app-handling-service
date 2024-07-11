@@ -1,17 +1,14 @@
 ﻿using Asp.Versioning;
-using Leuze_AGV_Robot_API.Models;
 using Leuze_AGV_Robot_API.Models.Handling;
 using Leuze_AGV_Robot_API.RealmDB;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Leuze_AGV_Robot_API.Controllers.Handling
 {
     [ApiVersion(1)]
-    [Route("api/v{v:apiVersion}/handling/autonomous/session")]
+    [Route("api/v{v:apiVersion}/handling/autonomous/sessions")]
     [ApiController]
     public class AutonomousSessionController(IServiceProvider serviceProvider) : ControllerBase
     {
@@ -81,7 +78,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             }
         }
 
-        [HttpGet("{sessionId}/action")]
+        [HttpGet("{sessionId}/actions")]
         public ActionResult<IEnumerable<ActionGetDTO>> GetActionAll(string sessionId)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
@@ -96,7 +93,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             return Ok(actionDTOs);
         }
 
-        [HttpPost("{sessionId}/action")]
+        [HttpPost("{sessionId}/actions")]
         public IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
@@ -124,6 +121,33 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             }
         }
 
+        [HttpDelete("{sessionId}/actions/{actionId}")]
+        public IActionResult DeleteAction(string sessionId, string actionId)
+        {
+            using var realm = serviceProvider.GetRequiredService<Realm>();
+            var session = SessionDatabaseHandler.FindSession(realm, sessionId);
+            if (session == null)
+            {
+                return NotFound("Session not found.");
+            }
+
+            var action = SessionDatabaseHandler.FindActionById(session, actionId);
+            if (action == null)
+            {
+                return NotFound("Action not found.");
+            }
+
+            try
+            {
+                SessionDatabaseHandler.RemoveActionFromSession(realm, session, action);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting action: {ex.Message}");
+            }
+        }
+
         private static SessionGetDTO ToSessionGetDTO(SessionModel session)
         {
             return new SessionGetDTO
@@ -136,9 +160,9 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
                 ModifiedDate = session.ModifiedDate,
                 Processes = session.Processes.Select(p => p.ToString()).ToList(),
                 MappingEnabled = session.MappingEnabled,
-                MapInputId = session.MapInputId.ToString(),
+                MapInputId = session.MapInputId?.ToString(),
                 MapOutputName = session.MapOutputName,
-                MapOutputId = session.MapOutputId.ToString(),
+                MapOutputId = session.MapOutputId?.ToString(),
             };
         }
 
@@ -149,7 +173,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
                 MappingEnabled = session.MappingEnabled,
                 MapInputId = !string.IsNullOrEmpty(session.MapInputId) ? ObjectId.Parse(session.MapInputId) : null,
                 MapOutputName = session.MapOutputName,
-                MapOutputId = !string.IsNullOrEmpty(session.MapInputId) ? ObjectId.Parse(session.MapOutputId) : null,
+                MapOutputId = !string.IsNullOrEmpty(session.MapOutputId) ? ObjectId.Parse(session.MapOutputId) : null,
             };
         }
 

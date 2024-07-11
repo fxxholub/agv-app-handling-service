@@ -1,59 +1,60 @@
 ﻿using Leuze_AGV_Robot_API.Models.Handling;
+using MongoDB.Bson;
+using Realms;
 
-namespace Leuze_AGV_Robot_API.Controllers.Handling
+namespace Leuze_AGV_Robot_API.RealmDB
 {
-    using Realms;
-    using MongoDB.Bson;
-    using System.Collections.Generic;
-    using System.Linq;
-
     public static class SessionDatabaseHandler
     {
-        // Method to add a new session
-        public static void AddSession(Realm realm, SessionModel session)
+        public static IList<SessionModel> GetAllSessions(Realm realm)
         {
-            realm.Write(() =>
-            {
-                realm.Add(session);
-            });
+            return realm.All<SessionModel>().ToList();
         }
 
-        // Method to find a session by its ID
         public static SessionModel FindSession(Realm realm, string sessionId)
         {
             return realm.Find<SessionModel>(ObjectId.Parse(sessionId));
         }
 
-        // Method to remove a session
+        public static ActionModel FindActionById(SessionModel session, string actionId)
+        {
+            return session.Actions.FirstOrDefault(a => a.Id == ObjectId.Parse(actionId));
+        }
+
+        public static void RemoveActionFromSession(Realm realm, SessionModel session, ActionModel action)
+        {
+            realm.Write(() =>
+            {
+                session.Actions.Remove(action);
+                realm.Remove(action);
+            });
+        }
+
+        public static void AddSession(Realm realm, SessionModel session)
+        {
+            realm.Write(() => realm.Add(session));
+        }
+
         public static void RemoveSession(Realm realm, SessionModel session)
         {
             realm.Write(() =>
             {
+                foreach (var action in session.Actions)
+                {
+                    realm.Remove(action);
+                }
                 realm.Remove(session);
             });
         }
 
-        // Method to get all sessions
-        public static List<SessionModel> GetAllSessions(Realm realm)
-        {
-            return realm.All<SessionModel>().ToList();
-        }
-
-        // Method to add a new action to a session
         public static void AddActionToSession(Realm realm, SessionModel session, ActionModel action)
         {
-            realm.Write(() =>
-            {
-                session.Actions.Add(action);
-            });
+            realm.Write(() => session.Actions.Add(action));
         }
 
-        // Method to get all actions from a session
-        public static List<ActionModel> GetActionsFromSession(SessionModel session)
+        public static IList<ActionModel> GetActionsFromSession(SessionModel session)
         {
-            return session.Actions.ToList();
+            return session.Actions.AsQueryable().ToList();
         }
     }
-
 }
-

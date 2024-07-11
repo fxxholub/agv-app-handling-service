@@ -35,7 +35,7 @@ namespace Leuze_AGV_Robot_API
                 opt.UseInMemoryDatabase("TodoList"));
 
             // Configure Realm
-            builder.Services.AddSingleton(provider =>
+            builder.Services.AddScoped(provider =>
             {
                 var config = new RealmConfiguration("robotDB.realm")
                 {

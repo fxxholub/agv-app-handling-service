@@ -8,30 +8,28 @@ using Realms;
 using System.Collections.Generic;
 using System.Linq;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Leuze_AGV_Robot_API.Controllers.Handling
 {
     [ApiVersion(1)]
     [Route("api/v{v:apiVersion}/handling/autonomous/session")]
     [ApiController]
-    public class AutonomousSessionController : ControllerBase
+    public class AutonomousSessionController(IServiceProvider serviceProvider) : ControllerBase
     {
-        // GET: api/<ManualSessionController>
+        private readonly IServiceProvider serviceProvider = serviceProvider;
+
         [HttpGet]
         public ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
         {
-            using var realm = GetRealmInstance();
+            using var realm = serviceProvider.GetRequiredService<Realm>();
             var sessionDTOs = SessionDatabaseHandler.GetAllSessions(realm)
                 .Select(s => ToSessionGetDTO(s)).ToList();
             return Ok(sessionDTOs);
         }
 
-        // GET api/<ManualSessionController>/5
         [HttpGet("{sessionId}")]
         public IActionResult GetSession(string sessionId)
         {
-            using var realm = GetRealmInstance();
+            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.FindSession(realm, sessionId);
             if (session == null)
             {
@@ -40,7 +38,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             return Ok(ToSessionGetDTO(session));
         }
 
-        // POST api/<ManualSessionController>
         [HttpPost]
         public IActionResult PostSession([FromBody] SessionPostDTO sessionDTO)
         {
@@ -51,7 +48,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
 
             try
             {
-                using var realm = GetRealmInstance();
+                using var realm = serviceProvider.GetRequiredService<Realm>();
                 var session = FromSessionPostDTO(sessionDTO);
                 SessionDatabaseHandler.AddSession(realm, session);
 
@@ -63,11 +60,10 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             }
         }
 
-        // DELETE api/<ManualSessionController>/5
         [HttpDelete("{sessionId}")]
         public IActionResult DeleteSession(string sessionId)
         {
-            using var realm = GetRealmInstance();
+            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.FindSession(realm, sessionId);
             if (session == null)
             {
@@ -85,11 +81,10 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             }
         }
 
-        // GET: api/<ManualSessionController>
         [HttpGet("{sessionId}/action")]
         public ActionResult<IEnumerable<ActionGetDTO>> GetActionAll(string sessionId)
         {
-            using var realm = GetRealmInstance();
+            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.FindSession(realm, sessionId);
             if (session == null)
             {
@@ -101,11 +96,10 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             return Ok(actionDTOs);
         }
 
-        // POST api/<ManualSessionController>
         [HttpPost("{sessionId}/action")]
         public IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
         {
-            using var realm = GetRealmInstance();
+            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.FindSession(realm, sessionId);
             if (session == null)
             {
@@ -177,12 +171,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
                 Command = Enum.Parse<ActionCommand>(action.Command),
                 TargetPosition = action.TargetPosition
             };
-        }
-
-        private Realm GetRealmInstance()
-        {
-            // This method should return an instance of your Realm database
-            return Realm.GetInstance();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Leuze_AGV_Robot_API.Models.Handling;
 using Leuze_AGV_Robot_API.RealmDB;
+using Leuze_AGV_Robot_API.StateMachine;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
@@ -37,23 +38,8 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             }
         }
 
-        [HttpGet("{sessionId}/actions")]
-        public ActionResult<IEnumerable<ActionGetDTO>> GetActionAll(string sessionId)
-        {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
-            if (session == null)
-            {
-                return NotFound();
-            }
-
-            var actionDTOs = SessionDatabaseHandler.GetSessionActions(realm, sessionId, HandlingMode)
-                .Select(a => ToActionGetDTO(a)).ToList();
-            return Ok(actionDTOs);
-        }
-
         [HttpPost("{sessionId}/actions")]
-        public IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
+        public override IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
         {
             using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
@@ -70,40 +56,15 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             try
             {
                 var action = FromActionPostDTO(actionDTO);
+                var newState = AutonomousSessionStateMachine.ChangeState(session.State, action.Command);
                 SessionDatabaseHandler.AddSessionAction(realm, sessionId, action, HandlingMode);
+                SessionDatabaseHandler.ChangeSessionState(realm, sessionId, HandlingMode, newState);
 
                 return Ok("Action created successfully.");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error creating action: {ex.Message}");
-            }
-        }
-
-        [HttpDelete("{sessionId}/actions/{actionId}")]
-        public IActionResult DeleteAction(string sessionId, string actionId)
-        {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
-            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
-            if (session == null)
-            {
-                return NotFound("Session not found.");
-            }
-
-            var action = SessionDatabaseHandler.GetSessionAction(realm, sessionId, actionId, HandlingMode);
-            if (action == null)
-            {
-                return NotFound("Action not found.");
-            }
-
-            try
-            {
-                SessionDatabaseHandler.RemoveSessionAction(realm, sessionId, actionId, HandlingMode);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error deleting action: {ex.Message}");
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Leuze_AGV_Robot_API.Models.Handling;
 using Leuze_AGV_Robot_API.RealmDB;
+using Leuze_AGV_Robot_API.StateMachine;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
@@ -56,6 +57,51 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error deleting session: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{sessionId}/actions")]
+        public ActionResult<IEnumerable<ActionGetDTO>> GetActionAll(string sessionId)
+        {
+            using var realm = serviceProvider.GetRequiredService<Realm>();
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            var actionDTOs = SessionDatabaseHandler.GetSessionActions(realm, sessionId, HandlingMode)
+                .Select(a => ToActionGetDTO(a)).ToList();
+            return Ok(actionDTOs);
+        }
+
+        [HttpPost("{sessionId}/actions")]
+        public abstract IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO);
+
+        [HttpDelete("{sessionId}/actions/{actionId}")]
+        public IActionResult DeleteAction(string sessionId, string actionId)
+        {
+            using var realm = serviceProvider.GetRequiredService<Realm>();
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
+            if (session == null)
+            {
+                return NotFound("Session not found.");
+            }
+
+            var action = SessionDatabaseHandler.GetSessionAction(realm, sessionId, actionId, HandlingMode);
+            if (action == null)
+            {
+                return NotFound("Action not found.");
+            }
+
+            try
+            {
+                SessionDatabaseHandler.RemoveSessionAction(realm, sessionId, actionId, HandlingMode);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting action: {ex.Message}");
             }
         }
 

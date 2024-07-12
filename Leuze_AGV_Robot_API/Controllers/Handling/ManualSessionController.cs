@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Leuze_AGV_Robot_API.Models.Handling;
 using Leuze_AGV_Robot_API.RealmDB;
+using Leuze_AGV_Robot_API.StateMachine;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
@@ -34,6 +35,36 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error creating session: {ex.Message}");
+            }
+        }
+
+        [HttpPost("{sessionId}/actions")]
+        public override IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
+        {
+            using var realm = serviceProvider.GetRequiredService<Realm>();
+            var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            if (actionDTO == null)
+            {
+                return BadRequest("Action data is null.");
+            }
+
+            try
+            {
+                var action = FromActionPostDTO(actionDTO);
+                var newState = ManualSessionStateMachine.ChangeState(session.State, action.Command);
+                SessionDatabaseHandler.AddSessionAction(realm, sessionId, action, HandlingMode);
+                SessionDatabaseHandler.ChangeSessionState(realm, sessionId, HandlingMode, newState);
+
+                return Ok("Action created successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error creating action: {ex.Message}");
             }
         }
     }

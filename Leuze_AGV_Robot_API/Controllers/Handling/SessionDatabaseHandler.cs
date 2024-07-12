@@ -1,4 +1,5 @@
 ﻿using Leuze_AGV_Robot_API.Models.Handling;
+using Leuze_AGV_Robot_API.StateMachine;
 using MongoDB.Bson;
 using Realms;
 using System.Collections.Generic;
@@ -25,6 +26,14 @@ namespace Leuze_AGV_Robot_API.RealmDB
             if (session.Mode != mode) return;
 
             realm.Write(() => realm.Add(session));
+        }
+
+        public static void ChangeSessionState(Realm realm, string sessionId, string mode, SessionState state)
+        {
+            var session = GetSession(realm, sessionId, mode);
+            if (session == null) return;
+
+            realm.Write(() => session.State = state);
         }
 
         public static void RemoveSession(Realm realm, string sessionId, string mode)

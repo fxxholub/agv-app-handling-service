@@ -1,13 +1,14 @@
-﻿using MongoDB.Bson;
+﻿using Leuze_AGV_Robot_API.StateMachine;
+using MongoDB.Bson;
 using Realms;
 
 namespace Leuze_AGV_Robot_API.Models.Handling
 {
-    
+
     public partial class SessionModel : IRealmObject
     {
         private string? _Mode { get; set; }
-        private string _State { get; set; } = SessionState.IDLE.ToString();
+        private string _State { get; set; } = SessionState.IDLING.ToString();
 
         [PrimaryKey]
         [MapTo("_id")]

@@ -2,7 +2,6 @@
 {
     public enum ActionCommand
     {
-        INIT,
         RUN,
         STOP,
         END

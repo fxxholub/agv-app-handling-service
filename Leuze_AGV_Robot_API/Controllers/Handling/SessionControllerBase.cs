@@ -9,16 +9,15 @@ using Realms;
 namespace Leuze_AGV_Robot_API.Controllers.Handling
 {
     [ApiController]
-    public abstract class SessionControllerBase(IServiceProvider serviceProvider) : ControllerBase
+    public abstract class SessionControllerBase(Realm realm) : ControllerBase
     {
-        protected readonly IServiceProvider serviceProvider = serviceProvider;
+        private readonly Realm realm = realm;
 
         protected abstract string HandlingMode { get; }
 
         [HttpGet]
         public ActionResult<IEnumerable<SessionGetDTO>> GetSessionAll()
         {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
             var sessionDTOs = SessionDatabaseHandler.GetSessions(realm, HandlingMode)
                 .Select(s => ToSessionGetDTO(s)).ToList();
             return Ok(sessionDTOs);
@@ -27,7 +26,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         [HttpGet("{sessionId}")]
         public IActionResult GetSession(string sessionId)
         {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
@@ -42,7 +40,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         [HttpDelete("{sessionId}")]
         public IActionResult DeleteSession(string sessionId)
         {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
@@ -63,7 +60,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         [HttpGet("{sessionId}/actions")]
         public ActionResult<IEnumerable<ActionGetDTO>> GetActionAll(string sessionId)
         {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
@@ -81,7 +77,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         [HttpDelete("{sessionId}/actions/{actionId}")]
         public IActionResult DeleteAction(string sessionId, string actionId)
         {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
@@ -116,7 +111,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
                 Actions = session.Actions.Select(a => ToActionGetDTO(a)).ToList(),
                 CreatedDate = session.CreatedDate,
                 ModifiedDate = session.ModifiedDate,
-                Processes = session.Processes.Select(p => p.ToString()).ToList(),
+                Processes = session.Processes.Select(p => ToProcessGetDTO(p)).ToList(),
                 MappingEnabled = session.MappingEnabled,
                 MapInputId = session.MapInputId?.ToString(),
                 MapOutputName = session.MapOutputName,
@@ -152,6 +147,20 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             {
                 Command = Enum.Parse<ActionCommand>(action.Command),
                 TargetPosition = action.TargetPosition
+            };
+        }
+
+        protected static ProcessGetDTO ToProcessGetDTO(ProcessModel process)
+        {
+            return new ProcessGetDTO
+            {
+                Id = process.Id.ToString(),
+                Name = process.Name,
+                Pid = process.Pid,
+                Active = process.Active,
+                CreatedDate = process.CreatedDate,
+                Host = process.Host,
+                User = process.User,
             };
         }
     }

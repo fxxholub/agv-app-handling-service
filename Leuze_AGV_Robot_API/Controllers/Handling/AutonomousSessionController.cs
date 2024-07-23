@@ -12,7 +12,7 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
     [ApiVersion(1)]
     [Route("api/v{v:apiVersion}/handling/autonomous/sessions")]
     [ApiController]
-    public class AutonomousSessionController(IServiceProvider serviceProvider) : SessionControllerBase(serviceProvider)
+    public class AutonomousSessionController(Realm realm) : SessionControllerBase(realm)
     {
         protected override string HandlingMode { get; } = "AUTONOMOUS";
 
@@ -26,12 +26,12 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
 
             try
             {
-                using var realm = serviceProvider.GetRequiredService<Realm>();
+                //using var realm = serviceProvider.GetRequiredService<Realm>();
                 var session = FromSessionPostDTO(sessionDTO);
                 session.Mode = HandlingMode;
                 SessionDatabaseHandler.AddSession(realm, session, HandlingMode);
 
-                return Ok("Session created successfully.");
+                return CreatedAtAction(nameof(GetSession), new { sessionId = session.Id }, ToSessionGetDTO(session));
             }
             catch (Exception ex)
             {
@@ -42,7 +42,6 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
         [HttpPost("{sessionId}/actions")]
         public override IActionResult PostAction(string sessionId, [FromBody] ActionPostDTO actionDTO)
         {
-            using var realm = serviceProvider.GetRequiredService<Realm>();
             var session = SessionDatabaseHandler.GetSession(realm, sessionId, HandlingMode);
             if (session == null)
             {
@@ -57,7 +56,8 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             try
             {
                 var action = FromActionPostDTO(actionDTO);
-                var newState = AutonomousSessionStateMachine.ChangeState(session.State, action.Command);
+                var stateMachine = new AutonomousSessionStateMachine(sessionId, realm, HandlingMode);
+                var newState = stateMachine.ChangeState(session.State, action.Command);
                 SessionDatabaseHandler.AddSessionAction(realm, sessionId, action, HandlingMode);
                 SessionDatabaseHandler.ChangeSessionState(realm, sessionId, HandlingMode, newState);
 

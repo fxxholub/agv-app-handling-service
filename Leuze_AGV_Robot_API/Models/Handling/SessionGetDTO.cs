@@ -20,7 +20,7 @@ namespace Leuze_AGV_Robot_API.Models.Handling
         [Required]
         public DateTimeOffset ModifiedDate { get; set; }
         [Required]
-        public IList<string> Processes { get; set; }
+        public IList<ProcessGetDTO> Processes { get; set; }
         [Required]
         public bool MappingEnabled { get; set; }
         public string? MapInputId { get; set; }

@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Realms;
 
 namespace Leuze_AGV_Robot_API
@@ -35,8 +36,18 @@ namespace Leuze_AGV_Robot_API
                 {
                     SchemaVersion = 1
                 };
+                Console.WriteLine($"Realm DB location: {config.DatabasePath}");
                 return Realm.GetInstance(config);
             });
+            //builder.Services.AddTransient(provider =>
+            //{
+            //    var config = new RealmConfiguration("robotDB.realm")
+            //    {
+            //        SchemaVersion = 1
+            //    };
+            //    Console.WriteLine($"Realm DB location: {config.DatabasePath}");
+            //    return Realm.GetInstance(config);
+            //});
 
             var app = builder.Build();
 

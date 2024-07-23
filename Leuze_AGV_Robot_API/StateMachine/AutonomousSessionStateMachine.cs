@@ -1,27 +1,185 @@
-﻿using Leuze_AGV_Robot_API.ProcessHandler;
+﻿using Leuze_AGV_Robot_API.Models.Handling;
+using Leuze_AGV_Robot_API.ProcessHandler;
+using Leuze_AGV_Robot_API.RealmDB;
+using Realms;
+using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace Leuze_AGV_Robot_API.StateMachine
 {
-    public static class AutonomousSessionStateMachine
+    public class AutonomousSessionStateMachine(string sessionId, Realm realm, string handlingMode): SessionStateMachineBase(sessionId, realm, handlingMode)
     {
-        public static SessionState ChangeState(SessionState lastState, ActionCommand command)
-        {
-            SessionState nextState = (lastState, command) switch
-            {
-                (SessionState.IDLING, ActionCommand.RUN) => Transition(SessionState.RUNNING, () => { }),
-                (SessionState.RUNNING, ActionCommand.STOP) => Transition(SessionState.STOPPED, () => { }),
-                (SessionState.STOPPED, ActionCommand.END) => Transition(SessionState.ENDED, () => { }),
 
-                _ => throw new NotSupportedException($"State '{lastState}' has no transition on '{command}' command")
-            };
+        public override SessionState ChangeState(SessionState lastState, ActionCommand command)
+        {
+            SessionState nextState;
+
+            try
+            {
+                nextState = (lastState, command) switch
+                {
+                    (SessionState.IDLING, ActionCommand.RUN) => Transition(SessionState.RUNNING, OnRunFirst),
+                    (SessionState.RUNNING, ActionCommand.STOP) => Transition(SessionState.STOPPED, () => { }),
+                    (SessionState.STOPPED, ActionCommand.END) => Transition(SessionState.ENDED, OnEnd),
+                    _ => throw new NotSupportedException($"State '{lastState}' has no transition on '{command}' command")
+                };
+            }
+            catch (NotSupportedException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception occurred during state transition: {ex.Message}");
+                nextState = SessionState.ENDED;
+                throw;
+            }
 
             return nextState;
         }
 
-        private static SessionState Transition(SessionState nextState, Action action)
+        private void OnRunFirst()
         {
-            action();
-            return nextState;
+            // Initialise Process Handlers
+            var djirpiHandler = new SSHProcessHandler("192.168.20.10", "jholub", "C:\\Users\\jholub\\.ssh\\djirpi");
+            var leplinuxHandler = new SSHProcessHandler("192.168.20.20", "lepuser", "C:\\Users\\jholub\\.ssh\\leplinux");
+
+            // Gather Scripts representing the processes
+            string djirpiRelative = @"Scripts\djirpi";
+            string djirpiAbsolute = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, djirpiRelative));
+            string[] djirpiScripts = Directory.GetFiles(djirpiAbsolute, "*", SearchOption.TopDirectoryOnly);
+
+            string leplinuxRelative = @"Scripts\leplinux";
+            string leplinuxAbsolute = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, leplinuxRelative));
+            string[] leplinuxScripts = Directory.GetFiles(leplinuxAbsolute, "*", SearchOption.TopDirectoryOnly);
+
+            // Try to start the processes
+            List<ProcessModel> djirpiProcesses = [];
+            foreach (var scriptPath in djirpiScripts)
+            { 
+                string pid = djirpiHandler.StartProcess(scriptPath);
+
+                ProcessModel process = new()
+                {
+                    Name = Path.GetFileName(scriptPath),
+                    Pid = pid,
+                    Active = true,
+                    Host = "192.168.20.10",
+                    User = "jholub"
+                };
+                djirpiProcesses.Add(process);
+            }
+
+            // Transactional manner - check if processes running
+            bool djirpiProcessesRunning = true;
+            foreach (var process in djirpiProcesses)
+            {
+                if(!djirpiHandler.CheckProcess(process.Pid))
+                {
+                    djirpiProcessesRunning = false;
+                    Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} is not running.");
+                }
+            }
+            // Transaction finalisation - register the processes in DB or kill them all
+            if (djirpiProcessesRunning)
+            {
+                foreach (var process in djirpiProcesses)
+                {
+                    SessionDatabaseHandler.AddSessionProcess(realm, sessionId, process, handlingMode);
+                    Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} started.");
+                }
+            }
+            else
+            {
+                foreach (var process in djirpiProcesses)
+                {
+                    djirpiHandler.KillProcess(process.Pid);
+                }
+                throw new Exception($"Processes RUN transaction has failed");
+            }
+
+            // Try to start the processes
+            List<ProcessModel> leplinuxProcesses = [];
+            foreach (var scriptPath in leplinuxScripts)
+            { 
+                string pid = leplinuxHandler.StartProcess(scriptPath);
+
+                ProcessModel process = new()
+                {
+                    Name = Path.GetFileName(scriptPath),
+                    Pid = pid,
+                    Active = true,
+                    Host = "192.168.20.20",
+                    User = "lepuser"
+                };
+                leplinuxProcesses.Add(process);
+            }
+
+            // Transactional manner - check if processes running
+            bool leplinuxProcessesRunning = true;
+            foreach (var process in leplinuxProcesses)
+            {
+                if(!leplinuxHandler.CheckProcess(process.Pid))
+                {
+                    leplinuxProcessesRunning = false;
+                    Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} is not running.");
+                }
+            }
+            // Transaction finalisation - register the processes in DB or kill them all
+            if (leplinuxProcessesRunning)
+            {
+                foreach (var process in leplinuxProcesses)
+                {
+                    SessionDatabaseHandler.AddSessionProcess(realm, sessionId, process, handlingMode);
+                    Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} started.");
+                }
+            }
+            else
+            {
+                foreach (var process in leplinuxProcesses)
+                {
+                    leplinuxHandler.KillProcess(process.Pid);
+                }
+                throw new Exception($"Processes RUN transaction has failed");
+            }
+        }
+
+        private void OnEnd()
+        {
+            var processes = SessionDatabaseHandler.GetSessionProcesses(realm, sessionId, handlingMode);
+
+            var djirpiHandler = new SSHProcessHandler("192.168.20.10", "jholub", "C:\\Users\\jholub\\.ssh\\djirpi");
+            var leplinuxHandler = new SSHProcessHandler("192.168.20.20", "lepuser", "C:\\Users\\jholub\\.ssh\\leplinux");
+
+            foreach (var process in processes)
+            {
+                if (process.Host == djirpiHandler.host)
+                {
+                    if (!djirpiHandler.CheckProcess(process.Pid))
+                    {
+                        Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} were not running.");
+                    } else
+                    {
+                        djirpiHandler.KillProcess(process.Pid);
+                        SessionDatabaseHandler.SetSessionProcessActive(realm, sessionId, handlingMode, process.Id.ToString(), false);
+                        Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} killed.");
+                    }
+                }
+
+                if (process.Host == leplinuxHandler.host)
+                {
+                    if (!leplinuxHandler.CheckProcess(process.Pid))
+                    {
+                        Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} were not running.");
+                    }
+                    else
+                    {
+                        leplinuxHandler.KillProcess(process.Pid);
+                        SessionDatabaseHandler.SetSessionProcessActive(realm, sessionId, handlingMode, process.Id.ToString(), false);
+                        Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} killed.");
+                    }
+                }
+            }
         }
     }
 }

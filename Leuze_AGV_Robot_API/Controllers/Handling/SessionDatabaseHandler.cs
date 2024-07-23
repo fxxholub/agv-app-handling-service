@@ -47,6 +47,10 @@ namespace Leuze_AGV_Robot_API.RealmDB
                 {
                     realm.Remove(action);
                 }
+                foreach (var process in session.Processes)
+                {
+                    realm.Remove(process);
+                }
                 realm.Remove(session);
             });
         }
@@ -85,6 +89,53 @@ namespace Leuze_AGV_Robot_API.RealmDB
                 session.Actions.Remove(action);
                 realm.Remove(action);
             });
+        }
+
+        // Session Process handling methods
+        public static void AddSessionProcess(Realm realm, string sessionId, ProcessModel process, string mode)
+        {
+            var session = GetSession(realm, sessionId, mode);
+            if (session == null) return;
+
+            realm.Write(() => session.Processes.Add(process));
+        }
+
+        public static IList<ProcessModel> GetSessionProcesses(Realm realm, string sessionId, string mode)
+        {
+            var session = GetSession(realm, sessionId, mode);
+            return session?.Processes.AsQueryable().ToList();
+        }
+
+        public static ProcessModel GetSessionProcess(Realm realm, string sessionId, string processId, string mode)
+        {
+            var session = GetSession(realm, sessionId, mode);
+            return session?.Processes.FirstOrDefault(p => p.Id == ObjectId.Parse(processId));
+        }
+
+        public static void RemoveSessionProcess(Realm realm, string sessionId, string processId, string mode)
+        {
+            var session = GetSession(realm, sessionId, mode);
+            if (session == null) return;
+
+            var process = session.Processes.FirstOrDefault(p => p.Id == ObjectId.Parse(processId));
+            if (process == null) return;
+
+            realm.Write(() =>
+            {
+                session.Processes.Remove(process);
+                realm.Remove(process);
+            });
+        }
+
+        public static void SetSessionProcessActive(Realm realm, string sessionId, string mode, string processId, bool isActive)
+        {
+            var session = GetSession(realm, sessionId, mode);
+            if (session == null) return;
+
+            var process = session.Processes.FirstOrDefault(p => p.Id == ObjectId.Parse(processId));
+            if (process == null) return;
+
+            realm.Write(() => process.Active = isActive);
         }
     }
 }

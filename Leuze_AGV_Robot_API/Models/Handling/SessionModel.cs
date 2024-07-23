@@ -37,7 +37,7 @@ namespace Leuze_AGV_Robot_API.Models.Handling
         public DateTimeOffset ModifiedDate { get; set; } = DateTimeOffset.UtcNow;
 
         [MapTo("processes")]
-        public IList<ObjectId> Processes { get; } = null!;
+        public IList<ProcessModel> Processes { get; } = null!;
 
         [MapTo("mappingEnabled")]
         public bool MappingEnabled { get; set; }

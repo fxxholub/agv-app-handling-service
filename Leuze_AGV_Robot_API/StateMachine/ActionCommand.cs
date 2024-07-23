@@ -3,6 +3,7 @@
     public enum ActionCommand
     {
         RUN,
+        RESUME,
         STOP,
         END
     }

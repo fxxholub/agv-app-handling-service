@@ -1,8 +1,15 @@
-﻿namespace Leuze_AGV_Robot_API.StateMachine
+﻿using Leuze_AGV_Robot_API.Models.Handling;
+using Leuze_AGV_Robot_API.ProcessHandler;
+using Leuze_AGV_Robot_API.RealmDB;
+using Realms;
+using System.Security.Cryptography;
+
+namespace Leuze_AGV_Robot_API.StateMachine
 {
-    public static class ManualSessionStateMachine
+    public class ManualSessionStateMachine(string sessionId, Realm realm, string handlingMode) : SessionStateMachineBase(sessionId, realm, handlingMode)
     {
-        public static SessionState ChangeState(SessionState lastState, ActionCommand command)
+
+        public override SessionState ChangeState(SessionState lastState, ActionCommand command)
         {
             SessionState nextState = (lastState, command) switch
             {
@@ -13,12 +20,6 @@
                 _ => throw new NotSupportedException($"State '{lastState}' has no transition on '{command}' command")
             };
 
-            return nextState;
-        }
-
-        private static SessionState Transition(SessionState nextState, Action action)
-        {
-            action();
             return nextState;
         }
     }

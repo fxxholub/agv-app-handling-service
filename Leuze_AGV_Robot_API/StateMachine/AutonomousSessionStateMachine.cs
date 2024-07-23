@@ -41,7 +41,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
         private void OnRunFirst()
         {
             // Initialise Process Handlers
-            var djirpiHandler = new SSHProcessHandler("192.168.20.10", "jholub", "C:\\Users\\jholub\\.ssh\\djirpi");
+            var djirpiHandler = new SSHProcessHandler("192.168.20.10", "jtvrz", "C:\\Users\\jholub\\.ssh\\djirpi");
             var leplinuxHandler = new SSHProcessHandler("192.168.20.20", "lepuser", "C:\\Users\\jholub\\.ssh\\leplinux");
 
             // Gather Scripts representing the processes
@@ -65,7 +65,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                     Pid = pid,
                     Active = true,
                     Host = "192.168.20.10",
-                    User = "jholub"
+                    User = "jtvrz"
                 };
                 djirpiProcesses.Add(process);
             }

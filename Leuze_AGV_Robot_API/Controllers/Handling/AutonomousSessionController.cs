@@ -6,6 +6,7 @@ using Leuze_AGV_Robot_API.StateMachine;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
+using System;
 
 namespace Leuze_AGV_Robot_API.Controllers.Handling
 {
@@ -26,10 +27,14 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
 
             try
             {
-                //using var realm = serviceProvider.GetRequiredService<Realm>();
                 var session = FromSessionPostDTO(sessionDTO);
                 session.Mode = HandlingMode;
                 SessionDatabaseHandler.AddSession(realm, session, HandlingMode);
+
+                //initial ROS processes start
+                var stateMachine = new AutonomousSessionStateMachine(session.Id.ToString(), realm, HandlingMode);
+                var newState = stateMachine.ChangeState(session.State, ActionCommand.START);
+                SessionDatabaseHandler.ChangeSessionState(realm, session.Id.ToString(), HandlingMode, newState);
 
                 return CreatedAtAction(nameof(GetSession), new { sessionId = session.Id }, ToSessionGetDTO(session));
             }

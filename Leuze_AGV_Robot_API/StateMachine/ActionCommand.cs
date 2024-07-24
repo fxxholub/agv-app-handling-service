@@ -2,9 +2,7 @@
 {
     public enum ActionCommand
     {
-        RUN,
-        RESUME,
-        STOP,
+        START,
         END
     }
 }

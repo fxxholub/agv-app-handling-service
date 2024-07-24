@@ -29,6 +29,11 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
                 session.Mode = HandlingMode;
                 SessionDatabaseHandler.AddSession(realm, session, HandlingMode);
 
+                //initial ROS processes start
+                var stateMachine = new ManualSessionStateMachine(session.Id.ToString(), realm, HandlingMode);
+                var newState = stateMachine.ChangeState(session.State, ActionCommand.START);
+                SessionDatabaseHandler.ChangeSessionState(realm, session.Id.ToString(), HandlingMode, newState);
+
                 return CreatedAtAction(nameof(GetSession), new { sessionId = session.Id }, ToSessionGetDTO(session));
             }
             catch (Exception ex)
@@ -54,9 +59,10 @@ namespace Leuze_AGV_Robot_API.Controllers.Handling
             try
             {
                 var action = FromActionPostDTO(actionDTO);
-                //var newState = ManualSessionStateMachine.ChangeState(session.State, action.Command);
-                //SessionDatabaseHandler.AddSessionAction(realm, sessionId, action, HandlingMode);
-                //SessionDatabaseHandler.ChangeSessionState(realm, sessionId, HandlingMode, newState);
+                var stateMachine = new ManualSessionStateMachine(sessionId, realm, HandlingMode);
+                var newState = stateMachine.ChangeState(session.State, action.Command);
+                SessionDatabaseHandler.AddSessionAction(realm, sessionId, action, HandlingMode);
+                SessionDatabaseHandler.ChangeSessionState(realm, sessionId, HandlingMode, newState);
 
                 return Ok("Action created successfully.");
             }

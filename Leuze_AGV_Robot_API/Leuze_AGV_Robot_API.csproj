@@ -10,20 +10,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\djirpi\djirpi_battery.sh" />
-    <None Remove="Scripts\djirpi\djirpi_bms.sh" />
-    <None Remove="Scripts\djirpi\djirpi_bms_gpio.sh" />
-    <None Remove="Scripts\djirpi\djirpi_platform.sh" />
-    <None Remove="Scripts\djirpi\djirpi_scanner_1.sh" />
-    <None Remove="Scripts\djirpi\djirpi_scanner_2.sh" />
-    <None Remove="Scripts\djirpi\djirpi_scan_merge.sh" />
-    <None Remove="Scripts\djirpi_platform.sh" />
-    <None Remove="Scripts\djirpi_scanner_1.sh" />
-    <None Remove="Scripts\djirpi_scanner_2.sh" />
-    <None Remove="Scripts\djirpi_scan_merge.sh" />
-    <None Remove="Scripts\leplinux\leplinux_navigation_bringup.sh" />
-    <None Remove="Scripts\leplinux\leplinux_navigation_collision.sh" />
-    <None Remove="Scripts\leplinux\leplinux_navigation_safety.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_battery.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_bms.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_bms_gpio.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_platform.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_scanner_1.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_scanner_2.sh" />
+    <None Remove="ProcessScripts\Autonomous\djirpi\djirpi_scan_merge.sh" />
+    <None Remove="ProcessScripts\djirpi_platform.sh" />
+    <None Remove="ProcessScripts\djirpi_scanner_1.sh" />
+    <None Remove="ProcessScripts\djirpi_scanner_2.sh" />
+    <None Remove="ProcessScripts\djirpi_scan_merge.sh" />
+    <None Remove="ProcessScripts\Autonomous\leplinux\leplinux_navigation_bringup.sh" />
+    <None Remove="ProcessScripts\Autonomous\leplinux\leplinux_navigation_collision.sh" />
+    <None Remove="ProcessScripts\Autonomous\leplinux\leplinux_navigation_safety.sh" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,34 +42,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\non_active\djirpi_battery.sh">
+    <EmbeddedResource Include="ProcessScripts\non_active\djirpi_battery.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\non_active\djirpi_bms_gpio.sh">
+    <EmbeddedResource Include="ProcessScripts\non_active\djirpi_bms_gpio.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\non_active\djirpi_bms.sh">
+    <EmbeddedResource Include="ProcessScripts\non_active\djirpi_bms.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\djirpi\djirpi_platform.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\djirpi\djirpi_platform.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\djirpi\djirpi_scanner_1.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\djirpi\djirpi_scanner_1.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\djirpi\djirpi_scanner_2.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\djirpi\djirpi_scanner_2.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\djirpi\djirpi_scan_merge.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\djirpi\djirpi_scan_merge.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\leplinux\leplinux_navigation_bringup.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\leplinux\leplinux_navigation_bringup.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\leplinux\leplinux_navigation_collision.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\leplinux\leplinux_navigation_collision.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Scripts\leplinux\leplinux_navigation_safety.sh">
+    <EmbeddedResource Include="ProcessScripts\Autonomous\leplinux\leplinux_navigation_safety.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -87,6 +87,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ProcessScripts\Manual\" />
   </ItemGroup>
 
 </Project>

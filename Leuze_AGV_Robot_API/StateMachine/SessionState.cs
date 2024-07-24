@@ -3,8 +3,7 @@
     public enum SessionState
     {
         IDLING,
-        RUNNING,
-        STOPPED,
+        STARTED,
         ENDED,
         ERR
     }

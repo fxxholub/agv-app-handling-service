@@ -18,9 +18,8 @@ namespace Leuze_AGV_Robot_API.StateMachine
             {
                 nextState = (lastState, command) switch
                 {
-                    (SessionState.IDLING, ActionCommand.RUN) => Transition(SessionState.RUNNING, OnRunFirst),
-                    (SessionState.RUNNING, ActionCommand.STOP) => Transition(SessionState.STOPPED, () => { }),
-                    (SessionState.STOPPED, ActionCommand.END) => Transition(SessionState.ENDED, OnEnd),
+                    (SessionState.IDLING, ActionCommand.START) => Transition(SessionState.STARTED, OnStart),
+                    (SessionState.STARTED, ActionCommand.END) => Transition(SessionState.ENDED, OnEnd),
                     _ => throw new NotSupportedException($"State '{lastState}' has no transition on '{command}' command")
                 };
             }
@@ -38,18 +37,18 @@ namespace Leuze_AGV_Robot_API.StateMachine
             return nextState;
         }
 
-        private void OnRunFirst()
+        private void OnStart()
         {
             // Initialise Process Handlers
             var djirpiHandler = new SSHProcessHandler("192.168.20.10", "jtvrz", "C:\\Users\\jholub\\.ssh\\djirpi");
             var leplinuxHandler = new SSHProcessHandler("192.168.20.20", "lepuser", "C:\\Users\\jholub\\.ssh\\leplinux");
 
             // Gather Scripts representing the processes
-            string djirpiRelative = @"Scripts\djirpi";
+            string djirpiRelative = @"ProcessScripts\Autonomous\djirpi";
             string djirpiAbsolute = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, djirpiRelative));
             string[] djirpiScripts = Directory.GetFiles(djirpiAbsolute, "*", SearchOption.TopDirectoryOnly);
 
-            string leplinuxRelative = @"Scripts\leplinux";
+            string leplinuxRelative = @"ProcessScripts\Autonomous\leplinux";
             string leplinuxAbsolute = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, leplinuxRelative));
             string[] leplinuxScripts = Directory.GetFiles(leplinuxAbsolute, "*", SearchOption.TopDirectoryOnly);
 
@@ -69,7 +68,8 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 };
                 djirpiProcesses.Add(process);
             }
-
+            // wait some time before checking their status
+            Thread.Sleep(1000);
             // Transactional manner - check if processes running
             bool djirpiProcessesRunning = true;
             foreach (var process in djirpiProcesses)
@@ -77,7 +77,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 if(!djirpiHandler.CheckProcess(process.Pid))
                 {
                     djirpiProcessesRunning = false;
-                    Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} is not running.");
+                    Console.WriteLine($"process {process.Name} with pid {process.Pid} is not running.");
                 }
             }
             // Transaction finalisation - register the processes in DB or kill them all
@@ -86,7 +86,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 foreach (var process in djirpiProcesses)
                 {
                     SessionDatabaseHandler.AddSessionProcess(realm, sessionId, process, handlingMode);
-                    Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} started.");
+                    Console.WriteLine($"process {process.Name} with pid {process.Pid} started.");
                 }
             }
             else
@@ -95,7 +95,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 {
                     djirpiHandler.KillProcess(process.Pid);
                 }
-                throw new Exception($"Processes RUN transaction has failed");
+                throw new Exception($"Processes START transaction has failed");
             }
 
             // Try to start the processes
@@ -114,7 +114,8 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 };
                 leplinuxProcesses.Add(process);
             }
-
+            // wait some time before checking their status
+            Thread.Sleep(1000);
             // Transactional manner - check if processes running
             bool leplinuxProcessesRunning = true;
             foreach (var process in leplinuxProcesses)
@@ -122,7 +123,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 if(!leplinuxHandler.CheckProcess(process.Pid))
                 {
                     leplinuxProcessesRunning = false;
-                    Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} is not running.");
+                    Console.WriteLine($"process {process.Name} with pid {process.Pid} is not running.");
                 }
             }
             // Transaction finalisation - register the processes in DB or kill them all
@@ -131,7 +132,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 foreach (var process in leplinuxProcesses)
                 {
                     SessionDatabaseHandler.AddSessionProcess(realm, sessionId, process, handlingMode);
-                    Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} started.");
+                    Console.WriteLine($"process {process.Name} with pid {process.Pid} started.");
                 }
             }
             else
@@ -140,7 +141,7 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 {
                     leplinuxHandler.KillProcess(process.Pid);
                 }
-                throw new Exception($"Processes RUN transaction has failed");
+                throw new Exception($"Processes START transaction has failed");
             }
         }
 
@@ -157,12 +158,12 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 {
                     if (!djirpiHandler.CheckProcess(process.Pid))
                     {
-                        Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} were not running.");
+                        Console.WriteLine($"process {process.Name} with pid {process.Pid} were not running.");
                     } else
                     {
                         djirpiHandler.KillProcess(process.Pid);
                         SessionDatabaseHandler.SetSessionProcessActive(realm, sessionId, handlingMode, process.Id.ToString(), false);
-                        Console.WriteLine($"djirpi process {process.Name} with pid {process.Pid} killed.");
+                        Console.WriteLine($"process {process.Name} with pid {process.Pid} killed.");
                     }
                 }
 
@@ -170,13 +171,13 @@ namespace Leuze_AGV_Robot_API.StateMachine
                 {
                     if (!leplinuxHandler.CheckProcess(process.Pid))
                     {
-                        Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} were not running.");
+                        Console.WriteLine($"process {process.Name} with pid {process.Pid} were not running.");
                     }
                     else
                     {
                         leplinuxHandler.KillProcess(process.Pid);
                         SessionDatabaseHandler.SetSessionProcessActive(realm, sessionId, handlingMode, process.Id.ToString(), false);
-                        Console.WriteLine($"leplinux process {process.Name} with pid {process.Pid} killed.");
+                        Console.WriteLine($"process {process.Name} with pid {process.Pid} killed.");
                     }
                 }
             }

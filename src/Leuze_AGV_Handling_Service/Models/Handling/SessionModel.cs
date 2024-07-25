@@ -1,8 +1,8 @@
-﻿using SignalR_API.StateMachine;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using Realms;
+using WebAPI.StateMachine;
 
-namespace SignalR_API.Models.Handling
+namespace WebAPI.Models.Handling
 {
 
     public partial class SessionModel : IRealmObject

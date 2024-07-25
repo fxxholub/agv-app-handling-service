@@ -1,8 +1,8 @@
 ﻿using Realms;
 using MongoDB.Bson;
-using SignalR_API.StateMachine;
+using WebAPI.StateMachine;
 
-namespace SignalR_API.Models.Handling
+namespace WebAPI.Models.Handling
 {
     public partial class ActionModel : IRealmObject
     {

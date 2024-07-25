@@ -1,10 +1,10 @@
-﻿using SignalR_API.Models.Handling;
-using SignalR_API.ProcessHandler;
-using SignalR_API.RealmDB;
+﻿using WebAPI.Models.Handling;
+using WebAPI.ProcessHandler;
+using WebAPI.RealmDB;
 using Realms;
 using System.Security.Cryptography;
 
-namespace SignalR_API.StateMachine
+namespace WebAPI.StateMachine
 {
     public abstract class SessionStateMachineBase(string sessionId, Realm realm, string handlingMode)
     {

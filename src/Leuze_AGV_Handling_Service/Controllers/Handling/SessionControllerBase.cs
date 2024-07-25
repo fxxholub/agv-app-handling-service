@@ -1,12 +1,12 @@
 ﻿using Asp.Versioning;
-using SignalR_API.Models.Handling;
-using SignalR_API.RealmDB;
-using SignalR_API.StateMachine;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
+using WebAPI.Models.Handling;
+using WebAPI.RealmDB;
+using WebAPI.StateMachine;
 
-namespace SignalR_API.Controllers.Handling
+namespace WebAPI.Controllers.Handling
 {
     [ApiController]
     public abstract class SessionControllerBase(Realm realm) : ControllerBase

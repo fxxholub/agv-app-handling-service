@@ -1,11 +1,11 @@
-﻿using SignalR_API.Models.Handling;
-using SignalR_API.StateMachine;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using Realms;
 using System.Collections.Generic;
 using System.Linq;
+using WebAPI.Models.Handling;
+using WebAPI.StateMachine;
 
-namespace SignalR_API.RealmDB
+namespace WebAPI.RealmDB
 {
     public static class SessionDatabaseHandler
     {

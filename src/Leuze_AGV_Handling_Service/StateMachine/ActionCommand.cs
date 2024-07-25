@@ -1,4 +1,4 @@
-﻿namespace SignalR_API.StateMachine
+﻿namespace WebAPI.StateMachine
 {
     public enum ActionCommand
     {

@@ -1,11 +1,11 @@
-﻿using SignalR_API.Models.Handling;
-using SignalR_API.ProcessHandler;
-using SignalR_API.RealmDB;
-using Realms;
+﻿using Realms;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using WebAPI.Models.Handling;
+using WebAPI.ProcessHandler;
+using WebAPI.RealmDB;
 
-namespace SignalR_API.StateMachine
+namespace WebAPI.StateMachine
 {
     public class AutonomousSessionStateMachine(string sessionId, Realm realm, string handlingMode): SessionStateMachineBase(sessionId, realm, handlingMode)
     {

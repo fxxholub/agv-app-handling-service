@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Renci.SshNet;
 
-namespace SignalR_API.ProcessHandler
+namespace WebAPI.ProcessHandler
 {
     public class SSHProcessHandler(string host, string username, string privateKeyPath)
     {

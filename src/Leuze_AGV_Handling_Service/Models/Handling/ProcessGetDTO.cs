@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SignalR_API.Models.Handling
+namespace WebAPI.Models.Handling
 {
     public class ProcessGetDTO
     {

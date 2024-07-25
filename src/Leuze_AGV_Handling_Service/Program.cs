@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Realms;
 
-namespace SignalR_API
+namespace WebAPI
 {
     public class Program
     {

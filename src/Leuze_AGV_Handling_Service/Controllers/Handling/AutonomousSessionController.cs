@@ -1,14 +1,14 @@
 ﻿using Asp.Versioning;
-using SignalR_API.Models.Handling;
-using SignalR_API.ProcessHandler;
-using SignalR_API.RealmDB;
-using SignalR_API.StateMachine;
+using WebAPI.ProcessHandler;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
 using System;
+using WebAPI.Models.Handling;
+using WebAPI.RealmDB;
+using WebAPI.StateMachine;
 
-namespace SignalR_API.Controllers.Handling
+namespace WebAPI.Controllers.Handling
 {
     [ApiVersion(1)]
     [Route("api/v{v:apiVersion}/handling/autonomous/sessions")]

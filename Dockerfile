@@ -9,17 +9,17 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Leuze_AGV_Robot_API.csproj", "."]
-RUN dotnet restore "./Leuze_AGV_Robot_API.csproj"
+COPY ["src/Leuze_AGV_Handling_Service/Leuze_AGV_Handling_Service.csproj", "src/Leuze_AGV_Handling_Service/"]
+RUN dotnet restore "src/Leuze_AGV_Handling_Service/Leuze_AGV_Handling_Service.csproj"
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./Leuze_AGV_Robot_API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Leuze_AGV_Handling_Service"
+RUN dotnet build "Leuze_AGV_Handling_Service.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Leuze_AGV_Robot_API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Leuze_AGV_Handling_Service.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Leuze_AGV_Robot_API.dll"]
+ENTRYPOINT ["dotnet", "Leuze_AGV_Handling_Service.dll"]

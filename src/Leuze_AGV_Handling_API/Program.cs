@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Realms;
 
-namespace Leuze_AGV_Robot_API
+namespace SignalR_API
 {
     public class Program
     {

@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Renci.SshNet;
 
-namespace Leuze_AGV_Robot_API.ProcessHandler
+namespace SignalR_API.ProcessHandler
 {
     public class SSHProcessHandler(string host, string username, string privateKeyPath)
     {

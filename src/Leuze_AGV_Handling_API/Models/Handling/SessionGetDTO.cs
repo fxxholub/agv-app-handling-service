@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Leuze_AGV_Robot_API.Models.Handling
+namespace SignalR_API.Models.Handling
 {
     public class SessionGetDTO
     {

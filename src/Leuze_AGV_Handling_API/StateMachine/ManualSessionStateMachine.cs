@@ -1,10 +1,10 @@
-﻿using Leuze_AGV_Robot_API.Models.Handling;
-using Leuze_AGV_Robot_API.ProcessHandler;
-using Leuze_AGV_Robot_API.RealmDB;
+﻿using SignalR_API.Models.Handling;
+using SignalR_API.ProcessHandler;
+using SignalR_API.RealmDB;
 using Realms;
 using System.Security.Cryptography;
 
-namespace Leuze_AGV_Robot_API.StateMachine
+namespace SignalR_API.StateMachine
 {
     public class ManualSessionStateMachine(string sessionId, Realm realm, string handlingMode) : SessionStateMachineBase(sessionId, realm, handlingMode)
     {

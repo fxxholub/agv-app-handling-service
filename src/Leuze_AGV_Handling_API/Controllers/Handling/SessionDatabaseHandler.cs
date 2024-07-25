@@ -1,11 +1,11 @@
-﻿using Leuze_AGV_Robot_API.Models.Handling;
-using Leuze_AGV_Robot_API.StateMachine;
+﻿using SignalR_API.Models.Handling;
+using SignalR_API.StateMachine;
 using MongoDB.Bson;
 using Realms;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Leuze_AGV_Robot_API.RealmDB
+namespace SignalR_API.RealmDB
 {
     public static class SessionDatabaseHandler
     {

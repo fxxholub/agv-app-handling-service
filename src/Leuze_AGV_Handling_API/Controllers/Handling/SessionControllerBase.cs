@@ -1,12 +1,12 @@
 ﻿using Asp.Versioning;
-using Leuze_AGV_Robot_API.Models.Handling;
-using Leuze_AGV_Robot_API.RealmDB;
-using Leuze_AGV_Robot_API.StateMachine;
+using SignalR_API.Models.Handling;
+using SignalR_API.RealmDB;
+using SignalR_API.StateMachine;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Realms;
 
-namespace Leuze_AGV_Robot_API.Controllers.Handling
+namespace SignalR_API.Controllers.Handling
 {
     [ApiController]
     public abstract class SessionControllerBase(Realm realm) : ControllerBase

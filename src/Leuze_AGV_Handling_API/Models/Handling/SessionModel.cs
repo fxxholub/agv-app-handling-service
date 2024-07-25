@@ -1,8 +1,8 @@
-﻿using Leuze_AGV_Robot_API.StateMachine;
+﻿using SignalR_API.StateMachine;
 using MongoDB.Bson;
 using Realms;
 
-namespace Leuze_AGV_Robot_API.Models.Handling
+namespace SignalR_API.Models.Handling
 {
 
     public partial class SessionModel : IRealmObject

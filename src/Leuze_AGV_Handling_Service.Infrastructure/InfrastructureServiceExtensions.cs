@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Services;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,8 @@ public static class InfrastructureServiceExtensions
     //
     // services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
+    services.AddScoped<ICreateSessionService, CreateSessionService>();
+    services.AddScoped<IDeleteSessionService, DeleteSessionService>();
     services.AddScoped<IProcessService, SshProcessService>();
     
     logger.LogInformation("{Project} services registered", "Infrastructure");

@@ -12,11 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SessionAggregate\Events\" />
-    <Folder Include="SessionAggregate\Handlers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="SessionAggregate\MappingOptions.cs" />
     <Compile Remove="Exceptions\ProcessInvalidTransitionException.cs" />
     <Compile Remove="SessionAggregate\Events\ProcessWentDownUnexpectedlyEvent.cs" />

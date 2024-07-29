@@ -1,0 +1,6 @@
+@Leuze_AGV_Handling_Service.WebAPI_HostAddress = http://localhost:5148
+
+GET {{Leuze_AGV_Handling_Service.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

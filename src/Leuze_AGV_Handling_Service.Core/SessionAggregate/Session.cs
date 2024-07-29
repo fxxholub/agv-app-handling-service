@@ -4,22 +4,22 @@ using Leuze_AGV_Handling_Service.Core.Exceptions;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
-public class Session(HandlingMode handlingMode, bool mappingEnabled) : EntityBase, IAggregateRoot
+public class Session(
+  HandlingMode handlingMode,
+  bool mappingEnabled,
+  string? inputMapRef,
+  string? outputMapRef,
+  string? outputMapName
+  ) : EntityBase, IAggregateRoot
 {
-  public SessionState State { get; private set; } = SessionState.None;
-  
   public HandlingMode HandlingMode { get; private set; } = handlingMode;
-
+  public bool MappingEnabled { get; private set; } = mappingEnabled;
+  public string? InputMapRef { get; set; } = inputMapRef;
+  public string? OutputMapRef { get; set; } = outputMapRef;
+  public string? OutputMapName { get; set; } = outputMapName;
+  public SessionState State { get; private set; } = SessionState.None;
   private readonly List<Process> _processes = new();
   public IEnumerable<Process> Processes => _processes.AsReadOnly();
-  
-  public bool MappingEnabled { get; private set; } = mappingEnabled;
-
-  public string? InputMapRef { get; set; } = string.Empty;
-    
-  public string? OutputMapRef { get; set; } = string.Empty;
-    
-  public string? OutputMapName { get; set; } = string.Empty;
   
   public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
 

@@ -5,13 +5,13 @@ using Leuze_AGV_Handling_Service.Core.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
-public class Process(IProcessService processService,string name, string sessionId, IEnumerable<string> commands): EntityBase
+public class Process(IProcessService processService,string name, int sessionId, IEnumerable<string> commands): EntityBase
 {
     private readonly IProcessService _processService = processService; 
   
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
 
-    public string SessionId { get; private set; }  = Guard.Against.NullOrEmpty(sessionId);
+    public int SessionId { get; private set; }  = sessionId;
 
     public readonly IEnumerable<string> Commands = Guard.Against.NullOrEmpty(commands, nameof(commands));
 

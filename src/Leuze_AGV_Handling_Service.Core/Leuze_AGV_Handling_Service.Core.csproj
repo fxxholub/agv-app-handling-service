@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.1.3" />
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" />
+    <PackageReference Include="Ardalis.Result" />
+    <PackageReference Include="Ardalis.SharedKernel" />
+    <PackageReference Include="Ardalis.SmartEnum" />
+    <PackageReference Include="Ardalis.Specification" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SessionAggregate\Events\" />
+    <Folder Include="SessionAggregate\Handlers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="SessionAggregate\MappingOptions.cs" />
+    <Compile Remove="Exceptions\ProcessInvalidTransitionException.cs" />
+    <Compile Remove="SessionAggregate\Events\ProcessWentDownUnexpectedlyEvent.cs" />
+    <Compile Remove="Services\SessionStateMachine.cs" />
+  </ItemGroup>
+
+</Project>

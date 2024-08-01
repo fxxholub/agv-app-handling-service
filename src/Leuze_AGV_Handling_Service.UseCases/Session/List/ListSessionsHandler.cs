@@ -11,6 +11,6 @@ public class ListSessionsHandler(IListSessionsQueryService query)
   {
     var result = await query.ListAsync();
 
-    return Result.Success(result);
+    return Result.Success();
   }
 }

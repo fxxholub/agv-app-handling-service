@@ -2,7 +2,11 @@
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Services;
+using Leuze_AGV_Handling_Service.Infrastructure.InMemoryDb;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessService;
+using Leuze_AGV_Handling_Service.UseCases.Session.List;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,20 +20,29 @@ public static class InfrastructureServiceExtensions
     ILogger logger
     )
   {
+    /////// persistence stuff ///////
     // string? connectionString = config.GetConnectionString("SqliteConnection");
     // Guard.Against.Null(connectionString);
-    // services.AddDbContext<AppDbContext>(options =>
-    //  options.UseSqlite(connectionString));
+    services.AddDbContext<InMemoryDb.AppDbContext>(options =>
+      options
+        .UseInMemoryDatabase("HandlingServiceInMemoryDb")
+        .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+      );
 
-    // services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-    // services.AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>));
-    // services.AddScoped<IListContributorsQueryService, ListContributorsQueryService>();
-    // services.AddScoped<IDeleteContributorService, DeleteContributorService>();
-    //
-    // services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
-
+    services.AddScoped(typeof(IRepository<>), typeof(InMemoryDb.EfRepository<>));
+    services.AddScoped(typeof(IReadRepository<>), typeof(InMemoryDb.EfRepository<>));
+    
+    ////// use cases stuff ////////
+    // services.AddScoped<IListSessionsQueryService, ListSessionsQueryService>();
+    
+    ////// core stuff ////////
+    services.AddScoped<IStartSessionService, StartSessionService>();
+    services.AddScoped<IEndSessionService, EndSessionService>();
+    services.AddScoped<ICheckSessionService, CheckSessionService>();
     services.AddScoped<ICreateSessionService, CreateSessionService>();
     services.AddScoped<IDeleteSessionService, DeleteSessionService>();
+    
+    ////// infrastructure stuff ///////
     services.AddScoped<IProcessService, SshProcessService>();
     
     logger.LogInformation("{Project} services registered", "Infrastructure");

@@ -12,10 +12,10 @@ public class CheckSessionService(
     IRepository<Session> repository,
     IMediator mediator,
     ILogger<StartSessionService> logger
-) : IStartSessionService
+) : ICheckSessionService
 {
 
-    public async Task<Result> StartSession(int sessionId)
+    public async Task<Result> CheckSession(int sessionId)
     {
         logger.LogInformation("Checking Session {sessionId}", sessionId);
         

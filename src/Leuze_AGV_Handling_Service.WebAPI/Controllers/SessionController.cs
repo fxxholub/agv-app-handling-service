@@ -4,7 +4,9 @@ using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Leuze_AGV_Handling_Service.UseCases.Contributors.Get;
 using Leuze_AGV_Handling_Service.UseCases.Session;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
+using Leuze_AGV_Handling_Service.UseCases.Session.Delete;
 using Leuze_AGV_Handling_Service.UseCases.Session.Get;
+using Leuze_AGV_Handling_Service.UseCases.Session.List;
 using Leuze_AGV_Handling_Service.WebAPI.Models.Session;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +20,17 @@ public class SessionController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
     
-    // [HttpGet]
-    // public async Task<IActionResult> GetAll()
-    // {
-    //     var response = await _mediator.Send(new GetAllSessionQuery());
-    //     if (response.success)
-    //     {
-    //         Ok(response);
-    //     }
-    //
-    //     return BadRequest(response);
-    // }
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var response = await _mediator.Send(new ListSessionsQuery());
+        if (response.IsSuccess)
+        {
+            Ok(response.Value);
+        }
+    
+        return BadRequest(response);
+    }
     
     [HttpGet("{sessionId:int}")]
     public async Task<IActionResult> GetById(int sessionId)
@@ -54,6 +56,21 @@ public class SessionController(IMediator mediator) : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"Error creating session: {ex.Message}");
+        }
+    }
+    
+    [HttpDelete("{sessionId:int}")]
+    public async Task<IActionResult> Delete(int sessionId)
+    {
+        var result = await _mediator.Send(new DeleteSessionCommand(sessionId));
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+        else
+        {
+            return NotFound();
         }
     }
 

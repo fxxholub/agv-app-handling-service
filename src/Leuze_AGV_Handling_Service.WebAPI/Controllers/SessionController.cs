@@ -1,7 +1,6 @@
 using Ardalis.Result;
 using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;
-using Leuze_AGV_Handling_Service.UseCases.Contributors.Get;
 using Leuze_AGV_Handling_Service.UseCases.Session;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.Delete;

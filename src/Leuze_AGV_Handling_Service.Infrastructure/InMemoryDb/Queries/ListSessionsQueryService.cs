@@ -1,7 +1,4 @@
-﻿using Ardalis.Specification.EntityFrameworkCore;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
-using Leuze_AGV_Handling_Service.UseCases.Contributors;
-using Leuze_AGV_Handling_Service.UseCases.Contributors.List;
+﻿
 using Leuze_AGV_Handling_Service.UseCases.Session;
 using Leuze_AGV_Handling_Service.UseCases.Session.List;
 using Microsoft.EntityFrameworkCore;

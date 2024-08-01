@@ -1,5 +1,4 @@
 using System.Reflection;
-using Ardalis.ListStartupServices;
 using Ardalis.SharedKernel;
 using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;

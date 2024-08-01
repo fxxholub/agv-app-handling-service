@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Leuze_AGV_Handling_Service.WebAPI.Models.Session;
 
 public class ProcessResponseModel(string name, int sessionId, string pid, string state, string createdDate)

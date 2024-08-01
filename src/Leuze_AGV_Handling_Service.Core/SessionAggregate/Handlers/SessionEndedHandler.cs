@@ -1,5 +1,4 @@
-﻿using Leuze_AGV_Handling_Service.Core.ContributorAggregate.Events;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
+﻿
 using Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;

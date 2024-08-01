@@ -3,6 +3,7 @@ using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Services;
 using Leuze_AGV_Handling_Service.Infrastructure.InMemoryDb;
+using Leuze_AGV_Handling_Service.Infrastructure.InMemoryDb.Queries;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessService;
 using Leuze_AGV_Handling_Service.UseCases.Session.List;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped(typeof(IReadRepository<>), typeof(InMemoryDb.EfRepository<>));
     
     ////// use cases stuff ////////
-    // services.AddScoped<IListSessionsQueryService, ListSessionsQueryService>();
+    services.AddScoped<IListSessionsQueryService, ListSessionsQueryService>();
     
     ////// core stuff ////////
     services.AddScoped<IStartSessionService, StartSessionService>();

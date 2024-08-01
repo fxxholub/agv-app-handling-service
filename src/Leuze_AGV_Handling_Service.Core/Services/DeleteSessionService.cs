@@ -10,7 +10,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 
 public class DeleteSessionService(
     IRepository<Session> repository,
-    IMediator mediator,
+    IEndSessionService endSessionService,
     ILogger<DeleteSessionService> logger
 ) : IDeleteSessionService
 {
@@ -21,9 +21,10 @@ public class DeleteSessionService(
         Session? aggregateToDelete = await repository.GetByIdAsync(sessionId);
         if (aggregateToDelete == null) return Result.NotFound();
 
+        // end session first, before it is deleted
+        await endSessionService.EndSession(sessionId);
+        
         await repository.DeleteAsync(aggregateToDelete);
-        var domainEvent = new SessionDeletedEvent(sessionId);
-        await mediator.Publish(domainEvent);
         return Result.Success();
     }
 

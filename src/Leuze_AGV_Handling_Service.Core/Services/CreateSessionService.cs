@@ -10,7 +10,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 
 public class CreateSessionService(
     IRepository<Session> repository,
-    IMediator mediator,
+    IStartSessionService startSessionService,
     ILogger<DeleteSessionService> logger
 ) : ICreateSessionService
 {
@@ -33,8 +33,8 @@ public class CreateSessionService(
             );
         var createdItem = await repository.AddAsync(newSession);
         
-        var domainEvent = new SessionCreatedEvent(createdItem.Id);
-        await mediator.Publish(domainEvent);
+        // start the session after creation
+        await startSessionService.StartSession(createdItem.Id);
         
         logger.LogInformation("Created Session {sessionId}", createdItem.Id);
         return createdItem.Id;

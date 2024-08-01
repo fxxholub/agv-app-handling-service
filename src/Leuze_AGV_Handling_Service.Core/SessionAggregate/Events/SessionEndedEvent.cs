@@ -2,7 +2,7 @@
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
 
-internal sealed class SessionDeletedEvent(int sessionId) : DomainEventBase
+internal sealed class SessionEndedEvent(int sessionId) : DomainEventBase
 {
   public int SessionId { get; init; } = sessionId;
 }

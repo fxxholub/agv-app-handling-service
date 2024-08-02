@@ -6,7 +6,7 @@ public class ProcessResponseModel(
   string hostName,
   string hostAddr,
   string userName,
-  int sessionId,
+  int? sessionId,
   string pid,
   string state,
   string createdDate
@@ -18,7 +18,7 @@ public class ProcessResponseModel(
   public string HostAddr { get; set; } = hostAddr;
   public string UserName { get; set; } = userName;
 
-  public int SessionId { get; set; } = sessionId;
+  public int? SessionId { get; set; } = sessionId;
 
   public string Pid { get; set; } = pid;
 

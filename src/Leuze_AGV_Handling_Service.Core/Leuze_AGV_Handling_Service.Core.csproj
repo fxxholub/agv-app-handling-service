@@ -11,11 +11,4 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="SessionAggregate\MappingOptions.cs" />
-    <Compile Remove="Exceptions\ProcessInvalidTransitionException.cs" />
-    <Compile Remove="SessionAggregate\Events\ProcessWentDownUnexpectedlyEvent.cs" />
-    <Compile Remove="Services\SessionStateMachine.cs" />
-  </ItemGroup>
-
 </Project>

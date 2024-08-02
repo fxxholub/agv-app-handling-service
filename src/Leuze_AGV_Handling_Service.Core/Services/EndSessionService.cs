@@ -11,6 +11,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 public class EndSessionService(
     IRepository<Session> repository,
     IMediator mediator,
+    IProcessHandlerService processHandlerService,
     ILogger<EndSessionService> logger
 ) : IEndSessionService
 {
@@ -23,7 +24,7 @@ public class EndSessionService(
         Session? aggregate = await repository.GetByIdAsync(sessionId);
         if (aggregate == null) return Result.NotFound();
 
-        await aggregate.EndAsync();
+        await aggregate.EndAsync(processHandlerService);
         
         // notify system about end
         var domainEvent = new SessionEndedEvent(sessionId);

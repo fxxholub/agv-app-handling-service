@@ -31,6 +31,9 @@ public class CreateSessionService(
             );
         var createdItem = await repository.AddAsync(newSession);
         
+        // TODO add process scripts into session as processes here
+        
+        
         // start the session after creation
         await startSessionService.StartSession(createdItem.Id);
         

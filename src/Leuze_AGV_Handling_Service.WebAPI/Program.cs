@@ -35,7 +35,7 @@ builder.Services.AddControllers();                          // REST API controll
 //builder.Services.AddSignalR();                              // SignalR controllers
 
 builder.Services.AddEndpointsApiExplorer();                 // https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddApiVersioning(options =>
+builder.Services.AddApiVersioning(options =>                // API versioning
 {
   options.DefaultApiVersion = new ApiVersion(1, 0);
   options.ReportApiVersions = true;
@@ -48,12 +48,15 @@ builder.Services.AddApiVersioning(options =>
   options.GroupNameFormat = "'v'V";
   options.SubstituteApiVersionInUrl = true;
 });
-// builder.Services.AddSwaggerGen(options =>                  // Swagger for REST and SignalR
+// builder.Services.AddSwaggerGen(options =>                  // Swagger SignalR
 // {
 //   options.AddSignalRSwaggerGen();
 // });
 
-builder.Services.AddInfrastructureServices(builder.Configuration, microsoftLogger);
+builder.Services.AddInfrastructureServices(                   // Infrastructure services
+  builder.Configuration, 
+  microsoftLogger
+  );
 
 /**
  * App

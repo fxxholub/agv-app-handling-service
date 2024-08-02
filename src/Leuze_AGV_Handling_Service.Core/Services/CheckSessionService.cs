@@ -11,6 +11,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 public class CheckSessionService(
     IRepository<Session> repository,
     IMediator mediator,
+    IProcessHandlerService processHandlerService,
     ILogger<StartSessionService> logger
 ) : ICheckSessionService
 {
@@ -23,7 +24,7 @@ public class CheckSessionService(
         if (aggregate == null) return Result.NotFound();
 
         // notify system about bad check
-        if (await aggregate.CheckAsync())
+        if (await aggregate.CheckAsync(processHandlerService))
         {
             logger.LogWarning("Session Faulty {sessionId}", sessionId);
             var domainEvent = new SessionFaultyEvent(sessionId);

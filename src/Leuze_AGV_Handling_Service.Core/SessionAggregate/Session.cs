@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Exceptions;
+using Leuze_AGV_Handling_Service.Core.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
@@ -34,7 +35,7 @@ public class Session(
     _processes.Add(process);
   }
 
-  public async Task StartAsync()
+  public async Task StartAsync(IProcessHandlerService processHandlerService)
   {
     if (State is not SessionState.None)
     {
@@ -46,7 +47,7 @@ public class Session(
     {
       if (process.State is not ProcessState.Started)
       {
-        await process.StartAsync();
+        await process.StartAsync(processHandlerService);
       }
     }
 
@@ -55,7 +56,7 @@ public class Session(
     bool allGood = true;
     foreach (var process in _processes)
     {
-      if (!await process.CheckAsync())
+      if (!await process.CheckAsync(processHandlerService))
       {
         allGood = false;
       }
@@ -69,7 +70,7 @@ public class Session(
     State = SessionState.Err;
   }
 
-  public async Task<bool> CheckAsync()
+  public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)
   {
     if (State is SessionState.None or SessionState.Ended)
     {
@@ -80,7 +81,7 @@ public class Session(
     bool allGood = true;
     foreach (var process in _processes)
     {
-      if (!await process.CheckAsync()) allGood = false;
+      if (!await process.CheckAsync(processHandlerService)) allGood = false;
     }
 
     if (!allGood) State = SessionState.Err;
@@ -88,7 +89,7 @@ public class Session(
     return allGood;
   }
 
-  public async Task EndAsync()
+  public async Task EndAsync(IProcessHandlerService processHandlerService)
   {
     if (State is SessionState.Ended)
     {
@@ -98,7 +99,7 @@ public class Session(
 
     foreach (var process in _processes)
     {
-      await process.KillAsync();
+      await process.KillAsync(processHandlerService);
     }
   }
 }

@@ -11,6 +11,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 public class StartSessionService(
     IRepository<Session> repository,
     IMediator mediator,
+    IProcessHandlerService processHandlerService,
     ILogger<StartSessionService> logger
 ) : IStartSessionService
 {
@@ -23,7 +24,7 @@ public class StartSessionService(
         Session? aggregate = await repository.GetByIdAsync(sessionId);
         if (aggregate == null) return Result.NotFound();
 
-        await aggregate.StartAsync();
+        await aggregate.StartAsync(processHandlerService);
         
         // notify system about start
         var domainEvent = new SessionStartedEvent(sessionId);

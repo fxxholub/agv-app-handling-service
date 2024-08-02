@@ -5,15 +5,22 @@ using Leuze_AGV_Handling_Service.Core.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
-public class Process(IProcessService processService,string name, int sessionId, IEnumerable<string> commands): EntityBase
+public class Process(
+  string name,
+  string hostName,
+  string hostAddr,
+  string userName,
+  int? sessionId,
+  IEnumerable<string> commands
+  ): EntityBase
 {
-    private readonly IProcessService _processService = processService; 
-  
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
-
-    public int SessionId { get; private set; }  = sessionId;
-
+    
+    public string HostName { get; private set; } = Guard.Against.NullOrEmpty(hostName);
+    public string HostAddr { get; private set; } = Guard.Against.NullOrEmpty(hostAddr);
+    public string UserName { get; private set; } = Guard.Against.NullOrEmpty(userName);
     public readonly IEnumerable<string> Commands = Guard.Against.NullOrEmpty(commands, nameof(commands));
+    public int? SessionId { get; private set; }  = sessionId;
 
     public string Pid { get; private set; } = string.Empty;
 
@@ -21,7 +28,7 @@ public class Process(IProcessService processService,string name, int sessionId, 
     
     public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
 
-    public async Task StartAsync()
+    public async Task StartAsync(IProcessHandlerService processHandlerService)
     {
       if (State is ProcessState.Killed or ProcessState.Started)
       {
@@ -29,12 +36,12 @@ public class Process(IProcessService processService,string name, int sessionId, 
           $"Invalid Process operation, cannot Start while in {State.ToString()}.");
       }
       
-      Pid = await _processService.StartProcess(Commands);
+      Pid = await processHandlerService.StartProcess(this);
       
       State = ProcessState.Started;
     }
 
-    public async Task<bool> CheckAsync()
+    public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)
     {
       if (State is ProcessState.None or ProcessState.Killed)
       {
@@ -44,7 +51,7 @@ public class Process(IProcessService processService,string name, int sessionId, 
 
       if (State is ProcessState.Err) return false;
       
-      bool isOk = await _processService.CheckProcess(Pid);
+      bool isOk = await processHandlerService.CheckProcess(this);
 
       if (!isOk)
       {
@@ -54,7 +61,7 @@ public class Process(IProcessService processService,string name, int sessionId, 
       return isOk;
     } 
     
-    public async Task KillAsync()
+    public async Task KillAsync(IProcessHandlerService processHandlerService)
     {
       if (State is ProcessState.None or ProcessState.Killed)
       {
@@ -62,6 +69,6 @@ public class Process(IProcessService processService,string name, int sessionId, 
           $"Invalid Process operation, cannot Kill while in {State.ToString()}.");
       }
 
-      await _processService.KillProcess(Pid);
+      await processHandlerService.KillProcess(this);
     }
 }

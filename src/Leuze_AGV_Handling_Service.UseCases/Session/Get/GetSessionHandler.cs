@@ -23,6 +23,9 @@ public class GetSessionHandler(IReadRepository<Core.SessionAggregate.Session> re
       entity.State,
       entity.Processes.Select(process => new ProcessDTO(
         process.Name,
+        process.HostName,
+        process.HostAddr,
+        process.UserName,
         process.SessionId,
         process.Pid,
         process.State,

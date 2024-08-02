@@ -29,6 +29,9 @@ public class ListSessionsQueryService(AppDbContext _db) : IListSessionsQueryServ
           entity.State,
           entity.Processes.Select(process => new ProcessDTO(
             process.Name,
+            process.HostName,
+            process.HostAddr,
+            process.UserName,
             process.SessionId,
             process.Pid,
             process.State,

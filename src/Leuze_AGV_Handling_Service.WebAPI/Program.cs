@@ -48,10 +48,10 @@ builder.Services.AddApiVersioning(options =>                // API versioning
   options.GroupNameFormat = "'v'V";
   options.SubstituteApiVersionInUrl = true;
 });
-// builder.Services.AddSwaggerGen(options =>                  // Swagger SignalR
-// {
-//   options.AddSignalRSwaggerGen();
-// });
+builder.Services.AddSwaggerGen(options =>                  // Swagger SignalR
+{
+  // options.AddSignalRSwaggerGen();
+});
 
 builder.Services.AddInfrastructureServices(                   // Infrastructure services
   builder.Configuration, 

@@ -45,14 +45,17 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IDeleteSessionService, DeleteSessionService>();
     
     ////// infrastructure stuff ///////
-    services.AddScoped<IProcessHandlerService>(provider => 
-      new SshProcessHandlerService(
-        Environment.GetEnvironmentVariable("SSH_PRIVATE_KEY_PATH") ?? throw new EnvironmentVariableNullException()
-        ));
-    services.AddSingleton<IProcessProviderService>(provider => 
-      new FileProcessProviderService(
-        Environment.GetEnvironmentVariable("PROCESS_SCRIPTS_PATH") ?? throw new EnvironmentVariableNullException()
-        ));
+    // services.AddScoped<IProcessHandlerService>(provider => 
+    //   new SshProcessHandlerService(
+    //     Environment.GetEnvironmentVariable("SSH_PRIVATE_KEY_PATH") ?? throw new EnvironmentVariableNullException()
+    //     ));
+    services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
+    
+    // services.AddSingleton<IProcessProviderService>(provider => 
+    //   new FileProcessProviderService(
+    //     Environment.GetEnvironmentVariable("PROCESS_SCRIPTS_PATH") ?? throw new EnvironmentVariableNullException()
+    //     ));
+    services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
     
     logger.LogInformation("{Project} services registered", "Infrastructure");
 

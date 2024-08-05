@@ -8,6 +8,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 
 public class CreateSessionService(
     IRepository<Session> sessionRepository,
+    IRepository<Process> processRepository,
     IStartSessionService startSessionService,
     IProcessProviderService processProviderService,
     ILogger<CreateSessionService> logger
@@ -33,7 +34,8 @@ public class CreateSessionService(
 
         foreach (var process in processProviderService.GetProcesses(handlingMode))
         {
-            // newSession.AddProcess(process);
+            await processRepository.AddAsync(process);
+            newSession.AddProcess(process);
         }
         
         var createdItem = await sessionRepository.AddAsync(newSession);

@@ -18,7 +18,8 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
             // Add the command to run in the background and get the PID
             string detachedCommand = $"nohup bash -c \"{combinedCommands}\" > /dev/null 2>&1 & echo $!";
 
-            using (var client = new SshClient(process.HostAddr, process.UserName, new PrivateKeyFile(_privateKeyPath)))
+            var (addr, user) = ValidateProcessProperties(process);
+            using (var client = new SshClient(addr, user, new PrivateKeyFile(_privateKeyPath)))
             {
                 client.Connect();
                 var cmd = client.CreateCommand(detachedCommand);
@@ -39,7 +40,8 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
         
         return await Task.Run(() =>
         {
-            using (var client = new SshClient(process.HostAddr, process.UserName, new PrivateKeyFile(_privateKeyPath)))
+            var (addr, user) = ValidateProcessProperties(process);
+            using (var client = new SshClient(addr, user, new PrivateKeyFile(_privateKeyPath)))
             {
                 client.Connect();
                 var cmd = client.CreateCommand($"ps -p {process.Pid} > /dev/null && echo \"true\" || echo \"false\"");
@@ -66,7 +68,8 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
     {
         await Task.Run(() =>
         {
-            using (var client = new SshClient(process.HostAddr, process.UserName, new PrivateKeyFile(_privateKeyPath)))
+            var (addr, user) = ValidateProcessProperties(process);
+            using (var client = new SshClient(addr, user, new PrivateKeyFile(_privateKeyPath)))
             {
                 client.Connect();
                 var cmd = client.CreateCommand($"kill {process.Pid}");
@@ -74,5 +77,18 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
                 client.Disconnect();
             }
         });
+    }
+
+    private (string, string) ValidateProcessProperties(Process process)
+    {
+        if (String.IsNullOrEmpty(process.HostAddr))
+        {
+            throw new ArgumentException($"Process handled with SSH requires HostAddr.");
+        }
+        if (String.IsNullOrEmpty(process.UserName))
+        {
+            throw new ArgumentException($"Process handled with SSH requires UserName.");
+        }
+        return (process.HostAddr, process.UserName);
     }
 }

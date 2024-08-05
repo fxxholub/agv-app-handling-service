@@ -7,17 +7,17 @@ namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
 public class Process(
   string name,
-  string hostName,
-  string hostAddr,
-  string userName,
+  string? hostName,
+  string? hostAddr,
+  string? userName,
   int? sessionId
-  ) : EntityBase
+  ) : EntityBase, IAggregateRoot
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
     
-    public string HostName { get; private set; } = Guard.Against.NullOrEmpty(hostName);
-    public string HostAddr { get; private set; } = Guard.Against.NullOrEmpty(hostAddr);
-    public string UserName { get; private set; } = Guard.Against.NullOrEmpty(userName);
+    public string? HostName { get; private set; } = hostName;
+    public string? HostAddr { get; private set; } = hostAddr;
+    public string? UserName { get; private set; } = userName;
     public IEnumerable<string> Commands { get; private set; } = [];
     public int? SessionId { get; set; }  = sessionId;
 

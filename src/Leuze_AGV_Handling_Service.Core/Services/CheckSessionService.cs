@@ -12,7 +12,7 @@ public class CheckSessionService(
     IRepository<Session> repository,
     IMediator mediator,
     IProcessHandlerService processHandlerService,
-    ILogger<StartSessionService> logger
+    ILogger<CheckSessionService> logger
 ) : ICheckSessionService
 {
 

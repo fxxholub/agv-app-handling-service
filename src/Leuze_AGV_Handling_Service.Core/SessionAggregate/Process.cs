@@ -10,23 +10,28 @@ public class Process(
   string hostName,
   string hostAddr,
   string userName,
-  int? sessionId,
-  IEnumerable<string> commands
-  ): EntityBase
+  int? sessionId
+  ) : EntityBase
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
     
     public string HostName { get; private set; } = Guard.Against.NullOrEmpty(hostName);
     public string HostAddr { get; private set; } = Guard.Against.NullOrEmpty(hostAddr);
     public string UserName { get; private set; } = Guard.Against.NullOrEmpty(userName);
-    public readonly IEnumerable<string> Commands = Guard.Against.NullOrEmpty(commands, nameof(commands));
-    public int? SessionId { get; private set; }  = sessionId;
+    public IEnumerable<string> Commands { get; private set; } = [];
+    public int? SessionId { get; set; }  = sessionId;
 
     public string Pid { get; private set; } = string.Empty;
 
     public ProcessState State { get; private set; } = ProcessState.None;
     
     public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
+
+    public void AddCommands(IEnumerable<string> commands)
+    {
+      Guard.Against.NullOrEmpty(commands);
+      Commands = commands;
+    }
 
     public async Task StartAsync(IProcessHandlerService processHandlerService)
     {
@@ -71,4 +76,9 @@ public class Process(
 
       await processHandlerService.KillProcess(this);
     }
+
+    // protected override IEnumerable<object> GetEqualityComponents()
+    // {
+    //   return new[] { Name, HostAddr, UserName, Pid };
+    // }
 }

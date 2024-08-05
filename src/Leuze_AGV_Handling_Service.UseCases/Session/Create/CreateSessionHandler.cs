@@ -5,16 +5,37 @@ using Leuze_AGV_Handling_Service.Core.Interfaces;
 namespace Leuze_AGV_Handling_Service.UseCases.Session.Create;
 
 public class CreateSessionHandler(ICreateSessionService createSessionService) 
-  : ICommandHandler<CreateSessionCommand, Result<int>>
+  : ICommandHandler<CreateSessionCommand, Result<SessionDTO>>
 {
-  public async Task<Result<int>> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
+  public async Task<Result<SessionDTO>> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
   {
-    return await createSessionService.CreateSession(
+    var entity = await createSessionService.CreateSession(
       request.HandlingMode,
       request.MappingEnabled,
       request.InputMapRef,
       request.OutputMapRef,
       request.OutputMapName
+    );
+    
+    return new SessionDTO(
+      entity.Id,
+      entity.HandlingMode,
+      entity.MappingEnabled,
+      entity.InputMapRef ?? "",
+      entity.OutputMapRef ?? "",
+      entity.OutputMapName ?? "",
+      entity.State,
+      entity.Processes.Select(process => new ProcessDTO(
+        process.Name,
+        process.HostName,
+        process.HostAddr,
+        process.UserName,
+        process.SessionId,
+        process.Pid,
+        process.State,
+        process.CreatedDate
+      )).ToList(),
+      entity.CreatedDate
     );
   }
 }

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Leuze_AGV_Handling_Service.Core.Exceptions;
 using Leuze_AGV_Handling_Service.Core.Interfaces;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Renci.SshNet;
 
@@ -14,12 +15,16 @@ public class FileProcessProviderService: IProcessProviderService
 
     public FileProcessProviderService(string processScriptsPath)
     {
-        _processScriptsPath = processScriptsPath;
+        _processScriptsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, processScriptsPath);
         
         // get ProcessScripts directory
         if (!Directory.Exists(_processScriptsPath))
         {
             throw new DirectoryNotFoundException($"ProcessScripts directory '{_processScriptsPath}' was not found.");
+        }
+        if (Path.GetFileNameWithoutExtension(_processScriptsPath) != "ProcessScripts")
+        {
+            throw new DirectoryNotFoundException($"ProcessScripts directory must be named ProcessScripts directory, is '{Path.GetFileNameWithoutExtension(_processScriptsPath)}'.");
         }
         
         // get subdirectories (Common, Autonomous...)
@@ -27,7 +32,7 @@ public class FileProcessProviderService: IProcessProviderService
         
         foreach (var subDir in subDirectories)
         {
-            var subDirName = Path.GetDirectoryName(subDir);
+            var subDirName = Path.GetFileNameWithoutExtension(subDir);
             if (String.IsNullOrEmpty(subDirName))
             {
                 throw new InvalidEnumArgumentException($"ProcessScripts Subdirectory {subDirName} name is null or empty.");
@@ -78,23 +83,35 @@ public class FileProcessProviderService: IProcessProviderService
                         hostName,
                         hostAddr,
                         userName,
-                        null,
-                        lines
+                        null
                         );
+                    process.AddCommands(new List<string>(lines));
 
                     if (subDirName == "Common")
                     {
                         foreach (var handlingMode in handlingNames)
                         {
-                            _loadedProcesses[Enum.Parse<HandlingMode>(handlingMode)].Add(process);
+                            AddProcess(Enum.Parse<HandlingMode>(handlingMode), process);
                         }
                     }
                     else
                     {
-                        _loadedProcesses[Enum.Parse<HandlingMode>(subDirName)].Add(process);
+                        AddProcess(Enum.Parse<HandlingMode>(subDirName), process);
                     }
                 }
             }
+        }
+    }
+    
+    public void AddProcess(HandlingMode handlingMode, Process process)
+    {
+        if (_loadedProcesses.TryGetValue(handlingMode, out var processList))
+        {
+            processList.Add(process);
+        }
+        else
+        {
+            _loadedProcesses[handlingMode] = new List<Process> { process };
         }
     }
         

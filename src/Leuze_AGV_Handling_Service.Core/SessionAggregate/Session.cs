@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Exceptions;
@@ -19,7 +20,8 @@ public class Session(
   public string? OutputMapRef { get; set; } = outputMapRef;
   public string? OutputMapName { get; set; } = outputMapName;
   public SessionState State { get; private set; } = SessionState.None;
-  private readonly List<Process> _processes = new();
+  
+  private List<Process> _processes = new();
   public IEnumerable<Process> Processes => _processes.AsReadOnly();
   
   public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
@@ -32,6 +34,7 @@ public class Session(
         $"Invalid Session operation, cannot Add state which is in other state than {ProcessState.None.ToString()}.");
     }
     
+    process.SessionId = this.Id;
     _processes.Add(process);
   }
 

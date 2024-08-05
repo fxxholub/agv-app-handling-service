@@ -50,7 +50,8 @@ public class SessionController(IMediator mediator) : ControllerBase
       
         try
         {
-            return CreatedAtAction(nameof(GetById), new { sessionId = result.Value });
+            // return CreatedAtAction(nameof(GetById), new { sessionId = result.Value });
+            return Ok(ToResponse(result));
         }
         catch (Exception ex)
         {

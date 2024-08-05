@@ -69,8 +69,10 @@ public class Session(
     {
       State = SessionState.Started;
     }
-
-    State = SessionState.Err;
+    else
+    {
+      State = SessionState.Err;
+    }
   }
 
   public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)

@@ -32,18 +32,18 @@ public class CreateSessionService(
             outputMapName
             );
 
+        var createdSession = await sessionRepository.AddAsync(newSession);
+        
         foreach (var process in processProviderService.GetProcesses(handlingMode))
         {
-            await processRepository.AddAsync(process);
-            newSession.AddProcess(process);
+            var createdProcess = await processRepository.AddAsync(process);
+            createdSession.AddProcess(createdProcess);
         }
         
-        var createdItem = await sessionRepository.AddAsync(newSession);
-        
         // start the session after creation
-        await startSessionService.StartSession(createdItem.Id);
+        await startSessionService.StartSession(createdSession.Id);
         
-        logger.LogInformation("Created Session {sessionId}", createdItem.Id);
-        return createdItem;
+        logger.LogInformation("Created Session {sessionId}", createdSession.Id);
+        return createdSession;
     }
 }

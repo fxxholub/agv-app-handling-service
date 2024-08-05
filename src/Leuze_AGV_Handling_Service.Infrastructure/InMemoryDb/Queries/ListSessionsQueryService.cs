@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.InMemoryDb.Queries;
 
-public class ListSessionsQueryService(AppDbContext _db) : IListSessionsQueryService
+public class ListSessionsQueryService(AppDbContext db) : IListSessionsQueryService
 {
   // You can use EF, Dapper, SqlClient, etc. for queries -
   // this is just an example
@@ -16,7 +16,7 @@ public class ListSessionsQueryService(AppDbContext _db) : IListSessionsQueryServ
     // var result = await _db.Database.SqlQuery<ContributorDTO>(
     //   $"SELECT Id, Name, PhoneNumber_Number AS PhoneNumber FROM Contributors") // don't fetch other big columns
     //   .ToListAsync();
-    var sessions = await _db.Sessions.ToListAsync();
+    var sessions = await db.Sessions.ToListAsync();
 
     var result = sessions.Select(entity => 
         new SessionDTO(

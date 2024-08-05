@@ -23,18 +23,20 @@ public class SessionController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var response = await _mediator.Send(new ListSessionsQuery());
+        
         if (response.IsSuccess)
         {
             Ok(response.Value);
         }
     
-        return BadRequest(response);
+        return BadRequest();
     }
     
     [HttpGet("{sessionId:int}")]
     public async Task<IActionResult> GetById(int sessionId)
     {
         var response = await _mediator.Send(new GetSessionQuery(sessionId)); 
+        
         if (response.IsSuccess)
         {
             return Ok(ToResponse(response));
@@ -48,15 +50,12 @@ public class SessionController(IMediator mediator) : ControllerBase
     {
         var result = await _mediator.Send(FromRequest(request));
       
-        try
+        if (result.IsSuccess)
         {
-            // return CreatedAtAction(nameof(GetById), new { sessionId = result.Value });
             return Ok(ToResponse(result));
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error creating session: {ex.Message}");
-        }
+        
+        return StatusCode(500, $"Error creating session");
     }
     
     [HttpDelete("{sessionId:int}")]
@@ -68,10 +67,8 @@ public class SessionController(IMediator mediator) : ControllerBase
         {
             return NoContent();
         }
-        else
-        {
-            return NotFound();
-        }
+
+        return NotFound();
     }
 
     private CreateSessionCommand FromRequest(SessionRequestModel request)

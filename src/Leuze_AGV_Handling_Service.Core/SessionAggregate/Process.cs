@@ -11,7 +11,7 @@ public class Process(
   string? hostAddr,
   string? userName,
   int? sessionId
-  ) : EntityBase, IAggregateRoot
+  ) : EntityBase
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
     

@@ -23,6 +23,14 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        modelBuilder.Entity<Session>()
+            .Navigation(s => s.Processes)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        // var navigation = modelBuilder.Entity<Session>()
+        //     .Metadata.FindNavigation(nameof(Session.Processes));
+        // navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

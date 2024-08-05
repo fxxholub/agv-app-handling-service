@@ -21,7 +21,7 @@ public class Session(
   public string? OutputMapName { get; set; } = outputMapName;
   public SessionState State { get; private set; } = SessionState.None;
   
-  private List<Process> _processes = new();
+  private readonly List<Process> _processes = new List<Process>();
   public IEnumerable<Process> Processes => _processes.AsReadOnly();
   
   public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;

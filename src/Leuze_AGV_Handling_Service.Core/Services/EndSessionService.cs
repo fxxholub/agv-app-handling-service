@@ -8,6 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Services;
 
+/// <summary>
+/// Ends session`s underlying processes.
+/// </summary>
+/// <param name="repository"></param>
+/// <param name="mediator"></param>
+/// <param name="processHandlerService"></param>
+/// <param name="logger"></param>
 public class EndSessionService(
     IRepository<Session> repository,
     IMediator mediator,

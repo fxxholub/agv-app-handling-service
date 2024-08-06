@@ -14,6 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure;
+
+/// <summary>
+/// Registers Core and own Infrastructure services with DI.
+/// </summary>
 public static class InfrastructureServiceExtensions
 {
   public static IServiceCollection AddInfrastructureServices(

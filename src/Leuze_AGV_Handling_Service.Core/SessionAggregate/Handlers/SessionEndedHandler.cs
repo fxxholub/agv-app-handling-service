@@ -5,6 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Handlers;
 
+/// <summary>
+/// TODO
+/// </summary>
+/// <param name="logger"></param>
 internal class SessionEndedHandler(
   ILogger<SessionEndedHandler> logger
   ) : INotificationHandler<SessionEndedEvent>

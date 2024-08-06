@@ -6,6 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Services;
 
+/// <summary>
+/// Deletes session entity, but ends the session underlying processes beforehand.
+/// </summary>
+/// <param name="repository"></param>
+/// <param name="endSessionService"></param>
+/// <param name="logger"></param>
 public class DeleteSessionService(
     IRepository<Session> repository,
     IEndSessionService endSessionService,

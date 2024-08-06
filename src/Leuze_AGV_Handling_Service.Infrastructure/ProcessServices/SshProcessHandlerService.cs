@@ -5,9 +5,20 @@ using Renci.SshNet;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
+/// <summary>
+/// Handles process starting, checking and killing via SSH connection.
+/// The connection is made per action, immediately after it is closed.
+/// </summary>
+/// <param name="privateKeyPath"></param>
 public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerService
 {
     private readonly string _privateKeyPath = privateKeyPath;
+    
+    /// <summary>
+    /// Makes SSH connection and attempts to start given process.
+    /// </summary>
+    /// <param name="process"></param>
+    /// <returns></returns>
     public async Task<string> StartProcess(Process process)
     {
         return await Task.Run(() =>
@@ -31,6 +42,13 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
         });
     }
 
+    /// <summary>
+    /// Makes SSH connection and checks if process is alive.
+    /// </summary>
+    /// <param name="process"></param>
+    /// <returns></returns>
+    /// <exception cref="EnvironmentVariableNullException"></exception>
+    /// <exception cref="Exception"></exception>
     public async Task<bool> CheckProcess(Process process)
     {
         if (String.IsNullOrEmpty(process.Pid))
@@ -64,6 +82,10 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
         });
     }
 
+    /// <summary>
+    /// Makes SSH connection and kills process.
+    /// </summary>
+    /// <param name="process"></param>
     public async Task KillProcess(Process process)
     {
         await Task.Run(() =>
@@ -79,6 +101,12 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
         });
     }
 
+    /// <summary>
+    /// Validates process properties for SSH connection usage.
+    /// </summary>
+    /// <param name="process"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     private (string, string) ValidateProcessProperties(Process process)
     {
         if (String.IsNullOrEmpty(process.HostAddr))

@@ -6,6 +6,14 @@ using Leuze_AGV_Handling_Service.Core.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
+/// <summary>
+/// Describes user handling session with its settings, processes and mode selected.
+/// </summary>
+/// <param name="handlingMode"></param>
+/// <param name="mappingEnabled"></param>
+/// <param name="inputMapRef"></param>
+/// <param name="outputMapRef"></param>
+/// <param name="outputMapName"></param>
 public class Session(
   HandlingMode handlingMode,
   bool mappingEnabled,
@@ -26,6 +34,11 @@ public class Session(
   
   public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
 
+  /// <summary>
+  /// Add process instance to the session (only if process state is None).
+  /// </summary>
+  /// <param name="process"></param>
+  /// <exception cref="SessionInvalidOperationException"></exception>
   public void AddProcess(Process process)
   {
     if (process.State is not ProcessState.None)
@@ -38,14 +51,13 @@ public class Session(
     _processes.Add(process);
   }
 
+  /// <summary>
+  /// Starts a session`s underlying processes, checks if they started - updates states based on that.
+  /// </summary>
+  /// <param name="processHandlerService"></param>
+  /// <exception cref="SessionInvalidOperationException"></exception>
   public async Task StartAsync(IProcessHandlerService processHandlerService)
   {
-    if (State is not SessionState.None)
-    {
-      throw new SessionInvalidOperationException(
-        $"Invalid Session operation, cannot Start from None while in {State.ToString()}.");
-    }
-
     foreach (var process in _processes)
     {
       if (process.State is not ProcessState.Started)
@@ -75,9 +87,15 @@ public class Session(
     }
   }
 
+  /// <summary>
+  /// Checks if underlying processes are alive, updates their state and session`s state based on that.
+  /// </summary>
+  /// <param name="processHandlerService"></param>
+  /// <returns></returns>
+  /// <exception cref="SessionInvalidOperationException"></exception>
   public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)
   {
-    if (State is SessionState.None or SessionState.Ended)
+    if (State is SessionState.None)
     {
       throw new SessionInvalidOperationException(
         $"Invalid Session operation, cannot Check while in {State.ToString()}.");
@@ -94,14 +112,19 @@ public class Session(
     return allGood;
   }
 
+  /// <summary>
+  /// Ends session - kills all underlying processes.
+  /// </summary>
+  /// <param name="processHandlerService"></param>
+  /// <exception cref="SessionInvalidOperationException"></exception>
   public async Task EndAsync(IProcessHandlerService processHandlerService)
   {
-    if (State is SessionState.Ended)
+    if (State is SessionState.None)
     {
       throw new SessionInvalidOperationException(
         $"Invalid Session operation, cannot End while in {State.ToString()}.");
     }
-
+    
     foreach (var process in _processes)
     {
       await process.KillAsync(processHandlerService);

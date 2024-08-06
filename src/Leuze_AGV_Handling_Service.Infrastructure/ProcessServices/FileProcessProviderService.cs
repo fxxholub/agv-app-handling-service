@@ -8,11 +8,23 @@ using Renci.SshNet;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
+/// <summary>
+/// Fetches processes from ProcessScripts directory. Should be registered as Singleton.
+/// </summary>
 public class FileProcessProviderService: IProcessProviderService
 {
     private readonly string _processScriptsPath;
     private Dictionary<HandlingMode, List<Process>> _loadedProcesses = new();
 
+    /// <summary>
+    /// Fetches process scripts and makes process instances out of them.
+    /// Follows the rule set specified in /ProcessScripts readme.md.
+    /// </summary>
+    /// <param name="processScriptsPath"></param>
+    /// <exception cref="DirectoryNotFoundException"></exception>
+    /// <exception cref="InvalidEnumArgumentException"></exception>
+    /// <exception cref="FormatException"></exception>
+    /// <exception cref="InvalidDataException"></exception>
     public FileProcessProviderService(string processScriptsPath)
     {
         _processScriptsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, processScriptsPath);
@@ -103,7 +115,7 @@ public class FileProcessProviderService: IProcessProviderService
         }
     }
     
-    public void AddProcess(HandlingMode handlingMode, Process process)
+    private void AddProcess(HandlingMode handlingMode, Process process)
     {
         if (_loadedProcesses.TryGetValue(handlingMode, out var processList))
         {

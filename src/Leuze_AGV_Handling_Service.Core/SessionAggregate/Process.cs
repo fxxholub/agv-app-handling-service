@@ -5,6 +5,15 @@ using Leuze_AGV_Handling_Service.Core.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
 
+/// <summary>
+/// Describes a process, that can be started, checked and killed.
+/// Process can be handled localy, remotely or in other custom way - as IProcessHandlerService does.
+/// </summary>
+/// <param name="name"></param>
+/// <param name="hostName"></param>
+/// <param name="hostAddr"></param>
+/// <param name="userName"></param>
+/// <param name="sessionId"></param>
 public class Process(
   string name,
   string? hostName,
@@ -29,28 +38,37 @@ public class Process(
     
     public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
 
+    /// <summary>
+    /// Batch add commands, that forms a process.
+    /// </summary>
+    /// <param name="commands"></param>
     public void AddCommands(IEnumerable<string> commands)
     {
       Guard.Against.NullOrEmpty(commands);
       _commands.AddRange(commands);
     }
 
+    /// <summary>
+    /// Starts process with given Process Handler, marks process with Pid if succeded.
+    /// </summary>
+    /// <param name="processHandlerService"></param>
+    /// <exception cref="ProcessInvalidOperationException"></exception>
     public async Task StartAsync(IProcessHandlerService processHandlerService)
     {
-      if (State is ProcessState.Killed or ProcessState.Started)
-      {
-        throw new ProcessInvalidOperationException(
-          $"Invalid Process operation, cannot Start while in {State.ToString()}.");
-      }
-      
       Pid = await processHandlerService.StartProcess(this);
       
       State = ProcessState.Started;
     }
 
+    /// <summary>
+    /// Checks if process is alive with given Process Handler.
+    /// </summary>
+    /// <param name="processHandlerService"></param>
+    /// <returns></returns>
+    /// <exception cref="ProcessInvalidOperationException"></exception>
     public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)
     {
-      if (State is ProcessState.None or ProcessState.Killed)
+      if (State is ProcessState.None)
       {
         throw new ProcessInvalidOperationException(
           $"Invalid Process operation, cannot Check while in {State.ToString()}.");
@@ -68,19 +86,18 @@ public class Process(
       return isOk;
     } 
     
+    /// <summary>
+    /// Kills process with given Process Handler.
+    /// </summary>
+    /// <param name="processHandlerService"></param>
+    /// <exception cref="ProcessInvalidOperationException"></exception>
     public async Task KillAsync(IProcessHandlerService processHandlerService)
     {
-      if (State is ProcessState.None or ProcessState.Killed)
+      if (State is ProcessState.None)
       {
         throw new ProcessInvalidOperationException(
           $"Invalid Process operation, cannot Kill while in {State.ToString()}.");
       }
-
       await processHandlerService.KillProcess(this);
     }
-
-    // protected override IEnumerable<object> GetEqualityComponents()
-    // {
-    //   return new[] { Name, HostAddr, UserName, Pid };
-    // }
 }

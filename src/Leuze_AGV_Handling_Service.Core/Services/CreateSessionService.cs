@@ -6,6 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Services;
 
+/// <summary>
+/// Creates session entity, attempts to start the session by starting underlying processes.
+/// </summary>
+/// <param name="sessionRepository"></param>
+/// <param name="startSessionService"></param>
+/// <param name="processProviderService"></param>
+/// <param name="logger"></param>
 public class CreateSessionService(
     IRepository<Session> sessionRepository,
     IStartSessionService startSessionService,
@@ -35,7 +42,6 @@ public class CreateSessionService(
         
         foreach (var process in processProviderService.GetProcesses(handlingMode))
         {
-            // var createdProcess = await processRepository.AddAsync(process);
             createdSession.AddProcess(process);
         }
         await sessionRepository.UpdateAsync(createdSession);

@@ -9,7 +9,7 @@ public class GetSessionHandler(IReadRepository<Core.SessionAggregate.Session> re
 {
   public async Task<Result<SessionDTO>> Handle(GetSessionQuery request, CancellationToken cancellationToken)
   {
-    var spec = new SessionByIdSpec(request.SessionId);
+    var spec = new SessionByIdWithProcessesSpec(request.SessionId);
     var entity = await repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (entity == null) return Result.NotFound();
 

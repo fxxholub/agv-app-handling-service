@@ -18,14 +18,14 @@ public class CreateSessionHandler(ICreateSessionService createSessionService)
     );
     
     return new SessionDTO(
-      entity.Id,
-      entity.HandlingMode,
-      entity.MappingEnabled,
-      entity.InputMapRef ?? "",
-      entity.OutputMapRef ?? "",
-      entity.OutputMapName ?? "",
-      entity.State,
-      entity.Processes.Select(process => new ProcessDTO(
+      entity.Value.Id,
+      entity.Value.HandlingMode,
+      entity.Value.MappingEnabled,
+      entity.Value.InputMapRef ?? "",
+      entity.Value.OutputMapRef ?? "",
+      entity.Value.OutputMapName ?? "",
+      entity.Value.State,
+      entity.Value.Processes.Select(process => new ProcessDTO(
         process.Name,
         process.HostName,
         process.HostAddr,
@@ -35,7 +35,7 @@ public class CreateSessionHandler(ICreateSessionService createSessionService)
         process.State,
         process.CreatedDate
       )).ToList(),
-      entity.CreatedDate
+      entity.Value.CreatedDate
     );
   }
 }

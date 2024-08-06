@@ -13,7 +13,7 @@ public class CreateSessionService(
     ILogger<CreateSessionService> logger
 ) : ICreateSessionService
 {
-    public async Task<Session> CreateSession(
+    public async Task<Result<Session>> CreateSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,
@@ -38,13 +38,15 @@ public class CreateSessionService(
             // var createdProcess = await processRepository.AddAsync(process);
             createdSession.AddProcess(process);
         }
-
         await sessionRepository.UpdateAsync(createdSession);
         
         // start the session after creation
         await startSessionService.StartSession(createdSession.Id);
         
         logger.LogInformation("Created Session {sessionId}", createdSession.Id);
-        return createdSession;
+        
+        Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
+        if (aggregate == null) return Result.NotFound();
+        return Result.Success(createdSession);
     }
 }

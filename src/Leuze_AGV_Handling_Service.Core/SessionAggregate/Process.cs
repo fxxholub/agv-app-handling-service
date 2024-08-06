@@ -18,7 +18,9 @@ public class Process(
     public string? HostName { get; private set; } = hostName;
     public string? HostAddr { get; private set; } = hostAddr;
     public string? UserName { get; private set; } = userName;
-    public IEnumerable<string> Commands { get; private set; } = [];
+
+    private readonly List<string> _commands = new List<string>();
+    public IEnumerable<string> Commands => _commands.AsReadOnly();
     public int? SessionId { get; set; }  = sessionId;
 
     public string Pid { get; private set; } = string.Empty;
@@ -30,7 +32,7 @@ public class Process(
     public void AddCommands(IEnumerable<string> commands)
     {
       Guard.Against.NullOrEmpty(commands);
-      Commands = commands;
+      _commands.AddRange(commands);
     }
 
     public async Task StartAsync(IProcessHandlerService processHandlerService)

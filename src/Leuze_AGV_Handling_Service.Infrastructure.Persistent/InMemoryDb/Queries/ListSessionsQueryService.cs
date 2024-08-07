@@ -3,7 +3,7 @@ using Leuze_AGV_Handling_Service.UseCases.Session;
 using Leuze_AGV_Handling_Service.UseCases.Session.List;
 using Microsoft.EntityFrameworkCore;
 
-namespace Leuze_AGV_Handling_Service.Infrastructure.InMemoryDb.Queries;
+namespace Leuze_AGV_Handling_Service.Infrastructure.Persistent.InMemoryDb.Queries;
 
 public class ListSessionsQueryService(AppDbContext db) : IListSessionsQueryService
 {

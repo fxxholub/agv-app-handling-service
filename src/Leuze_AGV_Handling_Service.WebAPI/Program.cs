@@ -3,8 +3,12 @@ using Ardalis.SharedKernel;
 using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
+using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
+using Leuze_AGV_Handling_Service.Infrastructure.Ros2;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
+using Leuze_AGV_Handling_Service.WebAPI.Hubs;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Serilog;
 using Serilog.Extensions.Logging;
 
@@ -31,8 +35,8 @@ var microsoftLogger = new SerilogLoggerFactory(logger)
 
 ConfigureMediatR();                                         // MediatR
 
-builder.Services.AddControllers();                          // REST API controllers
-//builder.Services.AddSignalR();                              // SignalR controllers
+builder.Services.AddControllers();                          // REST controllers
+builder.Services.AddSignalR();                              // SignalR hubs
 
 builder.Services.AddEndpointsApiExplorer();                 // https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddApiVersioning(options =>                // API versioning
@@ -50,13 +54,21 @@ builder.Services.AddApiVersioning(options =>                // API versioning
 });
 builder.Services.AddSwaggerGen(options =>                  // Swagger SignalR
 {
-  // options.AddSignalRSwaggerGen();
+  options.AddSignalRSwaggerGen();
 });
 
-builder.Services.AddInfrastructureServices(                   // Infrastructure services
+builder.Services.AddInfrastructureServices(                   // Infrastructure services - common
   builder.Configuration, 
   microsoftLogger
   );
+builder.Services.AddInfrastructurePersistentServices(         // Infrastructure services - persistent
+  builder.Configuration, 
+  microsoftLogger
+);
+builder.Services.AddInfrastructureRos2Services(               // Infrastructure services - ROS2
+  builder.Configuration, 
+  microsoftLogger
+);
 
 /**
  * App
@@ -77,6 +89,13 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// // map SignalR stuffI
+// app.MapPost("broadcast", async (string message, IHubContext<HandlingHub, IHandlingHub> context) => {
+//   await context.Clients.All.ReceiveMessage(message);
+//   return Results.NoContent();
+// });
+app.MapHub<HandlingHub>($"/api/v1/signalr/handling-hub");
 
 app.Run();
 

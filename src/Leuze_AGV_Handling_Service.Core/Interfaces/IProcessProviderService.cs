@@ -4,5 +4,5 @@ namespace Leuze_AGV_Handling_Service.Core.Interfaces;
 
 public interface IProcessProviderService
 {
-    IEnumerable<Process> GetProcesses(HandlingMode handlingMode);
+    public IEnumerable<Process> GetProcesses(HandlingMode handlingMode);
 }

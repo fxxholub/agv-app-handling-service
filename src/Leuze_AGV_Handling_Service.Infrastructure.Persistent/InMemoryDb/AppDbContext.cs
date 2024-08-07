@@ -3,7 +3,7 @@ using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Microsoft.EntityFrameworkCore;
 
-namespace Leuze_AGV_Handling_Service.Infrastructure.InMemoryDb;
+namespace Leuze_AGV_Handling_Service.Infrastructure.Persistent.InMemoryDb;
 
 public class AppDbContext : DbContext
 {

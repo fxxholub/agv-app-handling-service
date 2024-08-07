@@ -10,11 +10,15 @@
         <PackageReference Include="Ardalis.Result.AspNetCore" />
         <PackageReference Include="Asp.Versioning.Http" />
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
         <PackageReference Include="Serilog.AspNetCore" />
+        <PackageReference Include="SignalRSwaggerGen" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Leuze_AGV_Handling_Service.Infrastructure.Persistent\Leuze_AGV_Handling_Service.Infrastructure.Persistent.csproj" />
+      <ProjectReference Include="..\Leuze_AGV_Handling_Service.Infrastructure.Ros2\Leuze_AGV_Handling_Service.Infrastructure.Ros2.csproj" />
       <ProjectReference Include="..\Leuze_AGV_Handling_Service.Infrastructure\Leuze_AGV_Handling_Service.Infrastructure.csproj" />
     </ItemGroup>
 

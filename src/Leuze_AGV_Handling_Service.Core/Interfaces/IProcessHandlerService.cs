@@ -4,7 +4,7 @@ namespace Leuze_AGV_Handling_Service.Core.Interfaces;
 
 public interface IProcessHandlerService
 {
-    Task<string> StartProcess(Process process);
-    Task<bool> CheckProcess(Process process);
-    Task KillProcess(Process process);
+    public Task<string> StartProcess(Process process);
+    public Task<bool> CheckProcess(Process process);
+    public Task KillProcess(Process process);
 }

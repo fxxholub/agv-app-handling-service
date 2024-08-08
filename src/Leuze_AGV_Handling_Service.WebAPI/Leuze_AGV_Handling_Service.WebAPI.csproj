@@ -18,7 +18,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Leuze_AGV_Handling_Service.Infrastructure.Persistent\Leuze_AGV_Handling_Service.Infrastructure.Persistent.csproj" />
-      <ProjectReference Include="..\Leuze_AGV_Handling_Service.Infrastructure.Ros2\Leuze_AGV_Handling_Service.Infrastructure.Ros2.csproj" />
       <ProjectReference Include="..\Leuze_AGV_Handling_Service.Infrastructure\Leuze_AGV_Handling_Service.Infrastructure.csproj" />
     </ItemGroup>
 

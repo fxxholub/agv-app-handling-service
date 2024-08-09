@@ -28,6 +28,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0-preview.6.24327.7" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />

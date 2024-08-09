@@ -11,7 +11,7 @@ Ros2CommonInterfaces contains most of the frequently used messages used during p
 
 Messages are generated into Ros2CommonMessages.
 
-Those were used as input to ros2cs, running:
+Those were used as input to ros2cs, running from Ros2 directory:
 
 `ros2cs`
 

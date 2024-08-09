@@ -39,7 +39,7 @@ public static class InfrastructureServiceExtensions
     //     ));
     services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
     
-    logger.LogInformation("{Project} services registered", "Infrastructure");
+    logger.LogInformation("Infrastructure services registered");
 
     return services;
   }

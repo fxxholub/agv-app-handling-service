@@ -26,7 +26,7 @@ public class SessionController(IMediator mediator) : ControllerBase
         
         if (response.IsSuccess)
         {
-            Ok(response.Value);
+            return Ok(response.Value);
         }
     
         return BadRequest();

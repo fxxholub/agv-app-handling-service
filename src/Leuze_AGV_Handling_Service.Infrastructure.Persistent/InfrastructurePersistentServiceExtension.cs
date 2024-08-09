@@ -33,7 +33,7 @@ public static class InfrastructurePersistentServiceExtension
     ////// use cases stuff ////////
     services.AddScoped<IListSessionsQueryService, ListSessionsQueryService>();
     
-    logger.LogInformation("{Project} services registered", "Infrastructure");
+    logger.LogInformation("Persistent services registered");
 
     return services;
   }

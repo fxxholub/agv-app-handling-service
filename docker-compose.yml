@@ -10,9 +10,10 @@ services:
       dockerfile: Dockerfile
       args:
         BUILD_CONFIGURATION: ${BUILD_CONFIGURATION}
+        ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+        ASPNETCORE_URLS: ${ASPNETCORE_URLS}
     expose:
       - "8080"
-      - "8181"
     ports:
       - "8080:8080"
       - "8081:8081"

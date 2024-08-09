@@ -4,6 +4,7 @@ using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
 using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
+using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
 using Leuze_AGV_Handling_Service.WebAPI.Hubs;
 using MediatR;
@@ -64,17 +65,17 @@ builder.Services.AddInfrastructurePersistentServices(         // Infrastructure 
   builder.Configuration, 
   microsoftLogger
 );
-// builder.Services.AddInfrastructureRos2Services(               // Infrastructure services - ROS2
-//   builder.Configuration, 
-//   microsoftLogger
-// );
+builder.Services.AddInfrastructureRos2Services(               // Infrastructure services - ROS2
+  builder.Configuration, 
+  microsoftLogger
+);
 
 /**
  * App
  */
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (true/*app.Environment.IsDevelopment()*/)
 {
   app.UseSwagger();
   app.UseSwaggerUI(options =>

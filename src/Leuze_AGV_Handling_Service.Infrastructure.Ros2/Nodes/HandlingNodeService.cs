@@ -11,7 +11,7 @@ public class HandlingNodeService : BackgroundService
     private readonly RclContext _context;
     private readonly IRclNode _node;
     
-    private readonly IRclSubscription<Ros2CommonMessages.Std.String> _scanSubscriber;
+    private readonly IRclSubscription<Ros2CommonMessages.Std.Bool> _scanSubscriber;
     private int _sub_count = 0;
 
     public HandlingNodeService(ILogger<HandlingNodeService> logger)
@@ -21,7 +21,7 @@ public class HandlingNodeService : BackgroundService
         _context = new RclContext();
         _node = _context.CreateNode("my_dummy_node");
         
-        _scanSubscriber = _node.CreateSubscription<Ros2CommonMessages.Std.String>("/scan1");
+        _scanSubscriber = _node.CreateSubscription<Ros2CommonMessages.Std.Bool>("/bms_statement");
         
         _logger.LogInformation($"Handling Ros2 node started.");
     }

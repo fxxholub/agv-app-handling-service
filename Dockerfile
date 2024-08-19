@@ -24,12 +24,6 @@ COPY ["src/Leuze_AGV_Handling_Service.Infrastructure.Ros2/Leuze_AGV_Handling_Ser
 RUN dotnet restore "src/Leuze_AGV_Handling_Service.WebAPI/Leuze_AGV_Handling_Service.WebAPI.csproj" -r $TARGET_RUNTIME
 COPY . .
 WORKDIR "/src/src/Leuze_AGV_Handling_Service.WebAPI"
-#RUN dotnet build "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# Publish stage
-#FROM build AS publish
-#ARG BUILD_CONFIGURATION=${BUILD_CONFIGURATION}
-#RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -r $TARGET_RUNTIME --self-contained -o /app/publish
 
 # Final stage
@@ -37,6 +31,4 @@ FROM --platform=linux/amd64 ros:humble-ros-core-jammy AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 COPY ProcessScripts /app/ProcessScripts
-#CMD source /opt/ros/humble/setup.sh && dotnet Leuze_AGV_Handling_Service.WebAPI.dll
-#ENTRYPOINT . /opt/ros/humble/setup.sh && exec ./Leuze_AGV_Handling_Service.WebAPI
 CMD . /opt/ros/humble/setup.sh && exec ./Leuze_AGV_Handling_Service.WebAPI

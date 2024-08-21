@@ -1,4 +1,3 @@
-version: '3.9'
 
 services:
   webapi:
@@ -12,8 +11,6 @@ services:
         BUILD_CONFIGURATION: ${BUILD_CONFIGURATION}
         ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
         ASPNETCORE_URLS: ${ASPNETCORE_URLS}
-    expose:
-      - "8080"
     ports:
       - "8080:8080"
       - "8081:8081"

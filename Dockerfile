@@ -31,4 +31,5 @@ FROM --platform=linux/amd64 ros:humble-ros-core-jammy AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 COPY ProcessScripts /app/ProcessScripts
-CMD . /opt/ros/humble/setup.sh && exec ./Leuze_AGV_Handling_Service.WebAPI
+CMD . /opt/ros/humble/setup.sh
+CMD exec ./Leuze_AGV_Handling_Service.WebAPI

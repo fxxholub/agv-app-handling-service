@@ -17,7 +17,7 @@ public static class InfrastructureRos2ServiceExtension
     )
   {
     
-    // services.AddHostedService<HandlingNodeService>();
+    services.AddHostedService<HandlingNodeService>();
     
     logger.LogInformation($"Ros2 services registered");
 

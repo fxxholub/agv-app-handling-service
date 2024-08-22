@@ -1,5 +1,5 @@
 ﻿## Base stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-amd64 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-arm64v8 AS base
 #FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-amd64 AS base
 USER $APP_UID
 WORKDIR /app
@@ -7,11 +7,11 @@ EXPOSE 8080
 EXPOSE 8081
 
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 AS build
 ARG BUILD_CONFIGURATION=${BUILD_CONFIGURATION}
 ARG ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
 ARG ASPNETCORE_URLS=${ASPNETCORE_URLS}
-ARG TARGET_RUNTIME=linux-x64
+ARG TARGET_RUNTIME=linux-arm64
 WORKDIR /src
 COPY ["Directory.Build.props", "."]
 COPY ["Directory.Packages.props", "."]
@@ -27,9 +27,9 @@ WORKDIR "/src/src/Leuze_AGV_Handling_Service.WebAPI"
 RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -r $TARGET_RUNTIME --self-contained -o /app/publish
 
 # Final stage
-FROM --platform=linux/amd64 ros:humble-ros-core-jammy AS final
+FROM arm64v8/ros:humble-ros-core-jammy AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 COPY ProcessScripts /app/ProcessScripts
-CMD . /opt/ros/humble/setup.sh
-CMD exec ./Leuze_AGV_Handling_Service.WebAPI
+#CMD . /opt/ros/humble/setup.sh
+CMD ./Leuze_AGV_Handling_Service.WebAPI

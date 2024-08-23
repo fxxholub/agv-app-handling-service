@@ -15,8 +15,7 @@ public static class InfrastructurePersistentServiceExtension
 {
   public static IServiceCollection AddInfrastructurePersistentServices(
     this IServiceCollection services,
-    ConfigurationManager config,
-    ILogger logger
+    ConfigurationManager config
     )
   {
     // string? connectionString = config.GetConnectionString("SqliteConnection");
@@ -32,8 +31,6 @@ public static class InfrastructurePersistentServiceExtension
     
     ////// use cases stuff ////////
     services.AddScoped<IListSessionsQueryService, ListSessionsQueryService>();
-    
-    logger.LogInformation("Persistent services registered");
 
     return services;
   }

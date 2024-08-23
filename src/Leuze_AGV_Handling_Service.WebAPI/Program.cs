@@ -5,118 +5,125 @@ using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
 using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
 using Leuze_AGV_Handling_Service.Infrastructure.Ros2;
-using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
 using Leuze_AGV_Handling_Service.WebAPI.Hubs;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Serilog;
-using Serilog.Extensions.Logging;
+using ILogger = Serilog.ILogger;
 
-/**
- * Logger
- */
-var logger = Log.Logger = new LoggerConfiguration()
-  .Enrich.FromLogContext()
-  .WriteTo.Console()
-  .CreateLogger();
-
-logger.Information("Starting web host");
-
-/**
- * Services Builder
- */
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Host.UseSerilog(                                    // Logger
-  (_, config) => 
-  config.ReadFrom.Configuration(builder.Configuration));
-var microsoftLogger = new SerilogLoggerFactory(logger)
-  .CreateLogger<Program>();
-
-ConfigureMediatR();                                         // MediatR
-
-builder.Services.AddControllers();                          // REST controllers
-builder.Services.AddSignalR();                              // SignalR hubs
-
-builder.Services.AddEndpointsApiExplorer();                 // https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddApiVersioning(options =>                // API versioning
+public class Program
 {
-  options.DefaultApiVersion = new ApiVersion(1, 0);
-  options.ReportApiVersions = true;
-  options.AssumeDefaultVersionWhenUnspecified = true;
-  options.ApiVersionReader = ApiVersionReader.Combine(
-    new UrlSegmentApiVersionReader(),
-    new HeaderApiVersionReader("X-Api-Version"));
-}).AddApiExplorer(options =>
-{
-  options.GroupNameFormat = "'v'V";
-  options.SubstituteApiVersionInUrl = true;
-});
-builder.Services.AddSwaggerGen(options =>                  // Swagger SignalR
-{
-  options.AddSignalRSwaggerGen();
-});
+    private static ILogger _logger = null!;
+    private static WebApplicationBuilder _builder = null!;
 
-builder.Services.AddInfrastructureServices(                   // Infrastructure services - common
-  builder.Configuration, 
-  microsoftLogger
-  );
-builder.Services.AddInfrastructurePersistentServices(         // Infrastructure services - persistent
-  builder.Configuration, 
-  microsoftLogger
-);
-// builder.Services.AddInfrastructureRos2Services(               // Infrastructure services - ROS2
-//   builder.Configuration, 
-//   microsoftLogger
-// );
-builder.Services.AddHostedService<HandlingNodeService>();
+    public static void Main(string[] args)
+    {
+        ConfigureLogger();
+        _logger.Information("Starting web host");
 
-/**
- * App
- */
-var app = builder.Build();
+        BuildServices(args);
 
-if (true/*app.Environment.IsDevelopment()*/)
-{
-  app.UseSwagger();
-  app.UseSwaggerUI(options =>
-  {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-  });
-}
+        var app = _builder.Build();
 
-app.UseHttpsRedirection();
+        ConfigureApp(app);
 
-app.UseAuthorization();
+        app.Run();
+    }
 
-app.MapControllers();
+    private static void ConfigureLogger()
+    {
+        _logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
+    }
 
-// // map SignalR stuffI
-// app.MapPost("broadcast", async (string message, IHubContext<HandlingHub, IHandlingHub> context) => {
-//   await context.Clients.All.ReceiveMessage(message);
-//   return Results.NoContent();
-// });
-app.MapHub<HandlingHub>($"/api/v1/signalr/handling-hub");
+    private static void BuildServices(string[] args)
+    {
+        _builder = WebApplication.CreateBuilder(args);
 
-app.Run();
+        _builder.Host.UseSerilog((_, config) =>
+            config.ReadFrom.Configuration(_builder.Configuration));
 
+        ConfigureMediatR();                                      // MediatR
 
-void ConfigureMediatR()
-{
-  var mediatRAssemblies = new[]
-  {
-    Assembly.GetAssembly(typeof(Session)), // Core
-    Assembly.GetAssembly(typeof(CreateSessionCommand)) // UseCases
-  };
-  builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
-  builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-  builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
-}
+        _builder.Services.AddControllers();                       // REST controllers
+        _builder.Services.AddSignalR();                           // SignalR hubs
 
+        _builder.Services.AddEndpointsApiExplorer();              // Swagger
+        ConfigureApiVersioning();
 
-// Make the implicit Program.cs class public,
-// so integration tests can reference the correct assembly for host building
-public partial class Program
-{
+        _builder.Services.AddSwaggerGen(options =>                // Swagger SignalR
+        {
+            options.AddSignalRSwaggerGen();
+        });
+
+        ConfigureInfrastructureServices();
+    }
+
+    private static void ConfigureMediatR()
+    {
+        var mediatRAssemblies = new[]
+        {
+            Assembly.GetAssembly(typeof(Session)),                // Core
+            Assembly.GetAssembly(typeof(CreateSessionCommand))    // UseCases
+        };
+        _builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
+        _builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        _builder.Services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
+    }
+
+    private static void ConfigureApiVersioning()
+    {
+        _builder.Services.AddApiVersioning(options =>            // API versioning
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.ReportApiVersions = true;
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ApiVersionReader = ApiVersionReader.Combine(
+                new UrlSegmentApiVersionReader(),
+                new HeaderApiVersionReader("X-Api-Version"));
+        }).AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'V";
+            options.SubstituteApiVersionInUrl = true;
+        });
+    }
+
+    private static void ConfigureInfrastructureServices()
+    {
+        _builder.Services.AddInfrastructureServices(             // Infrastructure services - common
+            _builder.Configuration
+        );
+        _builder.Services.AddInfrastructurePersistentServices(   // Infrastructure services - persistent
+            _builder.Configuration
+        );
+        _builder.Services.AddInfrastructureRos2Services(         // Infrastructure services - ROS2
+            _builder.Configuration
+        );
+    }
+
+    private static void ConfigureApp(WebApplication app)
+    {
+        if (true/*app.Environment.IsDevelopment()*/)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            });
+        }
+
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
+
+        // // map SignalR stuff
+        // app.MapPost("broadcast", async (string message, IHubContext<HandlingHub, IHandlingHub> context) => {
+        //   await context.Clients.All.ReceiveMessage(message);
+        //   return Results.NoContent();
+        // });
+        app.MapHub<HandlingHub>($"/api/v1/signalr/handling-hub");
+    }
 }

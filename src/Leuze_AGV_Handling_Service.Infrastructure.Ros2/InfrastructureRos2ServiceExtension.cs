@@ -12,14 +12,11 @@ public static class InfrastructureRos2ServiceExtension
 {
   public static IServiceCollection AddInfrastructureRos2Services(
     this IServiceCollection services,
-    ConfigurationManager config,
-    ILogger logger
+    ConfigurationManager config
     )
   {
     
     services.AddHostedService<HandlingNodeService>();
-    
-    logger.LogInformation($"Ros2 services registered");
 
     return services;
   }

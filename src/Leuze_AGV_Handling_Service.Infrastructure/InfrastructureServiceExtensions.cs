@@ -14,8 +14,7 @@ public static class InfrastructureServiceExtensions
 {
   public static IServiceCollection AddInfrastructureServices(
     this IServiceCollection services,
-    ConfigurationManager config,
-    ILogger logger
+    ConfigurationManager config
     )
   {
     
@@ -38,8 +37,6 @@ public static class InfrastructureServiceExtensions
     //     Environment.GetEnvironmentVariable("PROCESS_SCRIPTS_PATH") ?? throw new EnvironmentVariableNullException()
     //     ));
     services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
-    
-    logger.LogInformation("Infrastructure services registered");
 
     return services;
   }

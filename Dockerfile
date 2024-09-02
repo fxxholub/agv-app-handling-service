@@ -1,6 +1,5 @@
 ﻿## Base stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-arm64v8 AS base
-#FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-amd64 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -28,8 +27,10 @@ RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGUR
 
 # Final stage
 FROM arm64v8/ros:humble-ros-core-jammy AS final
+ARG PROCESS_SCRIPTS_PATH=${PROCESS_SCRIPTS_PATH}
+ARG SSH_PRIVATE_KEY_PATH=${SSH_PRIVATE_KEY_PATH}
 WORKDIR /app
 COPY --from=build /app/publish .
-COPY ProcessScripts /app/ProcessScripts
-#CMD . /opt/ros/humble/setup.sh
+COPY $PROCESS_SCRIPTS_PATH /app/ProcessScripts
+COPY $SSH_PRIVATE_KEY_PATH /app/.ssh/private_key
 CMD ./Leuze_AGV_Handling_Service.WebAPI

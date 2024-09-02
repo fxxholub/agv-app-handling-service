@@ -11,15 +11,15 @@ public class FakeProcessProviderService: IProcessProviderService
             new Process(
             "process1",
             "host1",
-            "",
-            "",
+            "172.17.0.1",
+            "jholub",
             null
             ),
             new Process(
                 "process2",
                 "host3",
-                "",
-                "",
+                "172.17.0.1",
+                "jholub",
                 null
             ),
         ]);

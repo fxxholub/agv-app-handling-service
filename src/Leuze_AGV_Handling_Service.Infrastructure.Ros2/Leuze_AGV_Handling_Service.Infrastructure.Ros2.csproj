@@ -11,4 +11,9 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" />
         <PackageReference Include="Rcl.NET" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Leuze_AGV_Handling_Service.Core\Leuze_AGV_Handling_Service.Core.csproj" />
+      <ProjectReference Include="..\Leuze_AGV_Handling_Service.UseCases\Leuze_AGV_Handling_Service.UseCases.csproj" />
+    </ItemGroup>
 </Project>

@@ -1,16 +1,15 @@
-using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 using SignalRSwaggerGen.Enums;
 using SignalRSwaggerGen.Naming;
 
-namespace Leuze_AGV_Handling_Service.WebAPI.Hubs;
+namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 
 // [ApiVersion(1)]
 // [SignalRHub(path: "api/v{v:apiVersion}/signalr/handling-hub")]
-[SignalRHub(path: "/api/v1/signalr/handling-hub")]
-public class HandlingHub : Hub<IHandlingHub>
+[SignalRHub(path: "/api/v1/signalr/autonomous")]
+public class ManualHandlingHub : Hub<IManualHandlingHub>
 {
     private static string? _connectedClientId = null;
     

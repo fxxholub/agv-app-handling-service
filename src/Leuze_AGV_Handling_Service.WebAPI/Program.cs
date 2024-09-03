@@ -5,10 +5,9 @@ using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
 using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
 using Leuze_AGV_Handling_Service.Infrastructure.Ros2;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
-using Leuze_AGV_Handling_Service.WebAPI.Hubs;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -54,11 +53,6 @@ public class Program
         _builder.Services.AddEndpointsApiExplorer();              // Swagger
         ConfigureApiVersioning();
 
-        _builder.Services.AddSwaggerGen(options =>                // Swagger SignalR
-        {
-            options.AddSignalRSwaggerGen();
-        });
-
         ConfigureInfrastructureServices();
     }
 
@@ -102,6 +96,9 @@ public class Program
         _builder.Services.AddInfrastructureRos2Services(         // Infrastructure services - ROS2
             _builder.Configuration
         );
+        _builder.Services.AddInfrastructureRos2Services(         // Infrastructure services - SignalR
+            _builder.Configuration
+        );
     }
 
     private static void ConfigureApp(WebApplication app)
@@ -119,11 +116,7 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
-        // // map SignalR stuff
-        // app.MapPost("broadcast", async (string message, IHubContext<HandlingHub, IHandlingHub> context) => {
-        //   await context.Clients.All.ReceiveMessage(message);
-        //   return Results.NoContent();
-        // });
-        app.MapHub<HandlingHub>($"/api/v1/signalr/handling-hub");
+        // // map SignalR hubs as endpoints
+        app.MapHub<AutonomousHandlingHub>($"/api/v1/signalr/autonomous");
     }
 }

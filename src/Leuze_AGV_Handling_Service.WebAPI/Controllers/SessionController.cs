@@ -17,12 +17,11 @@ namespace Leuze_AGV_Handling_Service.WebAPI.Controllers;
 [ApiController]
 public class SessionController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
     
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var response = await _mediator.Send(new ListSessionsQuery());
+        var response = await mediator.Send(new ListSessionsQuery());
         
         if (response.IsSuccess)
         {
@@ -35,7 +34,7 @@ public class SessionController(IMediator mediator) : ControllerBase
     [HttpGet("{sessionId:int}")]
     public async Task<IActionResult> GetById(int sessionId)
     {
-        var response = await _mediator.Send(new GetSessionQuery(sessionId)); 
+        var response = await mediator.Send(new GetSessionQuery(sessionId)); 
         
         if (response.IsSuccess)
         {
@@ -48,7 +47,7 @@ public class SessionController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] SessionRequestModel request)
     {
-        var result = await _mediator.Send(FromRequest(request));
+        var result = await mediator.Send(FromRequest(request));
       
         if (result.IsSuccess)
         {
@@ -61,7 +60,7 @@ public class SessionController(IMediator mediator) : ControllerBase
     [HttpDelete("{sessionId:int}")]
     public async Task<IActionResult> Delete(int sessionId)
     {
-        var result = await _mediator.Send(new DeleteSessionCommand(sessionId));
+        var result = await mediator.Send(new DeleteSessionCommand(sessionId));
 
         if (result.IsSuccess)
         {

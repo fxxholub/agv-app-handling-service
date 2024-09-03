@@ -16,7 +16,7 @@ public static class InfrastructureRos2ServiceExtension
     )
   {
     
-    services.AddHostedService<HandlingNodeService>();
+    services.AddHostedService<AutonomousNode>();
 
     return services;
   }

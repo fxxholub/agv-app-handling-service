@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Contexts;
+using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR;
@@ -8,15 +10,13 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR;
 /// </summary>
 public static class InfrastructureSignalRServiceExtension
 {
-  public static IServiceCollection AddInfrastructureRos2Services(
+  public static IServiceCollection AddInfrastructureSignalRServices(
     this IServiceCollection services,
     ConfigurationManager config
     )
   {
-    services.AddSwaggerGen(options =>                // Swagger SignalR
-    {
-      options.AddSignalRSwaggerGen();
-    });
+    
+    services.AddScoped<IAutonomousMessageNotifier, AutonomousMessageNotifierService>();
     
     return services;
   }

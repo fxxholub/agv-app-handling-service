@@ -13,6 +13,7 @@ public class AutonomousMessageNotifierService(
 {
     public async Task<Result> NotifyReceiveMap(string message)
     {
+        Console.WriteLine("gets notified");
         try
         {
             await hubContext.Clients.All.ReceiveMap(message);

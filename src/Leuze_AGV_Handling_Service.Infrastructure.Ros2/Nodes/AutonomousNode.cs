@@ -45,7 +45,6 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
 
         await foreach (var msg in _mapSubscriber.ReadAllAsync(cancellationToken))
         {
-            Console.WriteLine($"cw subscribed {msg.Data}");
             await ReceiveMap(msg.Data);
         }
     }
@@ -68,6 +67,8 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
 
     public async Task ReceiveMap(string message)
     {
-        var response = await _mediator.Send(new ReceiveMapCommand(message));
+        Console.WriteLine($"pre mediator cw subscribed {message}");
+        await _mediator.Send(new ReceiveMapCommand(message));
+        Console.WriteLine($"post mediator cw subscribed {message}");
     }
 }

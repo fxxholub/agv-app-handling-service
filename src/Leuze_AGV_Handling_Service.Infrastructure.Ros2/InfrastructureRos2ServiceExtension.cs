@@ -1,4 +1,5 @@
 ﻿using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
+using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ public static class InfrastructureRos2ServiceExtension
     )
   {
     
+    services.AddSingleton<IAutonomousMessageTransceiver, AutonomousNode>();
     services.AddHostedService<AutonomousNode>();
 
     return services;

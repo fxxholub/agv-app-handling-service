@@ -5,13 +5,16 @@ using Leuze_AGV_Handling_Service.Core.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
 using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
 using Leuze_AGV_Handling_Service.Infrastructure.Ros2;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
 using MediatR;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-public class Program
+namespace Leuze_AGV_Handling_Service.WebAPI;
+
+public static class Program
 {
     private static ILogger _logger = null!;
     private static WebApplicationBuilder _builder = null!;
@@ -51,6 +54,10 @@ public class Program
         _builder.Services.AddSignalR();                           // SignalR hubs
 
         _builder.Services.AddEndpointsApiExplorer();              // Swagger
+        _builder.Services.AddSwaggerGen(options =>                // Swagger SignalR
+        {
+            options.AddSignalRSwaggerGen();
+        });
         ConfigureApiVersioning();
 
         ConfigureInfrastructureServices();
@@ -87,7 +94,7 @@ public class Program
 
     private static void ConfigureInfrastructureServices()
     {
-        _builder.Services.AddInfrastructureServices(             // Infrastructure services - common
+        _builder.Services.AddInfrastructureServices(             // Infrastructure services - core
             _builder.Configuration
         );
         _builder.Services.AddInfrastructurePersistentServices(   // Infrastructure services - persistent
@@ -96,7 +103,7 @@ public class Program
         _builder.Services.AddInfrastructureRos2Services(         // Infrastructure services - ROS2
             _builder.Configuration
         );
-        _builder.Services.AddInfrastructureRos2Services(         // Infrastructure services - SignalR
+        _builder.Services.AddInfrastructureSignalRServices(      // Infrastructure services - SignalR
             _builder.Configuration
         );
     }

@@ -10,43 +10,50 @@ using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
 using MediatR;
 using Serilog;
-using ILogger = Serilog.ILogger;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Leuze_AGV_Handling_Service.WebAPI;
 
 public static class Program
 {
-    private static ILogger _logger = null!;
     private static WebApplicationBuilder _builder = null!;
 
     public static void Main(string[] args)
     {
-        ConfigureLogger();
-        _logger.Information("Starting web host");
-
+        
         BuildServices(args);
-
+        
         var app = _builder.Build();
 
         ConfigureApp(app);
-
-        app.Run();
-    }
-
-    private static void ConfigureLogger()
-    {
-        _logger = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
+        
+        Log.Information("Leuze AGV Handling Service starting");
+        
+        try
+        {
+            app.Run();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application start-up failed");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 
     private static void BuildServices(string[] args)
     {
         _builder = WebApplication.CreateBuilder(args);
-
-        _builder.Host.UseSerilog((_, config) =>
-            config.ReadFrom.Configuration(_builder.Configuration));
+        
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(_builder.Configuration) // load settings from appsettings.json
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
+        
+        _builder.Host.UseSerilog();
 
         ConfigureMediatR();                                      // MediatR
 

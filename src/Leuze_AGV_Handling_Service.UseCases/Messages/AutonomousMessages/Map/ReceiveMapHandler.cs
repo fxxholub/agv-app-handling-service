@@ -10,7 +10,6 @@ public class ReceiveMapHandler(IAutonomousMessageNotifier notifier)
 {
     public async Task<Result> Handle(ReceiveMapCommand request, CancellationToken cancellationToken)
     {
-        Console.WriteLine("get handled");
         return await notifier.NotifyReceiveMap(request.Message);
     }
 }

@@ -17,14 +17,12 @@ public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessag
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _logger.LogInformation("Handling Ros2 node started.");
-        Console.WriteLine("Handling Ros2 node started.");
+        _logger.LogInformation("Fake Handling Ros2 node started.");
     }
 
     public Task StartAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Handling Ros2 node started.");
-        Console.WriteLine("Handling Ros2 node started.");
+        _logger.LogInformation("Fake Handling Ros2 node started.");
 
         _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(2.5));
 
@@ -33,13 +31,12 @@ public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessag
 
     private async void DoWork(object? state)
     {
-        await ReceiveMap("Fake Ros2 node does work.");
+        await ReceiveMap("Fake Ros2 node does work!");
     }
 
     public Task StopAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Fake Ros2 node stopped.");
-        Console.WriteLine("Fake Ros2 node stopped.");
 
         _timer?.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
@@ -52,24 +49,19 @@ public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessag
 
     public async Task<Result> SendJoy(string message)
     {
-        _logger.LogInformation("Fake Ros2 node SendJoy.");
-        Console.WriteLine("Fake Ros2 node SendJoy.");
+        _logger.LogDebug("Fake Ros2 node SendJoy.");
         await Task.Delay(100);
         return Result.Success();
     }
 
     public async Task ReceiveMap(string message)
     {
-        _logger.LogInformation("Fake Ros2 node ReceiveMap.");
-        Console.WriteLine("Fake Ros2 node ReceiveMap.");
+        _logger.LogDebug("Fake Ros2 node ReceiveMap.");
 
-        // Create a scope to resolve scoped services
         using (var scope = _serviceProvider.CreateScope())
         {
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-            Console.WriteLine($"Pre mediator cw subscribed: {message}");
             await mediator.Send(new ReceiveMapCommand(message));
-            Console.WriteLine($"Post mediator cw subscribed: {message}");
         }
     }
 }

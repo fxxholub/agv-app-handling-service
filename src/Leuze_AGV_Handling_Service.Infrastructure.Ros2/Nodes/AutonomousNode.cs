@@ -12,7 +12,6 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IMediator _mediator;
     private readonly ILogger<AutonomousNode> _logger;
 
     private readonly IRclPublisher<Ros2CommonMessages.Std.String> _joyPublisher;
@@ -21,11 +20,8 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
     {
         _serviceProvider = serviceProvider;
         
-        _mediator = mediator;
-        
         _logger = logger;
         _logger.LogInformation($"Handling Ros2 node started.");
-        Console.WriteLine("cw Handling Ros2 node started.");
         
         var context = new RclContext();
         var node = context.CreateNode("handling_service_autonomous");
@@ -36,17 +32,6 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        // while (!cancellationToken.IsCancellationRequested)
-        // {
-        //     // if (_logger.IsEnabled(LogLevel.Information))
-        //     // {
-        //     // }
-        //
-        //     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-        //     Console.WriteLine($"Worker running at: {DateTimeOffset.Now} cw");
-        //     await Task.Delay(1000, cancellationToken);
-        // }
-
         await foreach (var msg in _mapSubscriber.ReadAllAsync(cancellationToken))
         {
             await ReceiveMap(msg.Data);
@@ -74,9 +59,7 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
         using (var scope = _serviceProvider.CreateScope())
         {
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-            Console.WriteLine($"Pre mediator cw subscribed: {message}");
             await mediator.Send(new ReceiveMapCommand(message));
-            Console.WriteLine($"Post mediator cw subscribed: {message}");
         }
     }
 }

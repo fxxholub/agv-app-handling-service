@@ -10,7 +10,6 @@ using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 using Leuze_AGV_Handling_Service.UseCases.Session.Create;
 using MediatR;
 using Serilog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Leuze_AGV_Handling_Service.WebAPI;
 
@@ -47,15 +46,9 @@ public static class Program
     {
         _builder = WebApplication.CreateBuilder(args);
         
-        Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(_builder.Configuration) // load settings from appsettings.json
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
-        
-        _builder.Host.UseSerilog();
+        ConfigureSerilog();                                       // Serilog
 
-        ConfigureMediatR();                                      // MediatR
+        ConfigureMediatR();                                       // MediatR
 
         _builder.Services.AddControllers();                       // REST controllers
         _builder.Services.AddSignalR();                           // SignalR hubs
@@ -65,9 +58,21 @@ public static class Program
         {
             options.AddSignalRSwaggerGen();
         });
+        
         ConfigureApiVersioning();
 
         ConfigureInfrastructureServices();
+    }
+
+    private static void ConfigureSerilog()
+    {
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(_builder.Configuration) // load settings from appsettings.json
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
+        
+        _builder.Host.UseSerilog();
     }
 
     private static void ConfigureMediatR()

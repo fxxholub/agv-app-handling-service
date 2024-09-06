@@ -2,6 +2,7 @@ using Ardalis.Result;
 using Leuze_AGV_Handling_Service.UseCases.Messages.AutonomousMessages.Map;
 using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rcl;
@@ -10,13 +11,16 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
 public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly IMediator _mediator;
     private readonly ILogger<AutonomousNode> _logger;
 
     private readonly IRclPublisher<Ros2CommonMessages.Std.String> _joyPublisher;
     private readonly IRclSubscription<Ros2CommonMessages.Std.String> _mapSubscriber;
-    public AutonomousNode(IMediator mediator, ILogger<AutonomousNode> logger)
+    public AutonomousNode(IServiceProvider serviceProvider, IMediator mediator, ILogger<AutonomousNode> logger)
     {
+        _serviceProvider = serviceProvider;
+        
         _mediator = mediator;
         
         _logger = logger;
@@ -67,8 +71,12 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageTransceiver
 
     public async Task ReceiveMap(string message)
     {
-        Console.WriteLine($"pre mediator cw subscribed {message}");
-        await _mediator.Send(new ReceiveMapCommand(message));
-        Console.WriteLine($"post mediator cw subscribed {message}");
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+            Console.WriteLine($"Pre mediator cw subscribed: {message}");
+            await mediator.Send(new ReceiveMapCommand(message));
+            Console.WriteLine($"Post mediator cw subscribed: {message}");
+        }
     }
 }

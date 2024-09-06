@@ -33,7 +33,7 @@ public class EndSessionService(
 
         await aggregate.EndAsync(processHandlerService);
         
-        // notify system about end
+        // notify system about session end
         var domainEvent = new SessionEndedEvent(sessionId);
         await mediator.Publish(domainEvent);
 

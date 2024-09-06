@@ -2,7 +2,7 @@
 
 namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Specifications;
 
-public class SessionByIdWithProcessesSpec : Specification<Session>
+public sealed class SessionByIdWithProcessesSpec : Specification<Session>
 {
   public SessionByIdWithProcessesSpec(int sessionId)
   {

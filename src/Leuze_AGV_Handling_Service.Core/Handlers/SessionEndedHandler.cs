@@ -17,7 +17,7 @@ internal class SessionEndedHandler(
   {
     logger.LogInformation("Handling Session Ended event for {sessionId}", domainEvent.SessionId);
 
-    // TODO handle SignalR connection open here
+    // TODO handle SignalR connection close here
     await Task.Delay(10);
   }
 }

@@ -4,5 +4,5 @@ namespace Leuze_AGV_Handling_Service.Core.Interfaces;
 
 public interface ICheckSessionService
 {
-  public Task<Result> CheckSession(int sessionId);
+  public Task<Result<bool>> CheckSession(int sessionId);
 }

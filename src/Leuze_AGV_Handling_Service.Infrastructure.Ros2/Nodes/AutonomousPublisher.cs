@@ -5,6 +5,9 @@ using Rcl;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
+/// <summary>
+/// Ros2 publisher of autonomous messages.
+/// </summary>
 public class AutonomousPublisher : IAutonomousMessageSender
 {
     private readonly ILogger<AutonomousPublisher> _logger;

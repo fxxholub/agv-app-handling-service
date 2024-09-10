@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
-/// Deletes session entity
+/// Deletes session entity.
 /// </summary>
 /// <param name="repository"></param>
 /// <param name="logger"></param>

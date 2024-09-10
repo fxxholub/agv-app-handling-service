@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
 
+/// <summary>
+/// Service forwarding autonomous messages from channel to the hub server side (server -> client).
+/// </summary>
+/// <param name="hubContext"></param>
 public class AutonomousHubMessageForwarder(
     IHubContext<AutonomousHandlingHub, IAutonomousHandlingHub> hubContext
     )

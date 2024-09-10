@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
-/// Creates session entity, attempts to start the session by starting underlying processes.
+/// Creates session entity.
 /// </summary>
 /// <param name="sessionRepository"></param>
 /// <param name="processProviderService"></param>

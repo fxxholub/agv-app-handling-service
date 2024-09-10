@@ -3,6 +3,11 @@ using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 
 namespace Leuze_AGV_Handling_Service.Core.Messages.Services;
 
+/// <summary>
+/// Message channel for the autonomous messages. Wraps the receiver and sender message methods.
+/// </summary>
+/// <param name="senderTarget"></param>
+/// <param name="receiverTarget"></param>
 public class ManualMessageChannel(IManualMessageSender senderTarget, IManualMessageReceiver receiverTarget) : MessageChannelBase, IManualMessageChannel
 {
     public async Task ReceiveMap(MapDTO map)

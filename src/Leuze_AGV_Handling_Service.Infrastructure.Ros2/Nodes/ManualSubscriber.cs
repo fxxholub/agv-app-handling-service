@@ -8,6 +8,9 @@ using Rcl;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
+/// <summary>
+/// Ros2 subscriber of manual messages.
+/// </summary>
 public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
 {
     private readonly IServiceProvider _serviceProvider;

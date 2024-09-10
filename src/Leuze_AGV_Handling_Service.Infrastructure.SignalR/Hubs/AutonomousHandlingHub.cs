@@ -5,6 +5,10 @@ using SignalRSwaggerGen.Attributes;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 
+/// <summary>
+/// Hub for all autonomous messages.
+/// </summary>
+/// <param name="messageChannel"></param>
 // [ApiVersion(1)]
 // [SignalRHub(path: "api/v{v:apiVersion}/signalr/handling-hub")]
 [SignalRHub(path: "/api/v1/signalr/autonomous")]

@@ -8,8 +8,10 @@ using Microsoft.Extensions.Logging;
 namespace Leuze_AGV_Handling_Service.Core.Handlers;
 
 /// <summary>
-/// TODO
+/// Handler effectively disabling communication of the message channel.
 /// </summary>
+/// <param name="autonomousChannel"></param>
+/// <param name="manualChannel"></param>
 /// <param name="logger"></param>
 internal class SessionEndedHandler(
   IAutonomousMessageChannel autonomousChannel,

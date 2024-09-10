@@ -5,6 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
+/// <summary>
+/// Common Manager for other Session services - keeps just one (current) Session alive.
+/// </summary>
+/// <param name="serviceProvider"></param>
 public class SessionManagerService(
     IServiceProvider serviceProvider
     ) : ISessionManagerService

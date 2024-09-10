@@ -5,6 +5,9 @@ using Rcl;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
+/// <summary>
+/// Ros2 publisher of manual messages.
+/// </summary>
 public class ManualPublisher : IManualMessageSender
 {
     private readonly ILogger<ManualPublisher> _logger;

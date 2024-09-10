@@ -6,10 +6,9 @@ using Microsoft.Extensions.Logging;
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
-/// Checks session`s underlying process, notifies the system about bad check
+/// Checks session`s underlying process. Returns true if process is running, false otherwise.
 /// </summary>
 /// <param name="repository"></param>
-/// <param name="mediator"></param>
 /// <param name="processHandlerService"></param>
 /// <param name="logger"></param>
 public class CheckSessionService(

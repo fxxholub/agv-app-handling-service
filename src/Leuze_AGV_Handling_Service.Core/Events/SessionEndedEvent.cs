@@ -7,6 +7,7 @@ namespace Leuze_AGV_Handling_Service.Core.Events;
 /// Event notifying system about ended session.
 /// </summary>
 /// <param name="sessionId"></param>
+/// <param name="sessionMode"></param>
 internal sealed class SessionEndedEvent(int sessionId, HandlingMode sessionMode) : DomainEventBase
 {
   public int SessionId { get; init; } = sessionId;

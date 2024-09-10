@@ -8,7 +8,7 @@ public class AutonomousMessageChannel(IAutonomousMessageSender senderTarget, IAu
 {
     public async Task ReceiveMap(MapDTO map)
     {
-        if (IsEnabled())
+        if (await IsEnabled())
         {
             await receiverTarget.ReceiveMap(map);
         }
@@ -16,7 +16,7 @@ public class AutonomousMessageChannel(IAutonomousMessageSender senderTarget, IAu
 
     public async Task SendJoy(JoyDTO joy)
     {
-        if (IsEnabled())
+        if (await IsEnabled())
         {
             await senderTarget.SendJoy(joy);
         }

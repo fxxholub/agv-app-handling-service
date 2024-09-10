@@ -38,7 +38,7 @@ public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
     {
         using (var scope = _serviceProvider.CreateScope())
         {
-            var messageChannel = scope.ServiceProvider.GetRequiredService<IAutonomousMessageChannel>();
+            var messageChannel = scope.ServiceProvider.GetRequiredService<IManualMessageChannel>();
             await messageChannel.ReceiveMap(map);
         }
     }

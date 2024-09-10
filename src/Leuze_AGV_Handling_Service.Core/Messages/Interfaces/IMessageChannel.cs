@@ -2,9 +2,9 @@ namespace Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
 
 public interface IMessageChannel
 {
-    public void Enable();
+    public Task Enable();
 
-    public void Disable();
+    public Task Disable();
 
-    public bool IsEnabled();
+    public Task<bool> IsEnabled();
 }

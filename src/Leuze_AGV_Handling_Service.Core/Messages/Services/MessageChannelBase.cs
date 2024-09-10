@@ -7,18 +7,20 @@ public class MessageChannelBase
 {
     private bool _enabled = true;
     
-    public void Enable()
+    public Task Enable()
     {
         _enabled = true;
+        return Task.CompletedTask;
     }
 
-    public void Disable()
+    public Task Disable()
     {
         _enabled = false;
+        return Task.CompletedTask;
     }
 
-    public bool IsEnabled()
+    public Task<bool> IsEnabled()
     {
-        return _enabled;
+        return Task.FromResult(_enabled);
     }
 }

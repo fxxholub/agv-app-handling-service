@@ -28,9 +28,12 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<ICreateSessionService, CreateSessionService>();
     services.AddScoped<IDeleteSessionService, DeleteSessionService>();
     
+    services.AddSingleton<IMessageChannel, AutonomousMessageChannel>();
+    services.AddSingleton<IMessageChannel, ManualMessageChannel>();
+    services.AddSingleton<IAutonomousMessageChannel, AutonomousMessageChannel>();
+    services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
+    
     ////// infrastructure stuff ///////
-    services.AddScoped<IAutonomousMessageChannel, AutonomousMessageChannel>();
-    services.AddScoped<IManualMessageChannel, ManualMessageChannel>();
     services.AddScoped<IProcessHandlerService>(provider => 
       new SshProcessHandlerService(
         ".ssh/private_key"

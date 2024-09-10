@@ -16,8 +16,8 @@ public static class InfrastructureRos2ServiceExtension
     ConfigurationManager config
     )
   {  
-    services.AddSingleton<IAutonomousMessageTransceiver, AutonomousNode>();
-    services.AddHostedService<AutonomousNode>();
+    services.AddSingleton<IManualMessageSender, ManualNode>();
+    services.AddHostedService<ManualNode>();
 
     return services;
   }

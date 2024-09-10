@@ -1,0 +1,6 @@
+namespace Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+
+public interface IAutonomousMessageReceiveForwarder: IMessageForwarder, IAutonomousMessageReceiver
+{
+    
+}

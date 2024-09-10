@@ -10,14 +10,14 @@ using Rcl;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
-public class AutonomousNode : BackgroundService, IAutonomousMessageSender, IAutonomousMessageReceiver
+public class ManualNode : BackgroundService, IAutonomousMessageSender, IAutonomousMessageReceiver, IManualMessageSender
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<AutonomousNode> _logger;
+    private readonly ILogger<ManualNode> _logger;
 
     private readonly IRclPublisher<Ros2CommonMessages.Std.String> _joyPublisher;
     private readonly IRclSubscription<Ros2CommonMessages.Std.String> _mapSubscriber;
-    public AutonomousNode(IServiceProvider serviceProvider, ILogger<AutonomousNode> logger)
+    public ManualNode(IServiceProvider serviceProvider, ILogger<ManualNode> logger)
     {
         _serviceProvider = serviceProvider;
         

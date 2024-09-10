@@ -1,5 +1,6 @@
 using Ardalis.Result;
-using Leuze_AGV_Handling_Service.UseCases.Messages.AutonomousMessages.Map;
+using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
+using Leuze_AGV_Handling_Service.Core.Messages.Events;
 using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
-public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessageTransceiver
+public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessageSender, IAutonomousMessageReceiver
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<FakeAutonomousNode> _logger;
@@ -31,7 +32,7 @@ public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessag
 
     private async void DoWork(object? state)
     {
-        await ReceiveMap("Fake Ros2 node does work!");
+        await ReceiveMap(new MapDTO("Fake Ros2 node does work!"));
     }
 
     public Task StopAsync(CancellationToken stoppingToken)
@@ -47,21 +48,20 @@ public class FakeAutonomousNode : IHostedService, IDisposable, IAutonomousMessag
         _timer?.Dispose();
     }
 
-    public async Task<Result> SendJoy(string message)
+    public async Task SendJoy(JoyDTO message)
     {
         _logger.LogDebug("Fake Ros2 node SendJoy.");
         await Task.Delay(100);
-        return Result.Success();
     }
 
-    public async Task ReceiveMap(string message)
+    public async Task ReceiveMap(MapDTO message)
     {
         _logger.LogDebug("Fake Ros2 node ReceiveMap.");
 
         using (var scope = _serviceProvider.CreateScope())
         {
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-            await mediator.Send(new ReceiveMapCommand(message));
+            await mediator.Publish(new ReceiveMapEvent(message));
         }
     }
 }

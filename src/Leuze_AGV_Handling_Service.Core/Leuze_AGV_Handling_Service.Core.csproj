@@ -18,8 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Messages\" />
     <Folder Include="Session\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Messages\Interfaces\IAutonomousMessageExtensible.cs" />
   </ItemGroup>
 
 </Project>

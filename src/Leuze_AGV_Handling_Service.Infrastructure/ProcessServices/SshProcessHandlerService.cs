@@ -1,6 +1,6 @@
 using Leuze_AGV_Handling_Service.Core.Exceptions;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Renci.SshNet;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;

@@ -1,5 +1,5 @@
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
 using Microsoft.Extensions.Logging;
 using Rcl;
 

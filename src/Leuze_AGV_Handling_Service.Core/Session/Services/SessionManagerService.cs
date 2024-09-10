@@ -1,9 +1,9 @@
 using Ardalis.Result;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Leuze_AGV_Handling_Service.Core.Services;
+namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 public class SessionManagerService(
     IServiceProvider serviceProvider
@@ -11,7 +11,7 @@ public class SessionManagerService(
 {
     private int? _currentSessionId = null;
 
-    public async Task<Result<Session>> CreateAndStartSession(
+    public async Task<Result<SessionAggregate.Session>> CreateAndStartSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,

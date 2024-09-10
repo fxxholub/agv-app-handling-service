@@ -1,8 +1,8 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session.Delete;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Delete;
 
 public class DeleteSessionHandler(ISessionManagerService sessionManager)
   : ICommandHandler<DeleteSessionCommand, Result>

@@ -1,13 +1,13 @@
 using System.Reflection;
 using Ardalis.SharedKernel;
 using Asp.Versioning;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
 using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
 using Leuze_AGV_Handling_Service.Infrastructure.Ros2;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
-using Leuze_AGV_Handling_Service.UseCases.Session.Create;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
 using MediatR;
 using Serilog;
 

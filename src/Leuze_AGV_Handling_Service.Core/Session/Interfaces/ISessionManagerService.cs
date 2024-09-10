@@ -1,11 +1,11 @@
 using Ardalis.Result;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
-namespace Leuze_AGV_Handling_Service.Core.Interfaces;
+namespace Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
 public interface ISessionManagerService
 {
-    public Task<Result<Session>> CreateAndStartSession(
+    public Task<Result<SessionAggregate.Session>> CreateAndStartSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,

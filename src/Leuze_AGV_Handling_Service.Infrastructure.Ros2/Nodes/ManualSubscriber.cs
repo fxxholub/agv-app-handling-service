@@ -1,5 +1,6 @@
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

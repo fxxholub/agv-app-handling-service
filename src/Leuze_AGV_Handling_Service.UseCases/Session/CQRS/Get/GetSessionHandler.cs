@@ -1,10 +1,10 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate.Specifications;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session.Get;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
 
-public class GetSessionHandler(IReadRepository<Core.SessionAggregate.Session> repository)
+public class GetSessionHandler(IReadRepository<Core.Session.SessionAggregate.Session> repository)
   : IQueryHandler<GetSessionQuery, Result<SessionDTO>>
 {
   public async Task<Result<SessionDTO>> Handle(GetSessionQuery request, CancellationToken cancellationToken)

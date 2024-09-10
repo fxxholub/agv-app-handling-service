@@ -2,7 +2,7 @@
 using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session.List;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
 
 public class ListSessionsHandler(IListSessionsQueryService query, ILogger<ListSessionsHandler> logger)
   : IQueryHandler<ListSessionsQuery, Result<IEnumerable<SessionDTO>>>

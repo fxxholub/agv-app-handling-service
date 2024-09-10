@@ -1,5 +1,6 @@
-﻿using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Contexts;
-using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+﻿using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,12 +1,9 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
-using MediatR;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace Leuze_AGV_Handling_Service.Core.Services;
+namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
 /// Checks session`s underlying process, notifies the system about bad check
@@ -16,7 +13,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 /// <param name="processHandlerService"></param>
 /// <param name="logger"></param>
 public class CheckSessionService(
-    IRepository<Session> repository,
+    IRepository<SessionAggregate.Session> repository,
     IProcessHandlerService processHandlerService,
     ILogger<CheckSessionService> logger
 ) : ICheckSessionService
@@ -27,18 +24,10 @@ public class CheckSessionService(
         logger.LogInformation("Checking Session {sessionId}", sessionId);
         
         // get the session aggregate by id
-        Session? aggregate = await repository.GetByIdAsync(sessionId);
+        SessionAggregate.Session? aggregate = await repository.GetByIdAsync(sessionId);
         if (aggregate == null) return Result.NotFound();
         
         var checkOk = await aggregate.CheckAsync(processHandlerService);
-        
-        // // notify system about bad check
-        // if (!checkOk)
-        // {
-        //     logger.LogWarning("Session Faulty {sessionId}", sessionId);
-        //     var domainEvent = new SessionFaultyEvent(sessionId);
-        //     await mediator.Publish(domainEvent);
-        // }
 
         return Result.Success(checkOk);
     }

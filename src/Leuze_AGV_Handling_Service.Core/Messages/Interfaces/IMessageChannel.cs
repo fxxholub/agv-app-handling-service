@@ -1,4 +1,4 @@
-namespace Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+namespace Leuze_AGV_Handling_Service.Core.Messages.Interfaces;
 
 public interface IMessageChannel
 {

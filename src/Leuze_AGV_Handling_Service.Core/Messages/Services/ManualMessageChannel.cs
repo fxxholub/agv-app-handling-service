@@ -1,8 +1,7 @@
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.Core.Messages.Services;
-using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 
-namespace Leuze_AGV_Handling_Service.Infrastructure.Messages;
+namespace Leuze_AGV_Handling_Service.Core.Messages.Services;
 
 public class ManualMessageChannel(IManualMessageSender senderTarget, IManualMessageReceiver receiverTarget) : MessageChannelBase, IManualMessageChannel
 {

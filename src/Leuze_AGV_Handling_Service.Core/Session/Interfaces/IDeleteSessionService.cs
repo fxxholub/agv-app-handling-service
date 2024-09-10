@@ -1,6 +1,6 @@
 ﻿using Ardalis.Result;
 
-namespace Leuze_AGV_Handling_Service.Core.Interfaces;
+namespace Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
 public interface IDeleteSessionService
 {

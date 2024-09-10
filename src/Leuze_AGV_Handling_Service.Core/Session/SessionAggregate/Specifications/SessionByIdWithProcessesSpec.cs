@@ -1,6 +1,6 @@
 ﻿using Ardalis.Specification;
 
-namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Specifications;
+namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
 
 public sealed class SessionByIdWithProcessesSpec : Specification<Session>
 {

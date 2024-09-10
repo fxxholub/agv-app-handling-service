@@ -1,10 +1,10 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Microsoft.Extensions.Logging;
 
-namespace Leuze_AGV_Handling_Service.Core.Services;
+namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
 /// Creates session entity, attempts to start the session by starting underlying processes.
@@ -13,12 +13,12 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 /// <param name="processProviderService"></param>
 /// <param name="logger"></param>
 public class CreateSessionService(
-    IRepository<Session> sessionRepository,
+    IRepository<SessionAggregate.Session> sessionRepository,
     IProcessProviderService processProviderService,
     ILogger<CreateSessionService> logger
 ) : ICreateSessionService
 {
-    public async Task<Result<Session>> CreateSession(
+    public async Task<Result<SessionAggregate.Session>> CreateSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,
@@ -29,7 +29,7 @@ public class CreateSessionService(
         logger.LogInformation("Creating Session");
         
         // create session object
-        var newSession = new Session(
+        var newSession = new SessionAggregate.Session(
             handlingMode,
             mappingEnabled,
             inputMapRef,
@@ -50,7 +50,7 @@ public class CreateSessionService(
         logger.LogInformation("Created Session {sessionId}", createdSession.Id);
         
         // get the session from repository to check if added sucessfully
-        Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
+        SessionAggregate.Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
         if (aggregate == null) return Result.NotFound();
 
         return Result.Success(createdSession);

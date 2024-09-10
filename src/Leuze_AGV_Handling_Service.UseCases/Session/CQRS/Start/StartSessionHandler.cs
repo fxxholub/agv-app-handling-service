@@ -1,8 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session.Start;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Start;
 
 public class StartSessionHandler()
   : ICommandHandler<StartSessionCommand, Result>

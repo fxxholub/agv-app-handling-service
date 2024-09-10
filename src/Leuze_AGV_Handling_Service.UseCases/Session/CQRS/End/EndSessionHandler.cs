@@ -1,8 +1,8 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session.End;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.End;
 
 public class EndSessionHandler(ISessionManagerService sessionManager)
   : ICommandHandler<EndSessionCommand, Result>

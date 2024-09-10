@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Exceptions;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.Exceptions;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
-namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
+namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
 /// <summary>
 /// Describes a process, that can be started, checked and killed.

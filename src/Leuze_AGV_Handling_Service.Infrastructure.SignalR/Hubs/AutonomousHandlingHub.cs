@@ -1,6 +1,5 @@
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
-using MediatR;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 

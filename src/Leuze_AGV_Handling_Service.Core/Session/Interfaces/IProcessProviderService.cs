@@ -1,6 +1,6 @@
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
-namespace Leuze_AGV_Handling_Service.Core.Interfaces;
+namespace Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
 public interface IProcessProviderService
 {

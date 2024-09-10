@@ -1,12 +1,11 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate;
-using Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
+using Leuze_AGV_Handling_Service.Core.Events;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Leuze_AGV_Handling_Service.Core.Services;
+namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
 /// Ends session`s underlying processes.
@@ -16,7 +15,7 @@ namespace Leuze_AGV_Handling_Service.Core.Services;
 /// <param name="processHandlerService"></param>
 /// <param name="logger"></param>
 public class EndSessionService(
-    IRepository<Session> repository,
+    IRepository<SessionAggregate.Session> repository,
     IMediator mediator,
     IProcessHandlerService processHandlerService,
     ILogger<EndSessionService> logger
@@ -28,7 +27,7 @@ public class EndSessionService(
         logger.LogInformation("Ending Session {sessionId}", sessionId);
         
         
-        Session? aggregate = await repository.GetByIdAsync(sessionId);
+        SessionAggregate.Session? aggregate = await repository.GetByIdAsync(sessionId);
         if (aggregate == null) return Result.NotFound();
 
         await aggregate.EndAsync(processHandlerService);

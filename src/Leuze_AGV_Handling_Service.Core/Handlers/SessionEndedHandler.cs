@@ -1,10 +1,11 @@
-﻿
-using Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
-using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
+﻿using Leuze_AGV_Handling_Service.Core.Events;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
+using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Handlers;
+namespace Leuze_AGV_Handling_Service.Core.Handlers;
 
 /// <summary>
 /// TODO
@@ -20,10 +21,10 @@ internal class SessionEndedHandler(
   {
     logger.LogInformation("Handling Session Ended event for {sessionId}", domainEvent.SessionId);
 
-    if (domainEvent.sessionMode is HandlingMode.Autonomous)
+    if (domainEvent.SessionMode is HandlingMode.Autonomous)
     {
       await autonomousChannel.Disable();
-    } else if (domainEvent.sessionMode is HandlingMode.Manual)
+    } else if (domainEvent.SessionMode is HandlingMode.Manual)
     {
       await manualChannel.Disable();
     }

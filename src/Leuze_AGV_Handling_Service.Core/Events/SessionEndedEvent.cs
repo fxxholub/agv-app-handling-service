@@ -1,6 +1,7 @@
 ﻿using Ardalis.SharedKernel;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
-namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
+namespace Leuze_AGV_Handling_Service.Core.Events;
 
 /// <summary>
 /// Event notifying system about ended session.
@@ -9,5 +10,5 @@ namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Events;
 internal sealed class SessionEndedEvent(int sessionId, HandlingMode sessionMode) : DomainEventBase
 {
   public int SessionId { get; init; } = sessionId;
-  public HandlingMode sessionMode { get; init; } = sessionMode;
+  public HandlingMode SessionMode { get; init; } = sessionMode;
 }

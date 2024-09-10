@@ -1,4 +1,4 @@
-﻿namespace Leuze_AGV_Handling_Service.Core.Exceptions;
+﻿namespace Leuze_AGV_Handling_Service.Core.Session.Exceptions;
 
 public class SessionInvalidOperationException: InvalidOperationException
 {

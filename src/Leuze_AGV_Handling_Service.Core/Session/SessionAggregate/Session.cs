@@ -1,10 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Exceptions;
-using Leuze_AGV_Handling_Service.Core.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.Exceptions;
+using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
-namespace Leuze_AGV_Handling_Service.Core.SessionAggregate;
+namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
 /// <summary>
 /// Describes user handling session with its settings, processes and mode selected.

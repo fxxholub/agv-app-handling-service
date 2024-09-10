@@ -1,10 +1,5 @@
-using Ardalis.Result;
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.Core.Messages.Events;
 using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rcl;
 

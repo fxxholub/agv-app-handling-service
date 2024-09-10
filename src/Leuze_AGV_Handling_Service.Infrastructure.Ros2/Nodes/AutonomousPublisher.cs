@@ -1,10 +1,5 @@
-using Ardalis.Result;
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.Core.Messages.Events;
 using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rcl;
 
@@ -15,7 +10,7 @@ public class AutonomousPublisher : IAutonomousMessageSender
     private readonly ILogger<AutonomousPublisher> _logger;
 
     private readonly IRclPublisher<Ros2CommonMessages.Std.String> _joyPublisher;
-    public AutonomousPublisher(IServiceProvider serviceProvider, ILogger<AutonomousPublisher> logger)
+    public AutonomousPublisher(ILogger<AutonomousPublisher> logger)
     {
         _logger = logger;
         _logger.LogInformation($"Handling Ros2 node started.");

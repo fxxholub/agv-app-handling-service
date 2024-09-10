@@ -8,16 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Contexts;
 
-public class AutonomousHubReceiveForwarder(
+public class AutonomousHubMessageForwarder(
     IHubContext<AutonomousHandlingHub, IAutonomousHandlingHub> hubContext
     )
-    : MessageForwarderBase, IAutonomousMessageReceiveForwarder
+    : IAutonomousMessageReceiver
 {
     public async Task ReceiveMap(MapDTO map)
     {
-        if (IsEnabled())
-        {
-            await hubContext.Clients.All.ReceiveMap(map);
-        }
+        await hubContext.Clients.All.ReceiveMap(map);
     }
 }

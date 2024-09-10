@@ -1,8 +1,5 @@
-using Ardalis.Result;
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.Core.Messages.Events;
 using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -37,12 +34,12 @@ public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
         }
     }
 
-    public async Task ReceiveMap(MapDTO message)
+    public async Task ReceiveMap(MapDTO map)
     {
         using (var scope = _serviceProvider.CreateScope())
         {
-            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-            await mediator.Publish(new ReceiveMapEvent(message));
+            var messageChannel = scope.ServiceProvider.GetRequiredService<IAutonomousMessageChannel>();
+            await messageChannel.ReceiveMap(map);
         }
     }
 }

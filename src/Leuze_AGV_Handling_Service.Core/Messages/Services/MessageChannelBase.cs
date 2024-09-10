@@ -3,9 +3,9 @@ using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.Core.Messages.Services;
 
-public class MessageForwarderBase: IMessageForwarder
+public class MessageChannelBase
 {
-    private bool _enabled = false;
+    private bool _enabled = true;
     
     public void Enable()
     {

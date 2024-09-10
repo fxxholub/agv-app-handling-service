@@ -10,14 +10,13 @@ using Rcl;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
-public class AutonomousNode : BackgroundService, IAutonomousMessageSender, IAutonomousMessageReceiver
+public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<AutonomousNode> _logger;
-
-    private readonly IRclPublisher<Ros2CommonMessages.Std.String> _joyPublisher;
+    private readonly ILogger<ManualSubscriber> _logger;
+    
     private readonly IRclSubscription<Ros2CommonMessages.Std.String> _mapSubscriber;
-    public AutonomousNode(IServiceProvider serviceProvider, ILogger<AutonomousNode> logger)
+    public ManualSubscriber(IServiceProvider serviceProvider, ILogger<ManualSubscriber> logger)
     {
         _serviceProvider = serviceProvider;
         
@@ -25,9 +24,8 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageSender, IAuto
         _logger.LogInformation($"Handling Ros2 node started.");
         
         var context = new RclContext();
-        var node = context.CreateNode("handling_service_autonomous");
-
-        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Std.String>("/joy");
+        var node = context.CreateNode("handling_service_manual_sub");
+        
         _mapSubscriber = node.CreateSubscription<Ros2CommonMessages.Std.String>("/map");
     }
 
@@ -37,12 +35,6 @@ public class AutonomousNode : BackgroundService, IAutonomousMessageSender, IAuto
         {
             await ReceiveMap(new MapDTO(msg.Data));
         }
-    }
-
-    public async Task SendJoy(JoyDTO message)
-    {
-        var msg = new Ros2CommonMessages.Std.String(message.Something);
-        await _joyPublisher.PublishAsync(msg);
     }
 
     public async Task ReceiveMap(MapDTO message)

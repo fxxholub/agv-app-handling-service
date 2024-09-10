@@ -137,5 +137,6 @@ public static class Program
 
         // // map SignalR hubs as endpoints
         app.MapHub<AutonomousHandlingHub>($"/api/v1/signalr/autonomous");
+        app.MapHub<ManualHandlingHub>($"/api/v1/signalr/manual");
     }
 }

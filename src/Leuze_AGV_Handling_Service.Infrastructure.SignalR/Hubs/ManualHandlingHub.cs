@@ -14,6 +14,7 @@ public class ManualHandlingHub(IMediator mediator) : Hub<IManualHandlingHub>, IM
 {
     public async Task SendJoy(JoyDTO message)
     {
+        Console.WriteLine(message.Something);
         await mediator.Publish(new SendJoyEvent(message));
     }
 }

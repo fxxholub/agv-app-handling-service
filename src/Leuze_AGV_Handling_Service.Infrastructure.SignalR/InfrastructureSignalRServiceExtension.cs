@@ -17,6 +17,7 @@ public static class InfrastructureSignalRServiceExtension
   {
     
     services.AddScoped<IAutonomousMessageReceiveForwarder, AutonomousHubReceiveForwarder>();
+    services.AddScoped<IManualMessageReceiveForwarder, ManualHubReceiveForwarder>();
     
     return services;
   }

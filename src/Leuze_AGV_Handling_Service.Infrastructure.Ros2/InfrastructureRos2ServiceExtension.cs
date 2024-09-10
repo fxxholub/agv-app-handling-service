@@ -1,4 +1,5 @@
 ﻿using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Contexts;
 using Leuze_AGV_Handling_Service.UseCases.Messages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,13 @@ public static class InfrastructureRos2ServiceExtension
     ConfigurationManager config
     )
   {  
-    services.AddSingleton<IManualMessageSender, ManualNode>();
-    services.AddHostedService<ManualNode>();
+    services.AddHostedService<AutonomousSubscriber>();
+    services.AddHostedService<ManualSubscriber>();
+    services.AddSingleton<IAutonomousMessageSender, AutonomousPublisher>();
+    services.AddSingleton<IManualMessageSender, ManualPublisher>();
+
+    services.AddScoped<IAutonomousMessageSendForwarder, AutonomousNodeSendForwarder>();
+    services.AddScoped<IManualMessageSendForwarder, ManualNodeSendForwarder>();
 
     return services;
   }

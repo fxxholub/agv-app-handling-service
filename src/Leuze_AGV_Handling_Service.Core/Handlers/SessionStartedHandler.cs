@@ -11,7 +11,8 @@ namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Handlers;
 /// </summary>
 /// <param name="logger"></param>
 internal class SessionStartedHandler(
-  IMessageChannel messageChannel,
+  IAutonomousMessageChannel autonomousChannel,
+  IManualMessageChannel manualChannel,
   ILogger<SessionStartedHandler> logger
   ) : INotificationHandler<SessionStartedEvent>
 {
@@ -19,6 +20,12 @@ internal class SessionStartedHandler(
   {
     logger.LogInformation("Handling Session Started event for {sessionId}", domainEvent.SessionId);
 
-    await messageChannel.Enable();
+    if (domainEvent.sessionMode is HandlingMode.Autonomous)
+    {
+      await autonomousChannel.Enable();
+    } else if (domainEvent.sessionMode is HandlingMode.Manual)
+    {
+      await manualChannel.Enable();
+    }
   }
 }

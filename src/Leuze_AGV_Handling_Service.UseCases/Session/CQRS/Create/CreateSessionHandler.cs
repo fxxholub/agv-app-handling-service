@@ -4,12 +4,12 @@ using Leuze_AGV_Handling_Service.Core.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.Create;
 
-public class CreateSessionHandler(ICreateSessionService createSessionService) 
+public class CreateSessionHandler(ISessionManagerService sessionManager) 
   : ICommandHandler<CreateSessionCommand, Result<SessionDTO>>
 {
   public async Task<Result<SessionDTO>> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
   {
-    var entity = await createSessionService.CreateSession(
+    var entity = await sessionManager.CreateAndStartSession(
       request.HandlingMode,
       request.MappingEnabled,
       request.InputMapRef,

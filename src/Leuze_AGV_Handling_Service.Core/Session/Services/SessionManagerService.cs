@@ -1,16 +1,12 @@
 using Ardalis.Result;
 using Leuze_AGV_Handling_Service.Core.Interfaces;
 using Leuze_AGV_Handling_Service.Core.SessionAggregate;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Leuze_AGV_Handling_Service.Core.Services;
 
 public class SessionManagerService(
-    ICreateSessionService createSessionService,
-    IDeleteSessionService deleteSessionService,
-    IStartSessionService startSessionService,
-    IEndSessionService endSessionService,
-    ICheckSessionService checkSessionService
-    
+    IServiceProvider serviceProvider
     ) : ISessionManagerService
 {
     private int? _currentSessionId = null;
@@ -21,10 +17,15 @@ public class SessionManagerService(
         string? inputMapRef,
         string? outputMapRef,
         string? outputMapName
-        ) 
+        )
     {
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var createSessionService = scope.ServiceProvider.GetRequiredService<ICreateSessionService>();
+        var startSessionService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
+            
         if (_currentSessionExists()) return Result.Conflict();
-        
+
         // create the session
         var session = await createSessionService.CreateSession(
             handlingMode,
@@ -33,23 +34,27 @@ public class SessionManagerService(
             outputMapRef,
             outputMapName
         );
-        
+
         if (!session.IsSuccess) return Result.Error();
 
         // start the session along with its processes
         var started = await startSessionService.StartSession(session.Value.Id);
 
         if (!started.IsSuccess) return Result.Error();
-        
+
         // set the session as current
         _currentSessionId = session.Value.Id;
-        
-        return Result.Success(session);
 
+        return Result.Success(session);
     }
 
     public async Task<Result> EndAndDeleteSession(int sessionId)
     {
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
+        var deleteSessionService = scope.ServiceProvider.GetRequiredService<IDeleteSessionService>();
+        
         if (_isCurrentSession(sessionId))
         {
             // if session is current session, first end it
@@ -69,6 +74,10 @@ public class SessionManagerService(
 
     public async Task<Result> EndSession(int sessionId)
     {
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
+        
         if (_isCurrentSession(sessionId))
         {
             var ended = await endSessionService.EndSession(sessionId);
@@ -85,11 +94,16 @@ public class SessionManagerService(
 
     public async Task<Result<bool>> CheckAndEndBadSession(int sessionId)
     {
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var checkSessionService = scope.ServiceProvider.GetRequiredService<ICheckSessionService>();
+        
         if (_isCurrentSession(sessionId))
         {
             var checkedResult = await checkSessionService.CheckSession(sessionId);
             if (!checkedResult.IsSuccess) return Result.Error();
             
+            //TODO the end part
             
             return Result.Success(checkedResult.Value);
         }

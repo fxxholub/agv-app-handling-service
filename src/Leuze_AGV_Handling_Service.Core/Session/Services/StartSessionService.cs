@@ -34,7 +34,7 @@ public class StartSessionService(
         await aggregate.StartAsync(processHandlerService);
         
         // notify system about start
-        var domainEvent = new SessionStartedEvent(sessionId);
+        var domainEvent = new SessionStartedEvent(sessionId, aggregate.HandlingMode);
         await mediator.Publish(domainEvent);
 
         await repository.UpdateAsync(aggregate);

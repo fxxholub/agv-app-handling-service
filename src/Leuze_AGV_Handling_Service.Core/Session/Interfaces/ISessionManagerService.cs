@@ -12,7 +12,7 @@ public interface ISessionManagerService
         string? outputMapRef,
         string? outputMapName
         );
-
+    
     public Task<Result> EndAndDeleteSession(int sessionId);
     
     public Task<Result> EndSession(int sessionId);

@@ -5,7 +5,7 @@ namespace Leuze_AGV_Handling_Service.Core.Messages.Services;
 
 public class MessageChannelBase
 {
-    private bool _enabled = true;
+    private bool _enabled = false;
     
     public Task Enable()
     {

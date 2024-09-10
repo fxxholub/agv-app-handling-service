@@ -22,14 +22,14 @@ public static class InfrastructureServiceExtensions
   {
     
     ////// core stuff ////////
+    services.AddSingleton<ISessionManagerService, SessionManagerService>();
+    
     services.AddScoped<IStartSessionService, StartSessionService>();
     services.AddScoped<IEndSessionService, EndSessionService>();
     services.AddScoped<ICheckSessionService, CheckSessionService>();
     services.AddScoped<ICreateSessionService, CreateSessionService>();
     services.AddScoped<IDeleteSessionService, DeleteSessionService>();
     
-    services.AddSingleton<IMessageChannel, AutonomousMessageChannel>();
-    services.AddSingleton<IMessageChannel, ManualMessageChannel>();
     services.AddSingleton<IAutonomousMessageChannel, AutonomousMessageChannel>();
     services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
     

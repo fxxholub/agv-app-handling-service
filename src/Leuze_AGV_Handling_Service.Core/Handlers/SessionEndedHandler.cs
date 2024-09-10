@@ -11,7 +11,8 @@ namespace Leuze_AGV_Handling_Service.Core.SessionAggregate.Handlers;
 /// </summary>
 /// <param name="logger"></param>
 internal class SessionEndedHandler(
-  IMessageChannel messageChannel,
+  IAutonomousMessageChannel autonomousChannel,
+  IManualMessageChannel manualChannel,
   ILogger<SessionEndedHandler> logger
   ) : INotificationHandler<SessionEndedEvent>
 {
@@ -19,6 +20,12 @@ internal class SessionEndedHandler(
   {
     logger.LogInformation("Handling Session Ended event for {sessionId}", domainEvent.SessionId);
 
-    await messageChannel.Disable();
+    if (domainEvent.sessionMode is HandlingMode.Autonomous)
+    {
+      await autonomousChannel.Disable();
+    } else if (domainEvent.sessionMode is HandlingMode.Manual)
+    {
+      await manualChannel.Disable();
+    }
   }
 }

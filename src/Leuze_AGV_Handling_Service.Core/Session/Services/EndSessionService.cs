@@ -34,7 +34,7 @@ public class EndSessionService(
         await aggregate.EndAsync(processHandlerService);
         
         // notify system about session end
-        var domainEvent = new SessionEndedEvent(sessionId);
+        var domainEvent = new SessionEndedEvent(sessionId, aggregate.HandlingMode);
         await mediator.Publish(domainEvent);
 
         await repository.UpdateAsync(aggregate);

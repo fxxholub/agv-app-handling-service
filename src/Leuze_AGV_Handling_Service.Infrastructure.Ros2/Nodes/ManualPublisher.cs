@@ -16,7 +16,7 @@ public class ManualPublisher : IManualMessageSender
     public ManualPublisher(IServiceProvider serviceProvider, ILogger<ManualPublisher> logger)
     {
         _logger = logger;
-        _logger.LogInformation($"Handling Ros2 node started.");
+        _logger.LogInformation($"Handling Ros2 handling_service_manual_pub node started.");
         
         var context = new RclContext();
         var node = context.CreateNode("handling_service_manual_pub");

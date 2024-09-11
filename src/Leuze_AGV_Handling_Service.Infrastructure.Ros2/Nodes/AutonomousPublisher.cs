@@ -16,7 +16,7 @@ public class AutonomousPublisher : IAutonomousMessageSender
     public AutonomousPublisher(ILogger<AutonomousPublisher> logger)
     {
         _logger = logger;
-        _logger.LogInformation($"Handling Ros2 node started.");
+        _logger.LogInformation($"Handling Ros2 handling_service_autonomous_pub node started.");
         
         var context = new RclContext();
         var node = context.CreateNode("handling_service_autonomous_pub");

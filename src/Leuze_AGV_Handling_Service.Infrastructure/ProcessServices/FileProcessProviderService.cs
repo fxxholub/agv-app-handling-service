@@ -136,7 +136,6 @@ public class FileProcessProviderService: IProcessProviderService
         {
             throw new InvalidOperationException("ProcessScripts to deserialize the configuration file.");
         }
-        Console.WriteLine($"{config.HostName}, {config.HostAddr}, {config.HostUser}");
         return config;
     }
     

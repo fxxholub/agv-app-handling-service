@@ -22,7 +22,7 @@ public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
         _serviceProvider = serviceProvider;
         
         _logger = logger;
-        _logger.LogInformation($"Handling Ros2 node started.");
+        _logger.LogInformation($"Handling Ros2 handling_service_manual_sub node started.");
         
         var context = new RclContext();
         var node = context.CreateNode("handling_service_manual_sub");

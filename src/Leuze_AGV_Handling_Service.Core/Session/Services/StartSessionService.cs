@@ -1,9 +1,7 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Events;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
@@ -17,7 +15,6 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 /// <param name="logger"></param>
 public class StartSessionService(
     IRepository<SessionAggregate.Session> repository,
-    IMediator mediator,
     IProcessHandlerService processHandlerService,
     ILogger<StartSessionService> logger
 ) : IStartSessionService
@@ -32,10 +29,6 @@ public class StartSessionService(
         if (aggregate == null) return Result.NotFound();
 
         await aggregate.StartAsync(processHandlerService);
-        
-        // notify system about start
-        var domainEvent = new SessionStartedEvent(sessionId, aggregate.HandlingMode);
-        await mediator.Publish(domainEvent);
 
         await repository.UpdateAsync(aggregate);
 

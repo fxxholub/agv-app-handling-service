@@ -2,11 +2,7 @@
 
 TODO
 
-## ssh connection
 
-1) create ssh key pair, make .private_key file in project directory, copy the private key to this file
-2) update .env file with SSH_PRIVATE_KEY_PATH=.private_key
-
-## process scripts
+## Process scripts ans SSH connections
 
 read ProcessScripts/readme.md

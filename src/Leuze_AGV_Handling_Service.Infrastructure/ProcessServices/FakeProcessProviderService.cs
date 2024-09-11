@@ -13,6 +13,7 @@ public class FakeProcessProviderService: IProcessProviderService
             "host1",
             "172.17.0.1",
             "jholub",
+            null,
             null
             ),
             new Process(
@@ -20,6 +21,7 @@ public class FakeProcessProviderService: IProcessProviderService
                 "host3",
                 "172.17.0.1",
                 "jholub",
+                null,
                 null
             ),
         ]);

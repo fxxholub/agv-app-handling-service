@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
+using Newtonsoft.Json;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
@@ -10,7 +11,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 public class FileProcessProviderService: IProcessProviderService
 {
     private readonly string _processScriptsPath;
-    private Dictionary<HandlingMode, List<Process>> _loadedProcesses = new();
+    private readonly Dictionary<HandlingMode, List<Process>> _loadedProcesses = new();
 
     /// <summary>
     /// Fetches process scripts and makes process instances out of them.
@@ -35,67 +36,66 @@ public class FileProcessProviderService: IProcessProviderService
             throw new DirectoryNotFoundException($"ProcessScripts directory must be named ProcessScripts directory, is '{Path.GetFileNameWithoutExtension(_processScriptsPath)}'.");
         }
         
-        // get subdirectories (Common, Autonomous...)
-        var subDirectories = Directory.GetDirectories(_processScriptsPath);
+        // get folders (hosts / host connections)
+        var hostFolders = Directory.GetDirectories(_processScriptsPath);
         
-        foreach (var subDir in subDirectories)
+        // prepare handling modes for later check
+        var handlingModes = new List<HandlingMode>(Enum.GetValues<HandlingMode>());
+        var handlingNames = handlingModes.Select(mode => mode.ToString()).ToList();
+        
+        // host folders
+        foreach (var hostFolder in hostFolders)
         {
-            var subDirName = Path.GetFileNameWithoutExtension(subDir);
-            if (String.IsNullOrEmpty(subDirName))
+            var hostFolderName = Path.GetFileNameWithoutExtension(hostFolder);
+            if (String.IsNullOrEmpty(hostFolderName))
             {
-                throw new InvalidEnumArgumentException($"ProcessScripts Subdirectory {subDirName} name is null or empty.");
+                throw new InvalidEnumArgumentException($"ProcessScripts Folder {hostFolderName} name is null or empty.");
             }
             
-            // get subfolders - patter hostName-hostAddr-userName
-            var subFolders = Directory.GetDirectories(subDir);
-            
-            var handlingModes = new List<HandlingMode>(Enum.GetValues<HandlingMode>());
-            var handlingNames = handlingModes.Select(mode => mode.ToString()).ToList();
-            if (!(subDirName == "Common" || (handlingNames.Any(name => name.Equals(subDirName)))))
+            // prepare config and private key
+            var hostConfig = ParseConfig(Path.Join(hostFolder, "config.json"));
+            var privateKeyPath = Path.Join(hostFolder, ".private_key");
+            if (!Path.Exists(privateKeyPath))
             {
-                throw new InvalidEnumArgumentException($"ProcessScripts Subdirectory {subDirName} is neither Common nor valid HandlingMode.");
+                throw new FileNotFoundException($"ProcessScripts file {privateKeyPath} not found.");
             }
+            
+            // get hosts subfolders - handling modes
+            var handlingFolders = Directory.GetDirectories(hostFolder);
 
-            foreach (var subFol in subFolders)
+            // hosts handling folders
+            foreach (var handlingFolder in handlingFolders)
             {
-                // parse subFol by pattern
-                var subFolName = Path.GetFileName(subFol);
-                var parts = subFolName.Split('-');
-                if (parts.Length != 3)
-                {
-                    throw new FormatException($"Subfolder name '{subFolName}' is not in the expected format 'hostName-hostAddr-userName'.");
-                }
-                string hostName = parts[0];
-                string hostAddr = parts[1];
-                string userName = parts[2];
+                var handlingFolderName = Path.GetFileName(handlingFolder);
                 
-                if (String.IsNullOrEmpty(hostName) || String.IsNullOrEmpty(hostAddr) || String.IsNullOrEmpty(userName))
+                // check if handling folder has correct name
+                if (!(handlingFolderName == "Common" || (handlingNames.Any(name => name.Equals(handlingFolderName)))))
                 {
-                    throw new FormatException($"Subfolder name '{subFolName}' is not in the expected format 'hostName-hostAddr-userName'.");
+                    throw new InvalidEnumArgumentException($"ProcessScripts host {hostFolderName} subfolder {handlingFolderName} is neither Common nor valid HandlingMode.");
                 }
                 
                 // get .sh scripts
-                var scriptFiles = Directory.GetFiles(subFol, "*.sh");
-                    
+                var scriptFiles = Directory.GetFiles(handlingFolder, "*.sh");
+                
+                // script files
                 foreach (var scriptFile in scriptFiles)
                 {
+                    var scriptName = Path.GetFileNameWithoutExtension(scriptFile);
+                    
                     // get lines
                     var lines = File.ReadAllLines(scriptFile);
-                    // if (lines.IsNullOrEmpty())
-                    // {
-                    //     throw new InvalidDataException($"File {subFolName} doesnt contain any commands.");
-                    // }
 
                     Process process = new Process(
-                        Path.GetFileNameWithoutExtension(scriptFile),
-                        hostName,
-                        hostAddr,
-                        userName,
-                        null
+                        scriptName,
+                        hostConfig.HostName,
+                        hostConfig.HostAddr,
+                        hostConfig.HostUser,
+                        null,
+                        privateKeyPath
                         );
                     process.AddCommands(new List<string>(lines));
 
-                    if (subDirName == "Common")
+                    if (handlingFolderName == "Common")
                     {
                         foreach (var handlingMode in handlingNames)
                         {
@@ -104,7 +104,7 @@ public class FileProcessProviderService: IProcessProviderService
                     }
                     else
                     {
-                        AddProcess(Enum.Parse<HandlingMode>(subDirName), process);
+                        AddProcess(Enum.Parse<HandlingMode>(handlingFolderName), process);
                     }
                 }
             }
@@ -126,5 +126,24 @@ public class FileProcessProviderService: IProcessProviderService
     public IEnumerable<Process> GetProcesses(HandlingMode handlingMode)
     {
         return _loadedProcesses[handlingMode];
+    }
+
+    private static ProcessConfig ParseConfig(string configPath)
+    {
+        var jsonString = File.ReadAllText(configPath);
+        var config = JsonConvert.DeserializeObject<ProcessConfig>(jsonString);
+        if (config == null)
+        {
+            throw new InvalidOperationException("ProcessScripts to deserialize the configuration file.");
+        }
+        Console.WriteLine($"{config.HostName}, {config.HostAddr}, {config.HostUser}");
+        return config;
+    }
+    
+    private class ProcessConfig
+    {
+        public string? HostName { get; set; }
+        public string? HostAddr { get; set; }
+        public string? HostUser { get; set; }
     }
 }

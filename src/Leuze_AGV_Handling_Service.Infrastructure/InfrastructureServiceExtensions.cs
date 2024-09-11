@@ -3,6 +3,7 @@ using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 using Leuze_AGV_Handling_Service.Core.Messages.Services;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.Services;
+using Leuze_AGV_Handling_Service.Infrastructure.Exceptions;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,19 +34,14 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
     
     ////// infrastructure stuff ///////
-    services.AddScoped<IProcessHandlerService>(provider => 
-      new SshProcessHandlerService(
-        ".ssh/private_key"
-        // Environment.GetEnvironmentVariable("SSH_PRIVATE_KEY_PATH") ?? throw new EnvironmentVariableNullException()
-        ));
+    services.AddScoped<IProcessHandlerService, SshProcessHandlerService>();
     // services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
     
-    // services.AddSingleton<IProcessProviderService>(provider => 
-    //   new FileProcessProviderService(
-    //     "ProcessScripts"
-    //     // Environment.GetEnvironmentVariable("PROCESS_SCRIPTS_PATH") ?? throw new EnvironmentVariableNullException()
-    //     ));
-    services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
+    services.AddSingleton<IProcessProviderService>(provider => 
+      new FileProcessProviderService(
+        Environment.GetEnvironmentVariable("PROCESS_SCRIPTS_PATH_INNER") ?? throw new EnvironmentVariableNullException()
+      ));
+    // services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
 
     return services;
   }

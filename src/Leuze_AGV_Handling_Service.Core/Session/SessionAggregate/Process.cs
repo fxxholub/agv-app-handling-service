@@ -19,7 +19,8 @@ public class Process(
   string? hostName,
   string? hostAddr,
   string? userName,
-  int? sessionId
+  int? sessionId,
+  string? privateKeyPath
   ) : EntityBase
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
@@ -27,6 +28,8 @@ public class Process(
     public string? HostName { get; private set; } = hostName;
     public string? HostAddr { get; private set; } = hostAddr;
     public string? UserName { get; private set; } = userName;
+    
+    public string? PrivateKeyPath { get; private set; } = privateKeyPath;
 
     private readonly List<string> _commands = new List<string>();
     public IEnumerable<string> Commands => _commands.AsReadOnly();

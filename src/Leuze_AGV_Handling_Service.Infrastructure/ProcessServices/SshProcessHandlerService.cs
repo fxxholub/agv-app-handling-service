@@ -1,6 +1,6 @@
-using Leuze_AGV_Handling_Service.Core.Exceptions;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
+using Leuze_AGV_Handling_Service.Infrastructure.Exceptions;
 using Renci.SshNet;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
@@ -9,11 +9,8 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 /// Handles process starting, checking and killing via SSH connection.
 /// The connection is made per action, immediately after it is closed.
 /// </summary>
-/// <param name="privateKeyPath"></param>
-public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerService
+public class SshProcessHandlerService: IProcessHandlerService
 {
-    private readonly string _privateKeyPath = privateKeyPath;
-    
     /// <summary>
     /// Makes SSH connection and attempts to start given process.
     /// </summary>
@@ -29,8 +26,8 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
             // Add the command to run in the background and get the PID
             string detachedCommand = $"nohup bash -c \"{combinedCommands}\" > /dev/null 2>&1 & echo $!";
 
-            var (addr, user) = ValidateProcessProperties(process);
-            using (var client = new SshClient(addr, user, new PrivateKeyFile(_privateKeyPath)))
+            var (addr, user,privateKey) = ValidateProcessProperties(process);
+            using (var client = new SshClient(addr, user, new PrivateKeyFile(privateKey)))
             {
                 client.Connect();
                 var cmd = client.CreateCommand(detachedCommand);
@@ -58,8 +55,8 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
         
         return await Task.Run(() =>
         {
-            var (addr, user) = ValidateProcessProperties(process);
-            using (var client = new SshClient(addr, user, new PrivateKeyFile(_privateKeyPath)))
+            var (addr, user,privateKey) = ValidateProcessProperties(process);
+            using (var client = new SshClient(addr, user, new PrivateKeyFile(privateKey)))
             {
                 client.Connect();
                 var cmd = client.CreateCommand($"ps -p {process.Pid} > /dev/null && echo \"true\" || echo \"false\"");
@@ -90,8 +87,8 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
     {
         await Task.Run(() =>
         {
-            var (addr, user) = ValidateProcessProperties(process);
-            using (var client = new SshClient(addr, user, new PrivateKeyFile(_privateKeyPath)))
+            var (addr, user, privateKey) = ValidateProcessProperties(process);
+            using (var client = new SshClient(addr, user, new PrivateKeyFile(privateKey)))
             {
                 client.Connect();
                 var cmd = client.CreateCommand($"kill {process.Pid}");
@@ -107,7 +104,7 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
     /// <param name="process"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    private (string, string) ValidateProcessProperties(Process process)
+    private (string, string, string) ValidateProcessProperties(Process process)
     {
         if (String.IsNullOrEmpty(process.HostAddr))
         {
@@ -117,6 +114,10 @@ public class SshProcessHandlerService(string privateKeyPath): IProcessHandlerSer
         {
             throw new ArgumentException($"Process handled with SSH requires UserName.");
         }
-        return (process.HostAddr, process.UserName);
+        if (String.IsNullOrEmpty(process.PrivateKeyPath))
+        {
+            throw new ArgumentException($"Process handled with SSH requires PrivateKeyPath.");
+        }
+        return (process.HostAddr, process.UserName, process.PrivateKeyPath);
     }
 }

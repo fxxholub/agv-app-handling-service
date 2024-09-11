@@ -28,9 +28,8 @@ RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGUR
 # Final stage
 FROM arm64v8/ros:humble-ros-core-jammy AS final
 ARG PROCESS_SCRIPTS_PATH=${PROCESS_SCRIPTS_PATH}
-ARG SSH_PRIVATE_KEY_PATH=${SSH_PRIVATE_KEY_PATH}
+ENV PROCESS_SCRIPTS_PATH_INNER=ProcessScripts
 WORKDIR /app
 COPY --from=build /app/publish .
-COPY $PROCESS_SCRIPTS_PATH /app/ProcessScripts
-COPY $SSH_PRIVATE_KEY_PATH /app/.ssh/private_key
+COPY $PROCESS_SCRIPTS_PATH /app/${PROCESS_SCRIPTS_PATH_INNER}
 CMD ./Leuze_AGV_Handling_Service.WebAPI

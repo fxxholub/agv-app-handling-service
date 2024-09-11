@@ -10,4 +10,4 @@ public record CreateSessionCommand(
   string? OutputMapRef,
   string? OutputMapName
   ) : 
-  Ardalis.SharedKernel.ICommand<Result<SessionDTO>>;
+  Ardalis.SharedKernel.ICommand<Result<int>>;

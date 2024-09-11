@@ -15,7 +15,7 @@ public class SessionManagerService(
 {
     private int? _currentSessionId = null;
 
-    public async Task<Result<SessionAggregate.Session>> CreateAndStartSession(
+    public async Task<Result<int>> CreateAndStartSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,
@@ -27,11 +27,12 @@ public class SessionManagerService(
         using var scope = serviceProvider.CreateScope();
         var createSessionService = scope.ServiceProvider.GetRequiredService<ICreateSessionService>();
         var startSessionService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
+        var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
             
         if (_currentSessionExists()) return Result.Conflict();
 
         // create the session
-        var session = await createSessionService.CreateSession(
+        var created = await createSessionService.CreateSession(
             handlingMode,
             mappingEnabled,
             inputMapRef,
@@ -39,17 +40,22 @@ public class SessionManagerService(
             outputMapName
         );
 
-        if (!session.IsSuccess) return Result.Error();
+        if (!created.IsSuccess) return Result.Error();
 
         // start the session along with its processes
-        var started = await startSessionService.StartSession(session.Value.Id);
+        var started = await startSessionService.StartSession(created.Value);
 
-        if (!started.IsSuccess) return Result.Error();
+        // if start didn go well, rollback the start transaction by ending it
+        if (!started.IsSuccess)
+        {
+            await endSessionService.EndSession(created.Value);
+            return Result.Error();
+        } 
 
         // set the session as current
-        _currentSessionId = session.Value.Id;
+        _currentSessionId = created.Value;
 
-        return Result.Success(session);
+        return Result.Success(created.Value);
     }
 
     public async Task<Result> EndAndDeleteSession(int sessionId)

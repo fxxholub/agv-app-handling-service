@@ -67,14 +67,11 @@ public class SshProcessHandlerService: IProcessHandlerService
                 {
                     return true;
                 }
-                else if (result.Trim() == "false")
+                if (result.Trim() == "false")
                 {
                     return false;
                 }
-                else
-                {
-                    throw new Exception($"Process check on host {process.HostAddr} under user {process.UserName} with pid {process.Pid} has failed.");
-                }
+                throw new Exception($"Process check on host {process.HostAddr} under user {process.UserName} with pid {process.Pid} has failed.");
             }
         });
     }

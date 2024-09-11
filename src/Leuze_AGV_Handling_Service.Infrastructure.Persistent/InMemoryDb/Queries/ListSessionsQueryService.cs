@@ -1,4 +1,4 @@
-﻿using Leuze_AGV_Handling_Service.UseCases.Session;
+﻿using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,37 +9,14 @@ public class ListSessionsQueryService(AppDbContext db) : IListSessionsQueryServi
   // You can use EF, Dapper, SqlClient, etc. for queries -
   // this is just an example
 
-  public async Task<IEnumerable<SessionDTO>> ListAsync()
+  public async Task<IEnumerable<Session>> ListAsync()
   {
     // NOTE: This will fail if testing with EF InMemory provider!
     // var result = await _db.Database.SqlQuery<ContributorDTO>(
     //   $"SELECT Id, Name, PhoneNumber_Number AS PhoneNumber FROM Contributors") // don't fetch other big columns
     //   .ToListAsync();
-    var sessions = await db.Sessions.ToListAsync();
+    var sessions = await db.Sessions.Include(sesh => sesh.Processes).ToListAsync();
 
-    var result = sessions.Select(entity => 
-        new SessionDTO(
-          entity.Id,
-          entity.HandlingMode,
-          entity.MappingEnabled,
-          entity.InputMapRef ?? "",
-          entity.OutputMapRef ?? "",
-          entity.OutputMapName ?? "",
-          entity.State,
-          entity.Processes.Select(process => new ProcessDTO(
-            process.Name,
-            process.HostName,
-            process.HostAddr,
-            process.UserName,
-            process.SessionId,
-            process.Pid,
-            process.State,
-            process.CreatedDate
-          )).ToList(),
-          entity.CreatedDate
-        )
-      );
-
-    return result;
+    return sessions;
   }
 }

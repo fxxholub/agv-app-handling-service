@@ -5,7 +5,7 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
 public interface ISessionManagerService
 {
-    public Task<Result<SessionAggregate.Session>> CreateAndStartSession(
+    public Task<Result<int>> CreateAndStartSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,

@@ -26,7 +26,8 @@ WORKDIR "/src/src/Leuze_AGV_Handling_Service.WebAPI"
 RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -r $TARGET_RUNTIME --self-contained -o /app/publish
 
 # Final stage
-FROM arm64v8/ros:humble-ros-core-jammy AS final
+# FROM arm64v8/ros:humble-ros-core-jammy AS final
+FROM arm64v8/ros:humble-ros-base-jammy AS final
 ARG PROCESS_SCRIPTS_PATH=${PROCESS_SCRIPTS_PATH}
 ENV PROCESS_SCRIPTS_PATH_INNER=ProcessScripts
 WORKDIR /app

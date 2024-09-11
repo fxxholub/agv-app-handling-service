@@ -102,5 +102,10 @@ public class Process(
           $"Invalid Process operation, cannot Kill while in {State.ToString()}.");
       }
       await processHandlerService.KillProcess(this);
+
+      if (State is not ProcessState.Err)
+      {
+        State = ProcessState.Killed;
+      }
     }
 }

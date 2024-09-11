@@ -18,7 +18,7 @@ public class CreateSessionService(
     ILogger<CreateSessionService> logger
 ) : ICreateSessionService
 {
-    public async Task<Result<SessionAggregate.Session>> CreateSession(
+    public async Task<Result<int>> CreateSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,
@@ -53,6 +53,6 @@ public class CreateSessionService(
         SessionAggregate.Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
         if (aggregate == null) return Result.NotFound();
 
-        return Result.Success(createdSession);
+        return Result.Success(aggregate.Id);
     }
 }

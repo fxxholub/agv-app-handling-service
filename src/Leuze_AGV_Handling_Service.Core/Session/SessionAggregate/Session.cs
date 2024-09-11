@@ -127,5 +127,7 @@ public class Session(
     {
       await process.KillAsync(processHandlerService);
     }
+
+    State = SessionState.Ended;
   }
 }

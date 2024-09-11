@@ -2,6 +2,7 @@ using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Events;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -37,6 +38,12 @@ public class StartSessionService(
         await mediator.Publish(domainEvent);
 
         await repository.UpdateAsync(aggregate);
+
+        if (aggregate.State != SessionState.Started)
+        {
+            logger.LogError("Session not Started");
+            return Result.Error();
+        }
 
         return Result.Success();
     }

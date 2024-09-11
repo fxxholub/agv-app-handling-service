@@ -18,7 +18,7 @@ public class DeleteSessionService(
 
     public async Task<Result> DeleteSession(int sessionId)
     {
-        logger.LogInformation("Deleting Session {sessionId}", sessionId);
+        logger.LogInformation($"Deleting Session {sessionId}...");
         
         // get session object from repository
         SessionAggregate.Session? aggregateToDelete = await repository.GetByIdAsync(sessionId);
@@ -26,6 +26,9 @@ public class DeleteSessionService(
         
         // delete the object from repository
         await repository.DeleteAsync(aggregateToDelete);
+        
+        logger.LogInformation($"...deleted Session {sessionId}.");
+        
         return Result.Success();
     }
 

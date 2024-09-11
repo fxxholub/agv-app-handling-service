@@ -52,15 +52,15 @@ public class Session(
   /// <summary>
   /// Starts a session`s underlying processes, checks if they started - updates states based on that.
   /// </summary>
-  /// <param name="processHandlerService"></param>
+  /// <param name="processMonitorService"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task StartAsync(IProcessHandlerService processHandlerService)
+  public async Task StartAsync(IProcessMonitorService processMonitorService)
   {
     foreach (var process in _processes)
     {
       if (process.State is not ProcessState.Started)
       {
-        await process.StartAsync(processHandlerService);
+        await process.StartAsync(processMonitorService);
       }
     }
 
@@ -69,7 +69,7 @@ public class Session(
     bool allGood = true;
     foreach (var process in _processes)
     {
-      if (!await process.CheckAsync(processHandlerService))
+      if (!await process.CheckAsync(processMonitorService))
       {
         allGood = false;
       }
@@ -88,10 +88,10 @@ public class Session(
   /// <summary>
   /// Checks if underlying processes are alive, updates their state and session`s state based on that.
   /// </summary>
-  /// <param name="processHandlerService"></param>
+  /// <param name="processMonitorService"></param>
   /// <returns></returns>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)
+  public async Task<bool> CheckAsync(IProcessMonitorService processMonitorService)
   {
     if (State is SessionState.None)
     {
@@ -102,7 +102,7 @@ public class Session(
     bool allGood = true;
     foreach (var process in _processes)
     {
-      if (!await process.CheckAsync(processHandlerService)) allGood = false;
+      if (!await process.CheckAsync(processMonitorService)) allGood = false;
     }
 
     if (!allGood) State = SessionState.Err;
@@ -113,9 +113,9 @@ public class Session(
   /// <summary>
   /// Ends session - kills all underlying processes.
   /// </summary>
-  /// <param name="processHandlerService"></param>
+  /// <param name="processMonitorService"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task EndAsync(IProcessHandlerService processHandlerService)
+  public async Task EndAsync(IProcessMonitorService processMonitorService)
   {
     if (State is SessionState.None)
     {
@@ -125,7 +125,7 @@ public class Session(
     
     foreach (var process in _processes)
     {
-      await process.KillAsync(processHandlerService);
+      await process.KillAsync(processMonitorService);
     }
 
     State = SessionState.Ended;

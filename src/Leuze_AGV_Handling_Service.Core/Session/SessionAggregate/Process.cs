@@ -54,11 +54,11 @@ public class Process(
     /// <summary>
     /// Starts process with given Process Handler, marks process with Pid if succeded.
     /// </summary>
-    /// <param name="processHandlerService"></param>
+    /// <param name="processMonitorService"></param>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task StartAsync(IProcessHandlerService processHandlerService)
+    public async Task StartAsync(IProcessMonitorService processMonitorService)
     {
-      Pid = await processHandlerService.StartProcess(this);
+      Pid = await processMonitorService.StartProcess(this);
       
       State = ProcessState.Started;
     }
@@ -66,10 +66,10 @@ public class Process(
     /// <summary>
     /// Checks if process is alive with given Process Handler.
     /// </summary>
-    /// <param name="processHandlerService"></param>
+    /// <param name="processMonitorService"></param>
     /// <returns></returns>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task<bool> CheckAsync(IProcessHandlerService processHandlerService)
+    public async Task<bool> CheckAsync(IProcessMonitorService processMonitorService)
     {
       if (State is ProcessState.None)
       {
@@ -79,7 +79,7 @@ public class Process(
 
       if (State is ProcessState.Err) return false;
       
-      bool isOk = await processHandlerService.CheckProcess(this);
+      bool isOk = await processMonitorService.CheckProcess(this);
 
       if (!isOk)
       {
@@ -92,16 +92,16 @@ public class Process(
     /// <summary>
     /// Kills process with given Process Handler.
     /// </summary>
-    /// <param name="processHandlerService"></param>
+    /// <param name="processMonitorService"></param>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task KillAsync(IProcessHandlerService processHandlerService)
+    public async Task KillAsync(IProcessMonitorService processMonitorService)
     {
       if (State is ProcessState.None)
       {
         throw new ProcessInvalidOperationException(
           $"Invalid Process operation, cannot Kill while in {State.ToString()}.");
       }
-      await processHandlerService.KillProcess(this);
+      await processMonitorService.KillProcess(this);
 
       if (State is not ProcessState.Err)
       {

@@ -83,7 +83,10 @@ public class FileProcessProviderService: IProcessProviderService
                     var scriptName = Path.GetFileNameWithoutExtension(scriptFile);
                     
                     // get lines
-                    var lines = File.ReadAllLines(scriptFile);
+                    var lines = File.ReadAllLines(scriptFile)
+                        .Where(line => !(string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)))
+                        .Select(line => line.Trim())
+                        .ToList();
 
                     Process process = new Process(
                         scriptName,

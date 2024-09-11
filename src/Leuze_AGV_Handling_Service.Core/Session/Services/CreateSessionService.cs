@@ -26,7 +26,7 @@ public class CreateSessionService(
         string? outputMapName
         )
     {
-        logger.LogInformation("Creating Session");
+        logger.LogInformation("Creating Session...");
         
         // create session object
         var newSession = new SessionAggregate.Session(
@@ -47,11 +47,11 @@ public class CreateSessionService(
         }
         await sessionRepository.UpdateAsync(createdSession);
         
-        logger.LogInformation("Created Session {sessionId}", createdSession.Id);
-        
         // get the session from repository to check if added sucessfully
         SessionAggregate.Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
         if (aggregate == null) return Result.NotFound();
+        
+        logger.LogInformation($"...created Session {createdSession.Id}.");
 
         return Result.Success(aggregate.Id);
     }

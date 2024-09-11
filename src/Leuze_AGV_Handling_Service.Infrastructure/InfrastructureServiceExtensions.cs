@@ -34,7 +34,7 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
     
     ////// infrastructure stuff ///////
-    services.AddScoped<IProcessHandlerService, SshProcessHandlerService>();
+    services.AddScoped<IProcessMonitorService, SshProcessMonitorService>();
     // services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
     
     services.AddSingleton<IProcessProviderService>(provider => 

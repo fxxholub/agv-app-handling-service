@@ -3,7 +3,7 @@ using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
-public class FakeProcessHandlerService: IProcessHandlerService
+public class FakeProcessMonitorService: IProcessMonitorService
 {
     public async Task<string> StartProcess(Process process)
     {

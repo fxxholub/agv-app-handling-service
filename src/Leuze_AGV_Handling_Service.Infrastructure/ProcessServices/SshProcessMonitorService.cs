@@ -9,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 /// Handles process starting, checking and killing via SSH connection.
 /// The connection is made per action, immediately after it is closed.
 /// </summary>
-public class SshProcessHandlerService: IProcessHandlerService
+public class SshProcessMonitorService: IProcessMonitorService
 {
     /// <summary>
     /// Makes SSH connection and attempts to start given process.
@@ -20,8 +20,8 @@ public class SshProcessHandlerService: IProcessHandlerService
     {
         return await Task.Run(() =>
         {
-          // pipeline commands, && - run next only if current succeeded
-            string combinedCommands = string.Join(" && ", process.Commands);
+            // pipeline commands, && - run next only if current succeeded
+            string combinedCommands = string.Join(" && ", process.Commands).Trim();
 
             // Add the command to run in the background and get the PID
             string detachedCommand = $"nohup bash -c \"{combinedCommands}\" > /dev/null 2>&1 & echo $!";
@@ -59,8 +59,8 @@ public class SshProcessHandlerService: IProcessHandlerService
             using (var client = new SshClient(addr, user, new PrivateKeyFile(privateKey)))
             {
                 client.Connect();
-                var cmd = client.CreateCommand($"ps -p {process.Pid} > /dev/null && echo \"true\" || echo \"false\"");
-                string result = cmd.Execute();
+                var cmd = client.CreateCommand($"ps -p {process.Pid} > /dev/null && echo true || echo false");
+                string result = cmd.Execute().Trim();
                 client.Disconnect();
 
                 if (result.Trim() == "true")

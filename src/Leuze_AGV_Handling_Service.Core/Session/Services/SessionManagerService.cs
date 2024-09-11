@@ -13,7 +13,7 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 /// <param name="serviceProvider"></param>
 public class SessionManagerService(
     IServiceProvider serviceProvider,
-    IAutonomousMessageChannel autonomousChannel,
+    // IAutonomousMessageChannel autonomousChannel,
     IManualMessageChannel manualChannel
     ) : ISessionManagerService
 {
@@ -150,7 +150,7 @@ public class SessionManagerService(
     {
         if (_currentHandlingMode is HandlingMode.Autonomous)
         {
-            await autonomousChannel.Enable();
+            // await autonomousChannel.Enable();
         } else if (_currentHandlingMode is HandlingMode.Manual)
         {
             await manualChannel.Enable();
@@ -161,7 +161,7 @@ public class SessionManagerService(
     {
         if (_currentHandlingMode is HandlingMode.Autonomous)
         {
-            await autonomousChannel.Disable();
+            // await autonomousChannel.Disable();
         } else if (_currentHandlingMode is HandlingMode.Manual)
         {
             await manualChannel.Disable();

@@ -10,33 +10,34 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 /// Starts session with its underlying processes.
 /// </summary>
 /// <param name="repository"></param>
-/// <param name="mediator"></param>
-/// <param name="processHandlerService"></param>
+/// <param name="processMonitorService"></param>
 /// <param name="logger"></param>
 public class StartSessionService(
     IRepository<SessionAggregate.Session> repository,
-    IProcessHandlerService processHandlerService,
+    IProcessMonitorService processMonitorService,
     ILogger<StartSessionService> logger
 ) : IStartSessionService
 {
 
     public async Task<Result> StartSession(int sessionId)
     {
-        logger.LogInformation("Starting Session {sessionId}", sessionId);
+        logger.LogInformation($"Starting Session {sessionId}...");
         
         
         SessionAggregate.Session? aggregate = await repository.GetByIdAsync(sessionId);
         if (aggregate == null) return Result.NotFound();
 
-        await aggregate.StartAsync(processHandlerService);
+        await aggregate.StartAsync(processMonitorService);
 
         await repository.UpdateAsync(aggregate);
 
         if (aggregate.State != SessionState.Started)
         {
-            logger.LogError("Session not Started");
+            logger.LogInformation($"...start of Session {sessionId} err.");
             return Result.Error();
         }
+        
+        logger.LogInformation($"...started Session {sessionId}.");
 
         return Result.Success();
     }

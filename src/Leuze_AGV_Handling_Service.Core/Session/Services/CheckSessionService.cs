@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
@@ -22,8 +23,8 @@ public class CheckSessionService(
     {
         logger.LogInformation($"Checking Session {sessionId}...");
         
-        // get the session aggregate by id
-        SessionAggregate.Session? aggregate = await repository.GetByIdAsync(sessionId);
+        var spec = new SessionByIdWithProcessesWithCommandsSpec(sessionId);
+        SessionAggregate.Session? aggregate = await repository.FirstOrDefaultAsync(spec);
         
         if (aggregate == null) return Result.NotFound();
         

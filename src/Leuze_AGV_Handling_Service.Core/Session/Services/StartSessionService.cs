@@ -24,15 +24,10 @@ public class StartSessionService(
     {
         logger.LogInformation($"Starting Session {sessionId}...");
         
-        // this doesnt work (gets the session without processes) - dont know why
-        // SessionAggregate.Session? aggregate = await repository.GetByIdAsync(sessionId);
-        // this works - dont know why
         var spec = new SessionByIdWithProcessesWithCommandsSpec(sessionId);
         SessionAggregate.Session? aggregate = await repository.FirstOrDefaultAsync(spec);
         
         if (aggregate == null) return Result.NotFound();
-
-        // logger.LogDebug(aggregate.Processes.Count().ToString());
         
         await aggregate.StartAsync(processMonitorService);
 

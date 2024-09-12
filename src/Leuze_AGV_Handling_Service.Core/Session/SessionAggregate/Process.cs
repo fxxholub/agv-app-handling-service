@@ -39,6 +39,7 @@ public class Process(
 
     public ProcessState State { get; private set; } = ProcessState.None;
     
+    public string? ErrorReason { get; private set; }
     public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
 
     /// <summary>
@@ -58,9 +59,18 @@ public class Process(
     /// <exception cref="ProcessInvalidOperationException"></exception>
     public async Task StartAsync(IProcessMonitorService processMonitorService)
     {
-      Pid = await processMonitorService.StartProcess(this);
-      
-      State = ProcessState.Started;
+      var pid = await processMonitorService.StartProcess(this);
+
+      if (string.IsNullOrEmpty(pid))
+      {
+        State = ProcessState.Err;
+        ErrorReason = "Process did not start successfully.";
+      }
+      else
+      {
+        State = ProcessState.Started;
+        ErrorReason = null;
+      }
     }
 
     /// <summary>
@@ -84,6 +94,7 @@ public class Process(
       if (!isOk)
       {
         State = ProcessState.Err;
+        ErrorReason = "Process errored out when checked.";
       }
 
       return isOk;

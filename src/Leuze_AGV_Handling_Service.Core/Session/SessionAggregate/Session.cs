@@ -30,6 +30,8 @@ public class Session(
   private readonly List<Process> _processes = new List<Process>();
   public IEnumerable<Process> Processes => _processes.AsReadOnly();
   
+  public string? ErrorReason { get; set; }
+  
   public DateTimeOffset CreatedDate { get; private set; } = DateTimeOffset.UtcNow;
 
   /// <summary>
@@ -64,7 +66,7 @@ public class Session(
       }
     }
 
-    await Task.Delay(1000);
+    await Task.Delay(100);
 
     bool allGood = true;
     foreach (var process in _processes)
@@ -78,10 +80,12 @@ public class Session(
     if (allGood)
     {
       State = SessionState.Started;
+      ErrorReason = null;
     }
     else
     {
       State = SessionState.Err;
+      ErrorReason = "Some process/es did not start during session start.";
     }
   }
 
@@ -105,7 +109,11 @@ public class Session(
       if (!await process.CheckAsync(processMonitorService)) allGood = false;
     }
 
-    if (!allGood) State = SessionState.Err;
+    if (!allGood)
+    {
+      State = SessionState.Err;
+      ErrorReason = "Some process/es errored out when session checked.";
+    }
 
     return allGood;
   }

@@ -7,6 +7,7 @@ public class ProcessResponseModel(
   string? hostAddr,
   string? userName,
   int? sessionId,
+  string? errorReason,
   string pid,
   string state,
   string createdDate
@@ -20,10 +21,14 @@ public class ProcessResponseModel(
 
   public int? SessionId { get; set; } = sessionId;
 
+  public string? ErrorReason { get; set; } = errorReason;
+
   public string Pid { get; set; } = pid;
 
   public string State { get; set; } = state;
 
   public string CreatedDate { get; set; } = createdDate;
+  
+  
   
 }

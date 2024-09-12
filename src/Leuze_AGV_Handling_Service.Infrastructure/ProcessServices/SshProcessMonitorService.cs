@@ -50,7 +50,7 @@ public class SshProcessMonitorService: IProcessMonitorService
     {
         if (String.IsNullOrEmpty(process.Pid))
         {
-            throw new EnvironmentVariableNullException($"Cannot check process {process.Name} with null or empty Pid.");
+            throw new ArgumentException($"Cannot check process {process.Name} with null or empty Pid.");
         }
         
         return await Task.Run(() =>

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Leuze_AGV_Handling_Service.WebAPI.Models.Session;
 
 public class SessionResponseModel(
@@ -9,6 +8,7 @@ public class SessionResponseModel(
   string inputMapRef,
   string outputMapRef,
   string outputMapName,
+  string? errorReason,
   string state,
   List<ProcessResponseModel> processes,
   string createdDate)
@@ -25,6 +25,8 @@ public class SessionResponseModel(
   public string OutputMapRef { get; set; } = outputMapRef;
 
   public string OutputMapName { get; set; } = outputMapName;
+
+  public string? ErrorReason { get; set; } = errorReason;
 
   public string State { get; set; } = state;
   

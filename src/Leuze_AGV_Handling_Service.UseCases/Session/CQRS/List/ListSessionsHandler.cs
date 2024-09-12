@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
+using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
 
@@ -18,6 +19,7 @@ public class ListSessionsHandler(IListSessionsQueryService query)
         entity.InputMapRef ?? "",
         entity.OutputMapRef ?? "",
         entity.OutputMapName ?? "",
+        entity.ErrorReason,
         entity.State,
         entity.Processes.Select(process => new ProcessDTO(
           process.Name,
@@ -25,6 +27,7 @@ public class ListSessionsHandler(IListSessionsQueryService query)
           process.HostAddr,
           process.UserName,
           process.SessionId,
+          process.ErrorReason,
           process.Pid,
           process.State,
           process.CreatedDate

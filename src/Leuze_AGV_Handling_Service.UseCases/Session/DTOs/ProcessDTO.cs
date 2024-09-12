@@ -1,6 +1,6 @@
 ﻿using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
 public record ProcessDTO(
   string Name,
@@ -8,6 +8,7 @@ public record ProcessDTO(
   string? HostAddr,
   string? UserName,
   int? SessionId,
+  string? ErrorReason,
   string Pid,
   ProcessState State,
   DateTimeOffset CreatedDate

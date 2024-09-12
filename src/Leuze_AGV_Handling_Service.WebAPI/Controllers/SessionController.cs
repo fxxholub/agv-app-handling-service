@@ -1,11 +1,11 @@
 using Ardalis.Result;
 using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using Leuze_AGV_Handling_Service.UseCases.Session;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Delete;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
+using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 using Leuze_AGV_Handling_Service.WebAPI.Models.Session;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,8 @@ public class SessionController(IMediator mediator) : ControllerBase
         
         if (result.IsSuccess)
         {
-            return Ok(result.Value.Select(session => ToResponse(session)).ToList());
+            var response = result.Value.Select(session => ToResponse(session)).ToList(); 
+            return Ok(response);
         }
     
         return BadRequest();
@@ -38,7 +39,8 @@ public class SessionController(IMediator mediator) : ControllerBase
         
         if (result.IsSuccess)
         {
-            return Ok(ToResponse(result));
+            var response = ToResponse(result);
+            return Ok(response);
         }
 
         return NotFound();
@@ -47,7 +49,8 @@ public class SessionController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] SessionRequestModel request)
     {
-        var result = await mediator.Send(FromRequest(request));
+        var command = FromRequest(request);
+        var result = await mediator.Send(command);
       
         if (result.IsSuccess)
         {
@@ -55,7 +58,8 @@ public class SessionController(IMediator mediator) : ControllerBase
             
             if (resultEntity.IsSuccess)
             {
-                return Ok(ToResponse(resultEntity.Value));
+                var response = ToResponse(resultEntity.Value);
+                return Ok(response);
             }
         }
         
@@ -95,6 +99,7 @@ public class SessionController(IMediator mediator) : ControllerBase
         result.Value.InputMapRef ?? "",
         result.Value.OutputMapRef ?? "",
         result.Value.OutputMapName ?? "",
+        result.Value.ErrorReason,
         result.Value.State.ToString(),
         result.Value.Processes.Select(process => new ProcessResponseModel(
             process.Name,
@@ -102,6 +107,7 @@ public class SessionController(IMediator mediator) : ControllerBase
             process.HostAddr,
             process.UserName,
             process.SessionId,
+            process.ErrorReason,
             process.Pid,
             process.State.ToString(),
             process.CreatedDate.ToString()

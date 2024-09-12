@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
+using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
 
@@ -20,6 +21,7 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
       entity.InputMapRef ?? "",
       entity.OutputMapRef ?? "",
       entity.OutputMapName ?? "",
+      entity.ErrorReason,
       entity.State,
       entity.Processes.Select(process => new ProcessDTO(
         process.Name,
@@ -27,6 +29,7 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
         process.HostAddr,
         process.UserName,
         process.SessionId,
+        process.ErrorReason,
         process.Pid,
         process.State,
         process.CreatedDate

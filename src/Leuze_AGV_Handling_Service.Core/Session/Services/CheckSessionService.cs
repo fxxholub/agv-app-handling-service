@@ -28,6 +28,9 @@ public class CheckSessionService(
         if (aggregate == null) return Result.NotFound();
         
         var checkOk = await aggregate.CheckAsync(processMonitorService);
+
+        await repository.UpdateAsync(aggregate);
+        await repository.SaveChangesAsync();
         
         logger.LogInformation($"...checked Session {sessionId} with result {checkOk}");
 

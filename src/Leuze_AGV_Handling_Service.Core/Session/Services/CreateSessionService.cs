@@ -45,14 +45,18 @@ public class CreateSessionService(
         {
             createdSession.AddProcess(process);
         }
-        await sessionRepository.UpdateAsync(createdSession);
         
-        // get the session from repository to check if added sucessfully
-        SessionAggregate.Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
-        if (aggregate == null) return Result.NotFound();
+        logger.LogInformation(createdSession.Processes.Count().ToString());
+        
+        await sessionRepository.UpdateAsync(createdSession);
+        await sessionRepository.SaveChangesAsync();
+        
+        // // get the session from repository to check if added sucessfully
+        // SessionAggregate.Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
+        // if (aggregate is null) return Result.NotFound();
         
         logger.LogInformation($"...created Session {createdSession.Id}.");
 
-        return Result.Success(aggregate.Id);
+        return Result.Success(createdSession.Id);
     }
 }

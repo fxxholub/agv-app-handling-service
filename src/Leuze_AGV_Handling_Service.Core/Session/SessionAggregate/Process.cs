@@ -60,16 +60,16 @@ public class Process(
     public async Task StartAsync(IProcessMonitorService processMonitorService)
     {
       var pid = await processMonitorService.StartProcess(this);
-
       if (string.IsNullOrEmpty(pid))
       {
         State = ProcessState.Err;
-        ErrorReason = "Process did not start successfully.";
+        ErrorReason = "Process did not start successfully - no PID returned.";
       }
       else
       {
         State = ProcessState.Started;
         ErrorReason = null;
+        Pid = pid;
       }
     }
 

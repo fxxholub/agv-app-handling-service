@@ -29,6 +29,7 @@ public class EndSessionService(
         await aggregate.EndAsync(processMonitorService);
 
         await repository.UpdateAsync(aggregate);
+        await repository.SaveChangesAsync();
         
         logger.LogInformation($"...ended Session {sessionId}.");
 

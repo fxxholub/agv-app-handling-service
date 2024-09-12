@@ -31,8 +31,6 @@ public class SessionManagerService(
         // retrieve the services
         using var scope = serviceProvider.CreateScope();
         var createSessionService = scope.ServiceProvider.GetRequiredService<ICreateSessionService>();
-        var startSessionService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
-        var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
             
         if (_currentSessionExists()) return Result.Conflict();
 
@@ -46,23 +44,13 @@ public class SessionManagerService(
         );
 
         if (!created.IsSuccess) return Result.Error();
-
-        // start the session along with its processes
-        var started = await startSessionService.StartSession(created.Value);
-
-        // if start didn go well, rollback the start transaction by ending it
-        if (!started.IsSuccess)
-        {
-            await endSessionService.EndSession(created.Value);
-            return Result.Error();
-        } 
-
+        
         // set the session as current
         _currentSessionId = created.Value;
         _currentHandlingMode = handlingMode;
         
-        // enable message channel
-        _enableMessageChannel();
+        // additionally attempt to start the session
+        await StartSession(created.Value);
 
         return Result.Success(created.Value);
     }
@@ -71,27 +59,44 @@ public class SessionManagerService(
     {
         // retrieve the services
         using var scope = serviceProvider.CreateScope();
-        var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
         var deleteSessionService = scope.ServiceProvider.GetRequiredService<IDeleteSessionService>();
         
-        if (_isCurrentSession(sessionId))
-        {
-            // if session is current session, first end it
-            var ended = await endSessionService.EndSession(sessionId);
-            if (!ended.IsSuccess) return Result.Error();
-            
-            // disable message channel
-            _disableMessageChannel();
-            
-            // right after session ends, new session could be made
-            _currentSessionId = null;
-        }
+        // end the session first
+        var ended = await EndSession(sessionId);
+        
+        if (!ended.IsSuccess) return Result.Error();
         
         // finally, delete the session
         var deleted = await deleteSessionService.DeleteSession(sessionId);
+        
         if (!deleted.IsSuccess) return Result.Error();
 
         return Result.Success();
+    }
+
+    public async Task<Result> StartSession(int sessionId)
+    {
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var startSessionService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
+        
+        if (_isCurrentSession(sessionId))
+        {
+            // start the session along with its processes
+            var started = await startSessionService.StartSession(sessionId);
+
+            if (!started.IsSuccess)
+            {
+                return Result.Error();
+            }
+        
+            // enable message channel
+            _enableMessageChannel();
+
+            return Result.Success();
+        }
+
+        return Result.Conflict();
     }
 
     public async Task<Result> EndSession(int sessionId)

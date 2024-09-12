@@ -26,6 +26,7 @@ public class DeleteSessionService(
         
         // delete the object from repository
         await repository.DeleteAsync(aggregateToDelete);
+        await repository.SaveChangesAsync();
         
         logger.LogInformation($"...deleted Session {sessionId}.");
         

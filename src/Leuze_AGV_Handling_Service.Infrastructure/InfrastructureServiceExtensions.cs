@@ -7,6 +7,7 @@ using Leuze_AGV_Handling_Service.Infrastructure.Exceptions;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure;
 

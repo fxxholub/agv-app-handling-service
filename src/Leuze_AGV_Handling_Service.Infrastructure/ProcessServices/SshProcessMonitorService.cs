@@ -21,7 +21,11 @@ public class SshProcessMonitorService: IProcessMonitorService
         return await Task.Run(() =>
         {
             // pipeline commands, && - run next only if current succeeded
-            string combinedCommands = string.Join(" && ", process.Commands).Trim();
+            var strCommands = process.Commands.Select(c => c.Command).ToList();
+            string combinedCommands = string.Join(" && ", strCommands).Trim();
+
+            Console.WriteLine(process.Commands.Count().ToString());
+            Console.WriteLine($"command: {combinedCommands}");
 
             // Add the command to run in the background and get the PID
             string detachedCommand = $"nohup bash -c \"{combinedCommands}\" > /dev/null 2>&1 & echo $!";

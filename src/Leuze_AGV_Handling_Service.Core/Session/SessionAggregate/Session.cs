@@ -47,7 +47,7 @@ public class Session(
         $"Invalid Session operation, cannot Add state which is in other state than {ProcessState.None.ToString()}.");
     }
     
-    process.SessionId = this.Id;
+    process.SessionId = Id;
     _processes.Add(process);
   }
 

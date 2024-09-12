@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
@@ -8,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 /// <summary>
 /// Fetches processes from ProcessScripts directory. Should be registered as Singleton.
 /// </summary>
-public class FileProcessProviderService: IProcessProviderService
+public class FileProcessProviderService : IProcessProviderService
 {
     private readonly string _processScriptsPath;
     private readonly Dictionary<HandlingMode, List<Process>> _loadedProcesses = new();
@@ -82,11 +83,14 @@ public class FileProcessProviderService: IProcessProviderService
                 {
                     var scriptName = Path.GetFileNameWithoutExtension(scriptFile);
                     
+                    Console.WriteLine(File.ReadAllLines(scriptFile).Length.ToString());
                     // get lines
-                    var lines = File.ReadAllLines(scriptFile)
+                    var commands = File.ReadAllLines(scriptFile)
                         .Where(line => !(string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)))
                         .Select(line => line.Trim())
+                        .Select(line => new BashCommand(line))
                         .ToList();
+                    Console.WriteLine(commands.Count().ToString());
 
                     Process process = new Process(
                         scriptName,
@@ -96,7 +100,7 @@ public class FileProcessProviderService: IProcessProviderService
                         null,
                         privateKeyPath
                         );
-                    process.AddCommands(new List<string>(lines));
+                    process.AddCommands(commands);
 
                     if (handlingFolderName == "Common")
                     {

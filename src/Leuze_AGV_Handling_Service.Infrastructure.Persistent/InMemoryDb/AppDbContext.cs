@@ -28,6 +28,12 @@ public class AppDbContext : DbContext
             .Navigation(s => s.Processes)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
+        // Configure the Process -> BashCommand relationship
+        modelBuilder.Entity<Process>()
+            .HasMany(p => p.Commands)  // Process has many BashCommands
+            .WithOne()  // BashCommand has one Process (implicitly)
+            .HasForeignKey(c => c.ProcessId);  // Use ProcessId as the foreign key in BashCommand
+        
         // var navigation = modelBuilder.Entity<Session>()
         //     .Metadata.FindNavigation(nameof(Session.Processes));
         // navigation.SetPropertyAccessMode(PropertyAccessMode.Field);

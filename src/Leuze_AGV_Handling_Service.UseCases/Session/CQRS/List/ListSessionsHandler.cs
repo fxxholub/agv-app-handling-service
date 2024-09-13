@@ -4,6 +4,10 @@ using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
 
+/// <summary>
+/// Lists Sessions. Safe operation.
+/// </summary>
+/// <param name="query"></param>
 public class ListSessionsHandler(IListSessionsQueryService query)
   : IQueryHandler<ListSessionsQuery, Result<IEnumerable<SessionDTO>>>
 {

@@ -3,6 +3,9 @@ using Ardalis.SharedKernel;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Start;
 
+/// <summary>
+/// Starts Session.
+/// </summary>
 public class StartSessionHandler()
   : ICommandHandler<StartSessionCommand, Result>
 {

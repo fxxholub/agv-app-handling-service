@@ -79,7 +79,7 @@ public class SessionController(IMediator mediator) : ControllerBase
         return NotFound();
     }
 
-    private CreateSessionCommand FromRequest(SessionRequestModel request)
+    private static CreateSessionCommand FromRequest(SessionRequestModel request)
     {
       return new CreateSessionCommand(
         Enum.Parse<HandlingMode>(request.HandlingMode ?? throw new ArgumentNullException()),
@@ -90,7 +90,7 @@ public class SessionController(IMediator mediator) : ControllerBase
       );
     }
 
-    private SessionResponseModel ToResponse(Result<SessionDTO> result)
+    private static SessionResponseModel ToResponse(Result<SessionDTO> result)
     {
       return new SessionResponseModel(
         result.Value.Id,

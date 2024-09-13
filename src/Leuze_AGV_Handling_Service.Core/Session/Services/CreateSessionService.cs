@@ -43,7 +43,6 @@ public class CreateSessionService(
         // add processes to session
         foreach (var process in processProviderService.GetProcesses(handlingMode))
         {
-            Console.WriteLine($"adding to session commands: {process.Commands.Count().ToString()}");
             createdSession.AddProcess(process);
         }
         

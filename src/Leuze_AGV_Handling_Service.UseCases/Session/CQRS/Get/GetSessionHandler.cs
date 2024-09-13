@@ -5,6 +5,10 @@ using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
 
+/// <summary>
+/// Fetches Session. Safe operation.
+/// </summary>
+/// <param name="repository"></param>
 public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session> repository)
   : IQueryHandler<GetSessionQuery, Result<SessionDTO>>
 {

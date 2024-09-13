@@ -5,7 +5,7 @@ using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
 /// <summary>
-/// Describes user handling session with its settings, processes and mode selected.
+/// Describes user handling session with its settings, processes and handling mode.
 /// </summary>
 /// <param name="handlingMode"></param>
 /// <param name="mappingEnabled"></param>

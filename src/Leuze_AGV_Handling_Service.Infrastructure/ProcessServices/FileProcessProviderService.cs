@@ -83,15 +83,14 @@ public class FileProcessProviderService : IProcessProviderService
                 {
                     var scriptName = Path.GetFileNameWithoutExtension(scriptFile);
                     
-                    Console.WriteLine(File.ReadAllLines(scriptFile).Length.ToString());
-                    // get lines
+                    // get lines as commands
                     var commands = File.ReadAllLines(scriptFile)
                         .Where(line => !(string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)))
                         .Select(line => line.Trim())
                         .Select(line => new BashCommand(line))
                         .ToList();
-                    Console.WriteLine(commands.Count().ToString());
 
+                    // create Process object and commands
                     Process process = new Process(
                         scriptName,
                         hostConfig.HostName,
@@ -102,6 +101,7 @@ public class FileProcessProviderService : IProcessProviderService
                         );
                     process.AddCommands(commands);
 
+                    // Store loaded Processes to memory for later use
                     if (handlingFolderName == "Common")
                     {
                         foreach (var handlingMode in handlingNames)

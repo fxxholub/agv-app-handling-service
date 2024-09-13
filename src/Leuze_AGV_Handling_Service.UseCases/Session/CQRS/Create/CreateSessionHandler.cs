@@ -4,6 +4,10 @@ using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
 
+/// <summary>
+/// Creates Session.
+/// </summary>
+/// <param name="sessionManager"></param>
 public class CreateSessionHandler(ISessionManagerService sessionManager) 
   : ICommandHandler<CreateSessionCommand, Result<int>>
 {

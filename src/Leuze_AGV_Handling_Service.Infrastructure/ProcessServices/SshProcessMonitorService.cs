@@ -7,7 +7,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
 /// <summary>
 /// Handles process starting, checking and killing via SSH connection.
-/// The connection is made per action, immediately after it is closed.
+/// New connection is opened per every method call.
 /// </summary>
 public class SshProcessMonitorService: IProcessMonitorService
 {
@@ -23,9 +23,6 @@ public class SshProcessMonitorService: IProcessMonitorService
             // pipeline commands, && - run next only if current succeeded
             var strCommands = process.Commands.Select(c => c.Command).ToList();
             string combinedCommands = string.Join(" && ", strCommands).Trim();
-
-            Console.WriteLine(process.Commands.Count().ToString());
-            Console.WriteLine($"command: {combinedCommands}");
 
             // Add the command to run in the background and get the PID
             string detachedCommand = $"nohup bash -c \"{combinedCommands}\" > /dev/null 2>&1 & echo $!";
@@ -63,6 +60,9 @@ public class SshProcessMonitorService: IProcessMonitorService
             using (var client = new SshClient(addr, user, new PrivateKeyFile(privateKey)))
             {
                 client.Connect();
+                
+                //TODO: check the entire process tree, not just parent process
+                
                 var cmd = client.CreateCommand($"ps -p {process.Pid} > /dev/null && echo true || echo false");
                 string result = cmd.Execute().Trim();
                 client.Disconnect();
@@ -81,7 +81,7 @@ public class SshProcessMonitorService: IProcessMonitorService
     }
 
     /// <summary>
-    /// Makes SSH connection and kills process.
+    /// Makes SSH connection and kills process as entire process tree.
     /// </summary>
     /// <param name="process"></param>
     public async Task KillProcess(Process process)
@@ -92,7 +92,7 @@ public class SshProcessMonitorService: IProcessMonitorService
             using (var client = new SshClient(addr, user, new PrivateKeyFile(privateKey)))
             {
                 client.Connect();
-                var cmd = client.CreateCommand($"kill {process.Pid}");
+                var cmd = client.CreateCommand($"pkill -9 -P {process.Pid}");
                 cmd.Execute();
                 client.Disconnect();
             }

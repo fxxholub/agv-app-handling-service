@@ -7,7 +7,6 @@ namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
 /// <summary>
 /// Describes a process, that can be started, checked and killed.
-/// Process can be handled localy, remotely or in other custom way - as IProcessHandlerService does.
 /// </summary>
 /// <param name="name"></param>
 /// <param name="hostName"></param>

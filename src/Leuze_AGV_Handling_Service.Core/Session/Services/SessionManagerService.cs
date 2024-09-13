@@ -8,7 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
-/// Common Manager for other Session services - keeps just one (current) Session alive.
+/// Common Manager Service for other Session services.
+/// Guarantees that only one actively running session exists. 
+/// Handles operations chaining
+/// (for example Session Create and attempt to Start; Session Delete with session Ending).
 /// </summary>
 /// <param name="serviceProvider"></param>
 public class SessionManagerService(
@@ -20,6 +23,15 @@ public class SessionManagerService(
     private int? _currentSessionId = null;
     private HandlingMode? _currentHandlingMode = null;
 
+    /// <summary>
+    /// Creates Session, attempts to start it. Will proceed only if no current session is active.
+    /// </summary>
+    /// <param name="handlingMode"></param>
+    /// <param name="mappingEnabled"></param>
+    /// <param name="inputMapRef"></param>
+    /// <param name="outputMapRef"></param>
+    /// <param name="outputMapName"></param>
+    /// <returns></returns>
     public async Task<Result<int>> CreateAndStartSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
@@ -55,6 +67,11 @@ public class SessionManagerService(
         return Result.Success(created.Value);
     }
 
+    /// <summary>
+    /// Deletes the session, But if the Session is current active session, Ends it first.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
     public async Task<Result> EndAndDeleteSession(int sessionId)
     {
         // retrieve the services
@@ -74,6 +91,11 @@ public class SessionManagerService(
         return Result.Success();
     }
 
+    /// <summary>
+    /// Starts Session if it is the current active Session.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
     public async Task<Result> StartSession(int sessionId)
     {
         // retrieve the services
@@ -99,6 +121,11 @@ public class SessionManagerService(
         return Result.Conflict();
     }
 
+    /// <summary>
+    /// Ends session if it is the current active Session.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
     public async Task<Result> EndSession(int sessionId)
     {
         // retrieve the services
@@ -122,23 +149,29 @@ public class SessionManagerService(
         return Result.Conflict();
     }
 
-    public async Task<Result<bool>> CheckAndEndBadSession(int sessionId)
+    /// <summary>
+    /// Checks the Session and Ends it if check is bad.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
+    public Task<Result<bool>> CheckAndEndBadSession(int sessionId)
     {
-        // retrieve the services
-        using var scope = serviceProvider.CreateScope();
-        var checkSessionService = scope.ServiceProvider.GetRequiredService<ICheckSessionService>();
-        
-        if (_isCurrentSession(sessionId))
-        {
-            var checkedResult = await checkSessionService.CheckSession(sessionId);
-            if (!checkedResult.IsSuccess) return Result.Error();
-            
-            //TODO the end part
-            
-            return Result.Success(checkedResult.Value);
-        }
-
-        return Result.Conflict();
+        throw new NotImplementedException();
+        // // retrieve the services
+        // using var scope = serviceProvider.CreateScope();
+        // var checkSessionService = scope.ServiceProvider.GetRequiredService<ICheckSessionService>();
+        //
+        // if (_isCurrentSession(sessionId))
+        // {
+        //     var checkedResult = await checkSessionService.CheckSession(sessionId);
+        //     if (!checkedResult.IsSuccess) return Result.Error();
+        //     
+        //     //TODO the end part
+        //     
+        //     return Result.Success(checkedResult.Value);
+        // }
+        //
+        // return Result.Conflict();
     }
     
     private bool _currentSessionExists()

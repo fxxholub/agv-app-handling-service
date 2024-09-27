@@ -23,7 +23,7 @@ public class EndSessionService(
     {
         logger.LogInformation($"Ending Session {sessionId}...");
         
-        var spec = new SessionByIdWithProcessesWithCommandsSpec(sessionId);
+        var spec = new SessionByIdWithActionsAndProcessesWithCommandsSpec(sessionId);
         SessionAggregate.Session? aggregate = await repository.FirstOrDefaultAsync(spec);
         
         if (aggregate == null) return Result.NotFound();

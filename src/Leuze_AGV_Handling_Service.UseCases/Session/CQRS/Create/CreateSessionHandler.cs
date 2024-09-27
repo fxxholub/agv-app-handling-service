@@ -13,7 +13,7 @@ public class CreateSessionHandler(ISessionManagerService sessionManager)
 {
   public async Task<Result<int>> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
   {
-    var result = await sessionManager.CreateAndStartSession(
+    var result = await sessionManager.CreateSession(
       request.HandlingMode,
       request.MappingEnabled,
       request.InputMapRef,

@@ -5,17 +5,19 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 
 public interface ISessionManagerService
 {
-    public Task<Result<int>> CreateAndStartSession(
+    public Task<Result<int>> CreateSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,
         string? outputMapRef,
         string? outputMapName
-        );
-    
-    public Task<Result> EndAndDeleteSession(int sessionId);
-    
-    public Task<Result> EndSession(int sessionId);
+    );
 
-    public Task<Result<bool>> CheckAndEndBadSession(int sessionId);
+    public Task<Result> StartSession(int sessionId);
+
+    public Task<Result> EndSession(int sessionId);
+    
+    public Task<Result<bool>> CheckSession(int sessionId);
+
+    public Task<Result> DeleteSession(int sessionId);
 }

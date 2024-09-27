@@ -62,6 +62,16 @@ public static class Program
         ConfigureApiVersioning();
 
         ConfigureInfrastructureServices();
+        
+        _builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy",
+                // settings for local testing
+                builder => builder.WithOrigins("http://localhost:5156") // Blazor app origin
+                    .AllowAnyMethod()                     // Allow any HTTP method (GET, POST, etc.)
+                    .AllowAnyHeader()                     // Allow any headers
+                    .AllowCredentials());                 // Allow credentials if needed
+        });
     }
 
     private static void ConfigureSerilog()
@@ -132,6 +142,9 @@ public static class Program
         }
 
         app.UseHttpsRedirection();
+        
+        app.UseCors("CorsPolicy");
+        
         app.UseAuthorization();
         app.MapControllers();
 

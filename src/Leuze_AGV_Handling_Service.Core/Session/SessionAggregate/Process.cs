@@ -30,8 +30,8 @@ public class Process(
     
     public string? PrivateKeyPath { get; private set; } = privateKeyPath;
 
-    private readonly List<BashCommand> _commands = new List<BashCommand>();
-    public IEnumerable<BashCommand> Commands => _commands.AsReadOnly();
+    private readonly List<ProcessCommand> _commands = new List<ProcessCommand>();
+    public IEnumerable<ProcessCommand> Commands => _commands.AsReadOnly();
     public int? SessionId { get; set; }  = sessionId;
 
     public string Pid { get; private set; } = string.Empty;
@@ -45,7 +45,7 @@ public class Process(
     /// Batch add commands, that forms a process.
     /// </summary>
     /// <param name="commands"></param>
-    public void AddCommands(IEnumerable<BashCommand> commands)
+    public void AddCommands(IEnumerable<ProcessCommand> commands)
     {
       Guard.Against.NullOrEmpty(commands);
       _commands.AddRange(commands);

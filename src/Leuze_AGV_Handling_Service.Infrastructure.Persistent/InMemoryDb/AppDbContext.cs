@@ -24,19 +24,21 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+        // Session has Actions relationship
+        modelBuilder.Entity<Session>()
+            .Navigation(s => s.Actions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        // Session has Processes relationship
         modelBuilder.Entity<Session>()
             .Navigation(s => s.Processes)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        // Configure the Process -> BashCommand relationship
+        // Processes has Commands relationship
         modelBuilder.Entity<Process>()
-            .HasMany(p => p.Commands)  // Process has many BashCommands
-            .WithOne()  // BashCommand has one Process (implicitly)
+            .HasMany(p => p.Commands)  // Process has many Commands
+            .WithOne()  // Command has one Process (implicitly)
             .HasForeignKey(c => c.ProcessId);  // Use ProcessId as the foreign key in BashCommand
-        
-        // var navigation = modelBuilder.Entity<Session>()
-        //     .Metadata.FindNavigation(nameof(Session.Processes));
-        // navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

@@ -46,14 +46,8 @@ public class CreateSessionService(
             createdSession.AddProcess(process);
         }
         
-        // logger.LogDebug(createdSession.Processes.Count().ToString());
-        
         await sessionRepository.UpdateAsync(createdSession);
         await sessionRepository.SaveChangesAsync();
-        
-        // // get the session from repository to check if added sucessfully
-        // SessionAggregate.Session? aggregate = await sessionRepository.GetByIdAsync(createdSession.Id);
-        // if (aggregate is null) return Result.NotFound();
         
         logger.LogInformation($"...created Session {createdSession.Id}.");
 

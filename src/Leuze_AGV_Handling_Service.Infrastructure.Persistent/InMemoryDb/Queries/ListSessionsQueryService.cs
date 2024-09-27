@@ -15,7 +15,10 @@ public class ListSessionsQueryService(AppDbContext db) : IListSessionsQueryServi
     // var result = await _db.Database.SqlQuery<ContributorDTO>(
     //   $"SELECT Id, Name, PhoneNumber_Number AS PhoneNumber FROM Contributors") // don't fetch other big columns
     //   .ToListAsync();
-    var sessions = await db.Sessions.Include(sesh => sesh.Processes).ToListAsync();
+    var sessions = await db.Sessions
+      .Include(sesh => sesh.Actions)
+      .Include(sesh => sesh.Processes)
+      .ToListAsync();
 
     return sessions;
   }

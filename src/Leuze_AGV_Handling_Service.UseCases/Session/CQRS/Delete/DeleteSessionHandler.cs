@@ -13,6 +13,6 @@ public class DeleteSessionHandler(ISessionManagerService sessionManager)
 {
   public async Task<Result> Handle(DeleteSessionCommand request, CancellationToken cancellationToken)
   {
-    return await sessionManager.EndAndDeleteSession(request.SessionId);
+    return await sessionManager.DeleteSession(request.SessionId);
   }
 }

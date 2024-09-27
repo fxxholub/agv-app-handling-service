@@ -10,15 +10,15 @@ namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
 /// </summary>
 /// <param name="repository"></param>
 public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session> repository)
-  : IQueryHandler<GetSessionQuery, Result<SessionDTO>>
+  : IQueryHandler<GetSessionQuery, Result<SessionDto>>
 {
-  public async Task<Result<SessionDTO>> Handle(GetSessionQuery request, CancellationToken cancellationToken)
+  public async Task<Result<SessionDto>> Handle(GetSessionQuery request, CancellationToken cancellationToken)
   {
-    var spec = new SessionByIdWithProcessesSpec(request.SessionId);
+    var spec = new SessionByIdWithActionsAndProcessesSpec(request.SessionId);
     var entity = await repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (entity == null) return Result.NotFound();
 
-    return new SessionDTO(
+    return new SessionDto(
       entity.Id,
       entity.HandlingMode,
       entity.MappingEnabled,
@@ -27,7 +27,12 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
       entity.OutputMapName ?? "",
       entity.ErrorReason,
       entity.State,
-      entity.Processes.Select(process => new ProcessDTO(
+      entity.Actions.Select(action => new ActionDto(
+        action.Command,
+        action.SessionId,
+        action.CreatedDate
+        )).ToList(),
+      entity.Processes.Select(process => new ProcessDto(
         process.Name,
         process.HostName,
         process.HostAddr,

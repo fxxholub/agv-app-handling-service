@@ -27,6 +27,9 @@ public class Session(
   public string? OutputMapName { get; set; } = outputMapName;
   public SessionState State { get; private set; } = SessionState.None;
   
+  private readonly List<Action> _actions = new List<Action>();
+  public IEnumerable<Action> Actions => _actions.AsReadOnly();
+  
   private readonly List<Process> _processes = new List<Process>();
   public IEnumerable<Process> Processes => _processes.AsReadOnly();
   
@@ -58,6 +61,8 @@ public class Session(
   /// <exception cref="SessionInvalidOperationException"></exception>
   public async Task StartAsync(IProcessMonitorService processMonitorService)
   {
+    _actions.Add(new Action(ActionCommand.Start, Id));
+    
     foreach (var process in _processes)
     {
       if (process.State is not ProcessState.Started)
@@ -125,6 +130,8 @@ public class Session(
   /// <exception cref="SessionInvalidOperationException"></exception>
   public async Task EndAsync(IProcessMonitorService processMonitorService)
   {
+    _actions.Add(new Action(ActionCommand.End, Id));
+    
     if (State is SessionState.None)
     {
       throw new SessionInvalidOperationException(

@@ -10,6 +10,7 @@ public class SessionResponseModel(
   string outputMapName,
   string? errorReason,
   string state,
+  List<ActionResponseModel> actions,
   List<ProcessResponseModel> processes,
   string createdDate)
 {
@@ -29,6 +30,8 @@ public class SessionResponseModel(
   public string? ErrorReason { get; set; } = errorReason;
 
   public string State { get; set; } = state;
+  
+  public List<ActionResponseModel> Actions { get; set; } = actions;
   
   public List<ProcessResponseModel> Processes { get; set; } = processes;
 

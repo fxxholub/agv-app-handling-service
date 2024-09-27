@@ -3,7 +3,7 @@ using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
-public record SessionDTO(
+public record SessionDto(
   int Id,
 
   HandlingMode HandlingMode,
@@ -14,6 +14,7 @@ public record SessionDTO(
   string? ErrorReason,
 
   SessionState State,
-  List<ProcessDTO> Processes,
+  List<ActionDto> Actions,
+  List<ProcessDto> Processes,
   DateTimeOffset CreatedDate
 );

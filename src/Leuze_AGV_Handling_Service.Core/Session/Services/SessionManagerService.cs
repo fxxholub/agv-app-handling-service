@@ -32,7 +32,7 @@ public class SessionManagerService(
     /// <param name="outputMapRef"></param>
     /// <param name="outputMapName"></param>
     /// <returns></returns>
-    public async Task<Result<int>> CreateAndStartSession(
+    public async Task<Result<int>> CreateSession(
         HandlingMode handlingMode,
         bool mappingEnabled,
         string? inputMapRef,
@@ -60,35 +60,8 @@ public class SessionManagerService(
         // set the session as current
         _currentSessionId = created.Value;
         _currentHandlingMode = handlingMode;
-        
-        // additionally attempt to start the session
-        await StartSession(created.Value);
 
         return Result.Success(created.Value);
-    }
-
-    /// <summary>
-    /// Deletes the session, But if the Session is current active session, Ends it first.
-    /// </summary>
-    /// <param name="sessionId"></param>
-    /// <returns></returns>
-    public async Task<Result> EndAndDeleteSession(int sessionId)
-    {
-        // retrieve the services
-        using var scope = serviceProvider.CreateScope();
-        var deleteSessionService = scope.ServiceProvider.GetRequiredService<IDeleteSessionService>();
-        
-        // end the session first
-        var ended = await EndSession(sessionId);
-        
-        if (!ended.IsSuccess) return Result.Error();
-        
-        // finally, delete the session
-        var deleted = await deleteSessionService.DeleteSession(sessionId);
-        
-        if (!deleted.IsSuccess) return Result.Error();
-
-        return Result.Success();
     }
 
     /// <summary>
@@ -120,6 +93,7 @@ public class SessionManagerService(
 
         return Result.Conflict();
     }
+    
 
     /// <summary>
     /// Ends session if it is the current active Session.
@@ -150,28 +124,54 @@ public class SessionManagerService(
     }
 
     /// <summary>
-    /// Checks the Session and Ends it if check is bad.
+    /// Checks the Session.
     /// </summary>
     /// <param name="sessionId"></param>
     /// <returns></returns>
-    public Task<Result<bool>> CheckAndEndBadSession(int sessionId)
+    public async Task<Result<bool>> CheckSession(int sessionId)
     {
-        throw new NotImplementedException();
-        // // retrieve the services
-        // using var scope = serviceProvider.CreateScope();
-        // var checkSessionService = scope.ServiceProvider.GetRequiredService<ICheckSessionService>();
-        //
-        // if (_isCurrentSession(sessionId))
-        // {
-        //     var checkedResult = await checkSessionService.CheckSession(sessionId);
-        //     if (!checkedResult.IsSuccess) return Result.Error();
-        //     
-        //     //TODO the end part
-        //     
-        //     return Result.Success(checkedResult.Value);
-        // }
-        //
-        // return Result.Conflict();
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var checkSessionService = scope.ServiceProvider.GetRequiredService<ICheckSessionService>();
+        
+        if (_isCurrentSession(sessionId))
+        {
+            var checkedResult = await checkSessionService.CheckSession(sessionId);
+            
+            if (!checkedResult.IsSuccess) return Result.Error();
+            
+            return Result.Success(checkedResult.Value);
+        }
+        
+        return Result.Conflict();
+    }
+    
+    /// <summary>
+    /// Deletes the session by id. If the Session is current session, Ends it first.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
+    public async Task<Result> DeleteSession(int sessionId)
+    {
+        // retrieve the services
+        using var scope = serviceProvider.CreateScope();
+        var deleteSessionService = scope.ServiceProvider.GetRequiredService<IDeleteSessionService>();
+
+        // end the session first if it is the current one
+        if (_isCurrentSession(sessionId))
+        {
+            // end the session first
+            var ended = await EndSession(sessionId);
+            
+            if (!ended.IsSuccess) return Result.Error();
+        }
+        
+        // finally, delete the session
+        var deleted = await deleteSessionService.DeleteSession(sessionId);
+        
+        if (!deleted.IsSuccess) return Result.Error();
+
+        return Result.Success();
     }
     
     private bool _currentSessionExists()

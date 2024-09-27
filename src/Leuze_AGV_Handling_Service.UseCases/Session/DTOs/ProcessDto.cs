@@ -2,7 +2,7 @@
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
-public record ProcessDTO(
+public record ProcessDto(
   string Name,
   string? HostName,
   string? HostAddr,

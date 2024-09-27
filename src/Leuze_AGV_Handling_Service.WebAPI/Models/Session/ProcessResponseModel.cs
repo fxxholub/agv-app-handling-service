@@ -13,7 +13,6 @@ public class ProcessResponseModel(
   string createdDate
   )
 {
-
   public string Name { get; set; } = name;
   public string? HostName { get; set; } = hostName;
   public string? HostAddr { get; set; } = hostAddr;
@@ -28,7 +27,4 @@ public class ProcessResponseModel(
   public string State { get; set; } = state;
 
   public string CreatedDate { get; set; } = createdDate;
-  
-  
-  
 }

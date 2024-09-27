@@ -87,7 +87,7 @@ public class FileProcessProviderService : IProcessProviderService
                     var commands = File.ReadAllLines(scriptFile)
                         .Where(line => !(string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line)))
                         .Select(line => line.Trim())
-                        .Select(line => new BashCommand(line))
+                        .Select(line => new ProcessCommand(line))
                         .ToList();
 
                     // create Process object and commands

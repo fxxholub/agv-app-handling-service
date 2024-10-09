@@ -4,10 +4,8 @@ using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Delete;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.GetCurrent;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Start;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -34,7 +32,29 @@ public class ManualHandlingHub(
     [SignalRHidden]
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await ownership.Free(Context.ConnectionId);
+        if (await ownership.IsReservedByMe(Context.ConnectionId))
+        {
+            var sessionId = await ownership.GetSessionId();
+            if (sessionId.HasValue)
+            {
+                var result = await mediator.Send(new EndSessionCommand(sessionId.Value));
+
+                if (!result.IsSuccess)
+                {
+                    logger.LogInformation("disconnect Manual Session end errored.");
+                    return;
+                }
+                
+                var isFree = await ownership.Free(Context.ConnectionId);
+
+                if (!isFree)
+                {
+                    logger.LogInformation("disconnect Manual Session free errored.");
+                    return;
+                }
+            }
+        }
+
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -154,7 +174,6 @@ public class ManualHandlingHub(
                 // TODO: send error
             }
         }
-        
     }
     
     public async Task SendJoy(JoyDTO joy)

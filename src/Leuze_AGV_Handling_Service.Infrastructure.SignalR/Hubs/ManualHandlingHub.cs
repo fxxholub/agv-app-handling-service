@@ -59,14 +59,11 @@ public class ManualHandlingHub(
         await base.OnDisconnectedAsync(exception);
     }
     
-    public async Task SendCreateSession(CreateSessionRequestModel request)
+    public async Task<SessionResponseModel> SendCreateSession(CreateSessionRequestModel request)
     {
         // session can only be created if has no owner and no session exists
         if (! await ownership.IsNone())
-        {
-            logger.LogInformation("Manual Session cannot be created, since another user owns one.");
-            return;
-        }
+            throw new HubException("Manual Session Create error - cannot be created, since another user owns one.");
         
         var command = new CreateSessionCommand(
             HandlingMode.Manual,
@@ -76,104 +73,58 @@ public class ManualHandlingHub(
             request.OutputMapName);
         
         var result = await mediator.Send(command);
-
-        if (!result.IsSuccess)
-        {
-            logger.LogInformation("Manual Session creation errored.");
-            return;
-        }
-        // reserve session ownership
+        if (!result.IsSuccess) throw new HubException("Manual Session Create error.");
+        
         var isReserved = await ownership.Reserve(result.Value, Context.ConnectionId);
-
-        if (!isReserved)
-        {
-            logger.LogInformation("Manual Session could not be reserved.");
-            return;
-        }
+        if (!isReserved) throw new HubException("Manual Session Create error - could not be reserved.");
         
         var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
+        if (!resultEntity.IsSuccess) throw new HubException("Manual Session Create error - could not get session response data");
 
-        if (resultEntity.IsSuccess)
-        {
-            await Clients.All.ReceiveSession(SessionResponseModel.ToModel(resultEntity.Value));
-        }
-        else
-        {
-            // TODO: send error
-        }
+        return SessionResponseModel.ToModel(resultEntity.Value);
     }
     
-    public async Task SendStartSession()
+    public async Task<SessionResponseModel> SendStartSession()
     {
         if (! await ownership.IsReservedByMe(Context.ConnectionId))
-        {
-            logger.LogInformation("Manual Session could not be started, it is owned by somebody else or it has not been yet created.");
-            return;
-        }
+            throw new HubException("Manual Session Start error - session could not be started, it is owned by somebody else or it has not been yet created.");
 
         var sessionId = await ownership.GetSessionId();
         if (sessionId.HasValue)
         {
             var result = await mediator.Send(new StartSessionCommand(sessionId.Value));
-
-            if (!result.IsSuccess)
-            {
-                // TODO
-                logger.LogInformation("Manual Session start errored.");
-                return;
-            }
-            var resultEntity = await mediator.Send(new GetSessionQuery(sessionId.Value));
+            if (!result.IsSuccess) throw new HubException("Manual Session Start error.");
             
-            if (resultEntity.IsSuccess)
-            {
-                await Clients.All.ReceiveSession(SessionResponseModel.ToModel(resultEntity.Value));
-            }
-            else
-            {
-                // TODO: send error
-            }
+            var resultEntity = await mediator.Send(new GetSessionQuery(sessionId.Value));
+            if (!resultEntity.IsSuccess) throw new HubException("Manual Session Start error - could not get session response data");
+            
+            return SessionResponseModel.ToModel(resultEntity.Value);
         }
+
+        throw new HubException("Manual Session Start error - current session not found.");
     }
 
-    public async Task SendEndSession()
+    public async Task<SessionResponseModel> SendEndSession()
     {
         if (! await ownership.IsReservedByMe(Context.ConnectionId))
-        {
-            // TODO: notify user
-            logger.LogInformation("Manual Session could not be ended, it is owned by somebody else or it has not been yet created.");
-            return;
-        }
+            throw new HubException("Manual Session End error - session could not be ended, it is owned by somebody else or it has not been yet created.");
 
         var sessionId = await ownership.GetSessionId();
         if (sessionId.HasValue)
         {
             var result = await mediator.Send(new EndSessionCommand(sessionId.Value));
-
-            if (!result.IsSuccess)
-            {
-                logger.LogInformation("Manual Session end errored.");
-                return;
-            }
+            if (!result.IsSuccess) throw new HubException("Manual Session End error.");
             
             var isFree = await ownership.Free(Context.ConnectionId);
-
-            if (!isFree)
-            {
-                logger.LogInformation("Manual Session free errored.");
-                return;
-            }
+            if (!isFree) throw new HubException("Manual Session End error - could not free session.");
             
             var resultEntity = await mediator.Send(new GetSessionQuery(sessionId.Value));
-            
-            if (resultEntity.IsSuccess)
-            {
-                await Clients.All.ReceiveSession(SessionResponseModel.ToModel(resultEntity.Value));
-            }
-            else
-            {
-                // TODO: send error
-            }
+            if (!resultEntity.IsSuccess) throw new HubException("Manual Session End error - could not get session response data");
+                
+            return SessionResponseModel.ToModel(resultEntity.Value);
         }
+        
+        throw new HubException("Manual Session End error - current session not found.");
     }
     
     public async Task SendJoy(JoyDTO joy)

@@ -44,7 +44,7 @@ public class SessionManagerService(
         using var scope = serviceProvider.CreateScope();
         var createSessionService = scope.ServiceProvider.GetRequiredService<ICreateSessionService>();
             
-        if (_currentSessionExists()) return Result.Conflict();
+        if (CurrentSessionExists()) return Result.Conflict();
 
         // create the session
         var created = await createSessionService.CreateSession(
@@ -170,11 +170,24 @@ public class SessionManagerService(
         var deleted = await deleteSessionService.DeleteSession(sessionId);
         
         if (!deleted.IsSuccess) return Result.Error();
-
+        
         return Result.Success();
     }
+
+    /**
+     * Get id of current session. If does not exists, returns NotFound result.
+     */
+    public Result<int> GetCurrentSessionId()
+    {
+        if (_currentSessionId is not null)
+        {
+            return Result.Success(_currentSessionId.Value);
+        }
+
+        return Result.NotFound();
+    }
     
-    private bool _currentSessionExists()
+    public bool CurrentSessionExists()
     {
         return _currentSessionId is not null;
     }

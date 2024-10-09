@@ -134,8 +134,8 @@ public class Session(
     
     if (State is SessionState.None)
     {
-      throw new SessionInvalidOperationException(
-        $"Invalid Session operation, cannot End while in {State.ToString()}.");
+      State = SessionState.Ended;
+      return;
     }
     
     foreach (var process in _processes)

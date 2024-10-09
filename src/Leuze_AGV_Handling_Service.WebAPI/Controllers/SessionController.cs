@@ -5,6 +5,7 @@ using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Delete;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.GetCurrent;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Start;
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
@@ -15,9 +16,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Leuze_AGV_Handling_Service.WebAPI.Controllers;
 
 [ApiVersion(1)]
-[Route("api/v{v:apiVersion}/rest/autonomous/sessions/")]
+[Route("api/v{v:apiVersion}/rest/sessions")]
 [ApiController]
-public class AutonomousSessionController(IMediator mediator) : ControllerBase
+public class SessionController(IMediator mediator) : ControllerBase
 {
     
     [HttpGet]
@@ -38,6 +39,20 @@ public class AutonomousSessionController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> SessionsGetById(int sessionId)
     {
         var result = await mediator.Send(new GetSessionQuery(sessionId)); 
+        
+        if (result.IsSuccess)
+        {
+            var response = SessionsToResponse(result);
+            return Ok(response);
+        }
+
+        return NotFound();
+    }
+    
+    [HttpGet("current")]
+    public async Task<IActionResult> SessionsGetCurrent()
+    {
+        var result = await mediator.Send(new GetCurrentSessionQuery()); 
         
         if (result.IsSuccess)
         {
@@ -113,7 +128,7 @@ public class AutonomousSessionController(IMediator mediator) : ControllerBase
     private static CreateSessionCommand SessionsFromRequest(SessionRequestModel request)
     {
       return new CreateSessionCommand(
-        HandlingMode.Autonomous,
+          Enum.Parse<HandlingMode>(request.HandlingMode ?? throw new ArgumentNullException()),
         request.MappingEnabled,
         request.InputMapRef,
         request.OutputMapRef,
@@ -123,32 +138,32 @@ public class AutonomousSessionController(IMediator mediator) : ControllerBase
 
     private static SessionResponseModel SessionsToResponse(Result<SessionDto> result)
     {
-      return new SessionResponseModel(
-        result.Value.Id,
-        result.Value.HandlingMode.ToString(),
-        result.Value.MappingEnabled,
-        result.Value.InputMapRef ?? "",
-        result.Value.OutputMapRef ?? "",
-        result.Value.OutputMapName ?? "",
-        result.Value.ErrorReason,
-        result.Value.State.ToString(),
-        result.Value.Actions.Select(action => new ActionResponseModel(
-            action.Command.ToString(),
-            action.SessionId,
-            action.CreatedDate.ToString()
-            )).ToList(),
-        result.Value.Processes.Select(process => new ProcessResponseModel(
-            process.Name,
-            process.HostName,
-            process.HostAddr,
-            process.UserName,
-            process.SessionId,
-            process.ErrorReason,
-            process.Pid,
-            process.State.ToString(),
-            process.CreatedDate.ToString()
-          )).ToList(),
-        result.Value.CreatedDate.ToString()
+        return new SessionResponseModel(
+            result.Value.Id,
+            result.Value.HandlingMode.ToString(),
+            result.Value.MappingEnabled,
+            result.Value.InputMapRef ?? "",
+            result.Value.OutputMapRef ?? "",
+            result.Value.OutputMapName ?? "",
+            result.Value.ErrorReason,
+            result.Value.State.ToString(),
+            result.Value.Actions.Select(action => new ActionResponseModel(
+                action.Command.ToString(),
+                action.SessionId,
+                action.CreatedDate.ToString()
+                )).ToList(),
+            result.Value.Processes.Select(process => new ProcessResponseModel(
+                process.Name,
+                process.HostName,
+                process.HostAddr,
+                process.UserName,
+                process.SessionId,
+                process.ErrorReason,
+                process.Pid,
+                process.State.ToString(),
+                process.CreatedDate.ToString()
+              )).ToList(),
+            result.Value.CreatedDate.ToString()
         );
     }
 }

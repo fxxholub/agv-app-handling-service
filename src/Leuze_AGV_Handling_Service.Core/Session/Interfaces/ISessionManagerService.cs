@@ -20,4 +20,8 @@ public interface ISessionManagerService
     public Task<Result<bool>> CheckSession(int sessionId);
 
     public Task<Result> DeleteSession(int sessionId);
+
+    public Result<int> GetCurrentSessionId();
+
+    public bool CurrentSessionExists();
 }

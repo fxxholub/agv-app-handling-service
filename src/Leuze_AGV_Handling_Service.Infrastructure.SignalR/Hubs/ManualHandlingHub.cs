@@ -15,11 +15,9 @@ using SignalRSwaggerGen.Attributes;
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 
 /// <summary>
-/// Hub for all manual messages.
+/// Manual handling mode Hub
 /// </summary>
 /// <param name="messageChannel"></param>
-// [ApiVersion(1)]
-// [SignalRHub(path: "api/v{v:apiVersion}/signalr/handling-hub")]
 [SignalRHub(path: "/api/v1/signalr/manual")]
 public class ManualHandlingHub(
     IMediator mediator,
@@ -38,23 +36,17 @@ public class ManualHandlingHub(
             if (sessionId.HasValue)
             {
                 var result = await mediator.Send(new EndSessionCommand(sessionId.Value));
-
-                if (!result.IsSuccess)
+                if (result.IsSuccess)
                 {
-                    logger.LogInformation("disconnect Manual Session end errored.");
-                    return;
+                    var isFree = await ownership.Free(Context.ConnectionId);
+                    if (!isFree) logger.LogError("Manual Session Disconnect Free error.");
                 }
-                
-                var isFree = await ownership.Free(Context.ConnectionId);
-
-                if (!isFree)
+                else
                 {
-                    logger.LogInformation("disconnect Manual Session free errored.");
-                    return;
+                    logger.LogError("Manual Session Disconnect End error.");
                 }
             }
         }
-
 
         await base.OnDisconnectedAsync(exception);
     }

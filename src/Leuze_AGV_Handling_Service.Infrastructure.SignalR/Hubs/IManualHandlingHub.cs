@@ -6,5 +6,5 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 
 public interface IManualHandlingHub : IManualMessageReceiver
 {
-    public Task ReceiveSession(SessionResponseModel response);
+
 }

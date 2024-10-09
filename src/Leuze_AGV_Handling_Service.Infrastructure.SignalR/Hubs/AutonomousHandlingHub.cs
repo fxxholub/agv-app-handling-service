@@ -6,16 +6,14 @@ using SignalRSwaggerGen.Attributes;
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 
 /// <summary>
-/// Hub for all autonomous messages.
+/// Autonomous handling mode Hub
 /// </summary>
 /// <param name="messageChannel"></param>
-// [ApiVersion(1)]
-// [SignalRHub(path: "api/v{v:apiVersion}/signalr/handling-hub")]
 [SignalRHub(path: "/api/v1/signalr/autonomous")]
-public class AutonomousHandlingHub(IAutonomousMessageChannel messageChannel) : Hub<IAutonomousHandlingHub>, IAutonomousMessageSender
+public class AutonomousHandlingHub(/*IAutonomousMessageChannel messageChannel*/) : Hub<IAutonomousHandlingHub>/*, IAutonomousMessageSender*/
 {
-    public async Task SendJoy(JoyDTO joy)
+    public async Task Dummy()
     {
-        await messageChannel.SendJoy(joy);
+        await Task.Delay(1000);
     }
 }

@@ -40,10 +40,11 @@ public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
 
     public async Task ReceiveMap(MapDto map)
     {
-        using (var scope = _serviceProvider.CreateScope())
-        {
-            var messageChannel = scope.ServiceProvider.GetRequiredService<IManualMessageChannel>();
-            await messageChannel.ReceiveMap(map);
-        }
+        // using (var scope = _serviceProvider.CreateScope())
+        // {
+        //     var messageChannel = scope.ServiceProvider.GetRequiredService<IManualMessageChannel>();
+        //     await messageChannel.ReceiveMap(map);
+        // }
+        await Task.Delay(100);
     }
 }

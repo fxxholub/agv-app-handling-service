@@ -31,15 +31,15 @@ public class ManualPublisher : IManualMessageSender
         var now = DateTime.UtcNow;
         var seconds = (int)(now - DateTime.UnixEpoch).TotalSeconds; // Seconds since the Unix epoch
         var nanoseconds = (uint)(now.Ticks % TimeSpan.TicksPerSecond * 100); 
-        var timestamp = new Ros2CommonMessages.Builtin.Time();
+        var timestamp = new Ros2CommonMessages.Builtin.Time(seconds, nanoseconds);
         
         var header = new Ros2CommonMessages.Std.Header(timestamp);
 
         var msg = new Ros2CommonMessages.Sensor.Joy
         {
             Header = header,
-            Axes = new float[] { message.X, message.Y, message.W },
-            Buttons = new int[0]
+            Axes = [message.X, message.Y, message.W],
+            Buttons = []
         };
         
         await _joyPublisher.PublishAsync(msg);

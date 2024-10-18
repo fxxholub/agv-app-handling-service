@@ -119,8 +119,8 @@ public class ManualHandlingHub(
         throw new HubException("Manual Session End error - current session not found.");
     }
     
-    public async Task SendJoy(JoyDTO joy)
+    public async Task SendJoy(JoyDto joy)
     {
-        await messageChannel.SendJoy(joy);
+        if (await ownership.IsReservedByMe(Context.ConnectionId)) await messageChannel.SendJoy(joy);
     }
 }

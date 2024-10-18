@@ -14,7 +14,7 @@ public class AutonomousHubMessageForwarder(
     )
     : IAutonomousMessageReceiver
 {
-    public async Task ReceiveMap(MapDTO map)
+    public async Task ReceiveMap(MapDto map)
     {
         await hubContext.Clients.All.ReceiveMap(map);
     }

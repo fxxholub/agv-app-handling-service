@@ -4,5 +4,5 @@ namespace Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 
 public interface IManualMessageReceiver
 {
-    public Task ReceiveMap(MapDTO map);
+    public Task ReceiveMap(MapDto map);
 }

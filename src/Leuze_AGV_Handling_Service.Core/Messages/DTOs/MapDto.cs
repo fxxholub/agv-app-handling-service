@@ -1,5 +1,5 @@
 namespace Leuze_AGV_Handling_Service.Core.Messages.DTOs;
 
-public record JoyDTO(
+public record MapDto(
     string Something
     );

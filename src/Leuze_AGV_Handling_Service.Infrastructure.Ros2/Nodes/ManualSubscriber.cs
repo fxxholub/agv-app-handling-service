@@ -34,11 +34,11 @@ public class ManualSubscriber : BackgroundService, IAutonomousMessageReceiver
     {
         await foreach (var msg in _mapSubscriber.ReadAllAsync(cancellationToken))
         {
-            await ReceiveMap(new MapDTO(msg.Data));
+            await ReceiveMap(new MapDto(msg.Data));
         }
     }
 
-    public async Task ReceiveMap(MapDTO map)
+    public async Task ReceiveMap(MapDto map)
     {
         using (var scope = _serviceProvider.CreateScope())
         {

@@ -9,21 +9,13 @@ namespace Leuze_AGV_Handling_Service.Core.Messages.Services;
 /// </summary>
 /// <param name="senderTarget">Send messages channel end.</param>
 /// <param name="receiverTarget">Receive messages channel end.</param>
-public class AutonomousMessageChannel(IAutonomousMessageSender senderTarget, IAutonomousMessageReceiver receiverTarget) : MessageChannelBase, IAutonomousMessageChannel
+public class AutonomousMessageChannel(/*IAutonomousMessageSender senderTarget,*/ IAutonomousMessageReceiver receiverTarget) : MessageChannelBase, IAutonomousMessageChannel
 {
-    public async Task ReceiveMap(MapDTO map)
+    public async Task ReceiveMap(MapDto map)
     {
         if (await IsEnabled())
         {
             await receiverTarget.ReceiveMap(map);
-        }
-    }
-
-    public async Task SendJoy(JoyDTO joy)
-    {
-        if (await IsEnabled())
-        {
-            await senderTarget.SendJoy(joy);
         }
     }
 }

@@ -23,10 +23,4 @@ public class AutonomousPublisher : IAutonomousMessageSender
 
         _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Std.String>("/joy");
     }
-
-    public async Task SendJoy(JoyDTO message)
-    {
-        var msg = new Ros2CommonMessages.Std.String(message.Something);
-        await _joyPublisher.PublishAsync(msg);
-    }
 }

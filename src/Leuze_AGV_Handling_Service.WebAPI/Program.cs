@@ -46,6 +46,17 @@ public static class Program
     {
         _builder = WebApplication.CreateBuilder(args);
         
+        _builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy",
+                // settings for local testing
+                builder => builder.WithOrigins("http://localhost:8088") // Blazor app origin
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()                     // Allow any HTTP method (GET, POST, etc.)
+                    .AllowAnyHeader()                     // Allow any headers
+                    .AllowCredentials());                 // Allow credentials if needed
+        });
+        
         ConfigureSerilog();                                       // Serilog
 
         ConfigureMediatR();                                       // MediatR
@@ -63,15 +74,6 @@ public static class Program
 
         ConfigureInfrastructureServices();
         
-        _builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("CorsPolicy",
-                // settings for local testing
-                builder => builder.WithOrigins("http://localhost:8088") // Blazor app origin
-                    .AllowAnyMethod()                     // Allow any HTTP method (GET, POST, etc.)
-                    .AllowAnyHeader()                     // Allow any headers
-                    .AllowCredentials());                 // Allow credentials if needed
-        });
     }
 
     private static void ConfigureSerilog()
@@ -132,6 +134,8 @@ public static class Program
 
     private static void ConfigureApp(WebApplication app)
     {
+        app.UseCors("CorsPolicy");
+        
         if (true/*app.Environment.IsDevelopment()*/)
         {
             app.UseSwagger();
@@ -142,8 +146,6 @@ public static class Program
         }
 
         app.UseHttpsRedirection();
-        
-        app.UseCors("CorsPolicy");
         
         app.UseAuthorization();
         app.MapControllers();

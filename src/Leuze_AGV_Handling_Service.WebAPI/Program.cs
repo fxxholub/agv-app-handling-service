@@ -50,11 +50,10 @@ public static class Program
         {
             options.AddPolicy("CorsPolicy",
                 // settings for local testing
-                builder => builder.WithOrigins("http://localhost:8088") // Blazor app origin
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()                     // Allow any HTTP method (GET, POST, etc.)
-                    .AllowAnyHeader()                     // Allow any headers
-                    .AllowCredentials());                 // Allow credentials if needed
+                builder => builder.WithOrigins("*") // Blazor app origin
+                    .AllowAnyMethod()                       // Allow any HTTP method (GET, POST, etc.)
+                    .AllowAnyHeader());              // Allow any headers
+            // .AllowCredentials());                 // Allow credentials if needed
         });
         
         ConfigureSerilog();                                       // Serilog
@@ -136,6 +135,12 @@ public static class Program
     {
         app.UseCors("CorsPolicy");
         
+        app.MapHub<AutonomousHandlingHub>($"/api/v1/signalr/autonomous");
+        app.MapHub<ManualHandlingHub>($"/api/v1/signalr/manual");
+        
+        app.UseAuthorization();
+        app.MapControllers();
+        
         if (true/*app.Environment.IsDevelopment()*/)
         {
             app.UseSwagger();
@@ -145,13 +150,7 @@ public static class Program
             });
         }
 
-        app.UseHttpsRedirection();
-        
-        app.UseAuthorization();
-        app.MapControllers();
-
-        // // map SignalR hubs as endpoints
-        app.MapHub<AutonomousHandlingHub>($"/api/v1/signalr/autonomous");
-        app.MapHub<ManualHandlingHub>($"/api/v1/signalr/manual");
+        // produces signalR cors issues
+        // app.UseHttpsRedirection();
     }
 }

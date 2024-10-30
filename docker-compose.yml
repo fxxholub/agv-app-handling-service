@@ -1,7 +1,7 @@
 
 services:
   webapi:
-    image: leuze_agv_handling_service.webapi
+    image: leuze_agv_handling_service.app
     env_file:
       - .env
     build:

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Ardalis.SharedKernel" />
+      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Leuze_AGV_Handling_Service.UseCases\Leuze_AGV_Handling_Service.UseCases.csproj" />
+    </ItemGroup>
+
+</Project>

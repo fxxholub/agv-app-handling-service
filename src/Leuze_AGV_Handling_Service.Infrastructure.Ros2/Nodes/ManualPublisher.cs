@@ -23,7 +23,8 @@ public class ManualPublisher : IManualMessageSender
         var context = new RclContext();
         var node = context.CreateNode("handling_service_manual_pub");
 
-        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Sensor.Joy>("/handling_manual_joy");
+        // called joy for teleop_twist_joy package purposes
+        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Sensor.Joy>("/joy");
     }
 
     public async Task SendJoy(JoyDto message)

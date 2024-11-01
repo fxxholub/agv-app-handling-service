@@ -39,7 +39,7 @@ public class ManualPublisher : IManualMessageSender
         var msg = new Ros2CommonMessages.Sensor.Joy
         {
             Header = header,
-            Axes = [message.Y/10, message.W/10, message.X/10],
+            Axes = [-message.Y/10, -message.W/10, -message.X/10],
             Buttons = []
         };
         

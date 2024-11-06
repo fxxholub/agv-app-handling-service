@@ -29,8 +29,8 @@ public class ManualPublisher : IManualMessageSender
     {
         var msg = new Ros2CommonMessages.Geometry.Twist
         {
-            Linear = new Ros2CommonMessages.Geometry.Vector3(message.X/10, message.Y/10, 0),
-            Angular = new Ros2CommonMessages.Geometry.Vector3(message.W/10)
+            Linear = new Ros2CommonMessages.Geometry.Vector3(message.X/20, message.Y/20, 0),
+            Angular = new Ros2CommonMessages.Geometry.Vector3(0, 0, message.W/20)
         };
         
         await _joyPublisher.PublishAsync(msg);

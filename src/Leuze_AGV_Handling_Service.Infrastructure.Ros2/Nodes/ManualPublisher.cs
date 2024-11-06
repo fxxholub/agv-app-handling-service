@@ -22,7 +22,7 @@ public class ManualPublisher : IManualMessageSender
         var node = context.CreateNode("handling_service_manual_pub");
 
         // called joy for teleop_twist_joy package purposes
-        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/handling_manual_vel");
+        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/cmd_vel");
     }
 
     public async Task SendJoy(JoyDto message)

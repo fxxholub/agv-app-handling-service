@@ -8,23 +8,11 @@ namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 /// Describes user handling session with its settings, processes and handling mode.
 /// </summary>
 /// <param name="handlingMode"></param>
-/// <param name="mappingEnabled"></param>
-/// <param name="inputMapRef"></param>
-/// <param name="outputMapRef"></param>
-/// <param name="outputMapName"></param>
 public class Session(
-  HandlingMode handlingMode,
-  bool mappingEnabled,
-  string? inputMapRef,
-  string? outputMapRef,
-  string? outputMapName
+  HandlingMode handlingMode
   ) : EntityBase, IAggregateRoot
 {
   public HandlingMode HandlingMode { get; private set; } = handlingMode;
-  public bool MappingEnabled { get; private set; } = mappingEnabled;
-  public string? InputMapRef { get; set; } = inputMapRef;
-  public string? OutputMapRef { get; set; } = outputMapRef;
-  public string? OutputMapName { get; set; } = outputMapName;
   public SessionState State { get; private set; } = SessionState.None;
   
   private readonly List<Action> _actions = new List<Action>();

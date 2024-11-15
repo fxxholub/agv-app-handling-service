@@ -141,10 +141,6 @@ public class SessionController(IMediator mediator) : ControllerBase
         return new SessionResponseModel(
             result.Value.Id,
             result.Value.HandlingMode.ToString(),
-            result.Value.MappingEnabled,
-            result.Value.InputMapRef ?? "",
-            result.Value.OutputMapRef ?? "",
-            result.Value.OutputMapName ?? "",
             result.Value.ErrorReason,
             result.Value.State.ToString(),
             result.Value.Actions.Select(action => new ActionResponseModel(

@@ -5,6 +5,7 @@ using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.Services;
 using Leuze_AGV_Handling_Service.Infrastructure.Exceptions;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
+using Leuze_AGV_Handling_Service.Infrastructure.SessionServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,10 @@ public static class InfrastructureServiceExtensions
     
     services.AddSingleton<IAutonomousMessageChannel, AutonomousMessageChannel>();
     services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
+
+    services.AddSingleton<SessionWatchdogService>();
+    services.AddSingleton<ISessionWatchdogService>(sp => sp.GetRequiredService<SessionWatchdogService>());
+    services.AddHostedService(sp => sp.GetRequiredService<SessionWatchdogService>());
     
     ////// infrastructure stuff ///////
     services.AddScoped<IProcessMonitorService, SshProcessMonitorService>();

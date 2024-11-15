@@ -46,6 +46,16 @@ public static class Program
     {
         _builder = WebApplication.CreateBuilder(args);
         
+        _builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy",
+                // settings for local testing
+                builder => builder.WithOrigins("*") // Blazor app origin
+                    .AllowAnyMethod()                       // Allow any HTTP method (GET, POST, etc.)
+                    .AllowAnyHeader());              // Allow any headers
+            // .AllowCredentials());                 // Allow credentials if needed
+        });
+        
         ConfigureSerilog();                                       // Serilog
 
         ConfigureMediatR();                                       // MediatR
@@ -63,15 +73,6 @@ public static class Program
 
         ConfigureInfrastructureServices();
         
-        _builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("CorsPolicy",
-                // settings for local testing
-                builder => builder.WithOrigins("http://localhost:5156") // Blazor app origin
-                    .AllowAnyMethod()                     // Allow any HTTP method (GET, POST, etc.)
-                    .AllowAnyHeader()                     // Allow any headers
-                    .AllowCredentials());                 // Allow credentials if needed
-        });
     }
 
     private static void ConfigureSerilog()
@@ -132,6 +133,14 @@ public static class Program
 
     private static void ConfigureApp(WebApplication app)
     {
+        app.UseCors("CorsPolicy");
+        
+        app.MapHub<AutonomousHandlingHub>($"/api/v1/signalr/autonomous");
+        app.MapHub<ManualHandlingHub>($"/api/v1/signalr/manual");
+        
+        app.UseAuthorization();
+        app.MapControllers();
+        
         if (true/*app.Environment.IsDevelopment()*/)
         {
             app.UseSwagger();
@@ -141,15 +150,7 @@ public static class Program
             });
         }
 
-        app.UseHttpsRedirection();
-        
-        app.UseCors("CorsPolicy");
-        
-        app.UseAuthorization();
-        app.MapControllers();
-
-        // // map SignalR hubs as endpoints
-        app.MapHub<AutonomousHandlingHub>($"/api/v1/signalr/autonomous");
-        app.MapHub<ManualHandlingHub>($"/api/v1/signalr/manual");
+        // produces signalR cors issues
+        // app.UseHttpsRedirection();
     }
 }

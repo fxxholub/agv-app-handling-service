@@ -1,8 +1,6 @@
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
-using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Ros2CommonMessages.Builtin;
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.HighPerformance.Helpers;
 using Rcl;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
@@ -14,7 +12,7 @@ public class ManualPublisher : IManualMessageSender
 {
     private readonly ILogger<ManualPublisher> _logger;
 
-    private readonly IRclPublisher<Ros2CommonMessages.Sensor.Joy> _joyPublisher;
+    private readonly IRclPublisher<Ros2CommonMessages.Geometry.Twist> _joyPublisher;
     public ManualPublisher(IServiceProvider serviceProvider, ILogger<ManualPublisher> logger)
     {
         _logger = logger;
@@ -23,23 +21,16 @@ public class ManualPublisher : IManualMessageSender
         var context = new RclContext();
         var node = context.CreateNode("handling_service_manual_pub");
 
-        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Sensor.Joy>("/handling_manual_joy");
+        // called joy for teleop_twist_joy package purposes
+        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/cmd_vel");
     }
 
     public async Task SendJoy(JoyDto message)
     {
-        var now = DateTime.UtcNow;
-        var seconds = (int)(now - DateTime.UnixEpoch).TotalSeconds; // Seconds since the Unix epoch
-        var nanoseconds = (uint)(now.Ticks % TimeSpan.TicksPerSecond * 100); 
-        var timestamp = new Ros2CommonMessages.Builtin.Time(seconds, nanoseconds);
-        
-        var header = new Ros2CommonMessages.Std.Header(timestamp);
-
-        var msg = new Ros2CommonMessages.Sensor.Joy
+        var msg = new Ros2CommonMessages.Geometry.Twist
         {
-            Header = header,
-            Axes = [message.X, message.Y, message.W],
-            Buttons = []
+            Linear = new Ros2CommonMessages.Geometry.Vector3(-message.X/100, -message.Y/100, 0),
+            Angular = new Ros2CommonMessages.Geometry.Vector3(0, 0, -message.W/100)
         };
         
         await _joyPublisher.PublishAsync(msg);

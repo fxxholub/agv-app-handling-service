@@ -7,10 +7,6 @@ public record SessionDto(
   int Id,
 
   HandlingMode HandlingMode,
-  bool MappingEnabled,
-  string? InputMapRef,
-  string? OutputMapRef,
-  string? OutputMapName,
   string? ErrorReason,
 
   SessionState State,

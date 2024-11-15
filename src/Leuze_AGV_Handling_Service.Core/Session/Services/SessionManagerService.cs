@@ -47,13 +47,7 @@ public class SessionManagerService(
         if (CurrentSessionExists()) return Result.Conflict();
 
         // create the session
-        var created = await createSessionService.CreateSession(
-            handlingMode,
-            mappingEnabled,
-            inputMapRef,
-            outputMapRef,
-            outputMapName
-        );
+        var created = await createSessionService.CreateSession(handlingMode);
 
         if (!created.IsSuccess) return Result.Error();
         

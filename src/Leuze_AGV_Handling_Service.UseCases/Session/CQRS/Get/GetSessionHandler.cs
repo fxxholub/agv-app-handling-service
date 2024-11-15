@@ -21,10 +21,6 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
     return new SessionDto(
       entity.Id,
       entity.HandlingMode,
-      entity.MappingEnabled,
-      entity.InputMapRef ?? "",
-      entity.OutputMapRef ?? "",
-      entity.OutputMapName ?? "",
       entity.ErrorReason,
       entity.State,
       entity.Actions.Select(action => new ActionDto(

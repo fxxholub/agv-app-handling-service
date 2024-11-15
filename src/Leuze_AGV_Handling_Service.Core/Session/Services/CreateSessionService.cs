@@ -18,24 +18,12 @@ public class CreateSessionService(
     ILogger<CreateSessionService> logger
 ) : ICreateSessionService
 {
-    public async Task<Result<int>> CreateSession(
-        HandlingMode handlingMode,
-        bool mappingEnabled,
-        string? inputMapRef,
-        string? outputMapRef,
-        string? outputMapName
-        )
+    public async Task<Result<int>> CreateSession(HandlingMode handlingMode)
     {
         logger.LogInformation("Creating Session...");
         
         // create session object
-        var newSession = new SessionAggregate.Session(
-            handlingMode,
-            mappingEnabled,
-            inputMapRef,
-            outputMapRef,
-            outputMapName
-            );
+        var newSession = new SessionAggregate.Session(handlingMode);
 
         // add session object to repository
         var createdSession = await sessionRepository.AddAsync(newSession);

@@ -6,10 +6,6 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
 public class SessionResponseModel(
   int id,
   string handlingMode,
-  bool mappingEnabled,
-  string inputMapRef,
-  string outputMapRef,
-  string outputMapName,
   string? errorReason,
   string state,
   List<ActionResponseModel> actions,
@@ -20,14 +16,6 @@ public class SessionResponseModel(
   public int Id { get; set; } = id;
 
   public string HandlingMode { get; set; } = handlingMode;
-
-  public bool MappingEnabled { get; set; } = mappingEnabled;
-
-  public string InputMapRef { get; set; } = inputMapRef;
-
-  public string OutputMapRef { get; set; } = outputMapRef;
-
-  public string OutputMapName { get; set; } = outputMapName;
 
   public string? ErrorReason { get; set; } = errorReason;
 
@@ -44,10 +32,6 @@ public class SessionResponseModel(
     return new SessionResponseModel(
       dto.Id,
       dto.HandlingMode.ToString(),
-      dto.MappingEnabled,
-      dto.InputMapRef ?? "",
-      dto.OutputMapRef ?? "",
-      dto.OutputMapName ?? "",
       dto.ErrorReason,
       dto.State.ToString(),
       dto.Actions.Select(action => new ActionResponseModel(

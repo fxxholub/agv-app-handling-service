@@ -18,12 +18,12 @@ public class CreateSessionService(
     ILogger<CreateSessionService> logger
 ) : ICreateSessionService
 {
-    public async Task<Result<int>> CreateSession(HandlingMode handlingMode)
+    public async Task<Result<int>> CreateSession(HandlingMode handlingMode, Lifespan lifespan)
     {
         logger.LogInformation("Creating Session...");
         
         // create session object
-        var newSession = new SessionAggregate.Session(handlingMode);
+        var newSession = new SessionAggregate.Session(handlingMode, lifespan);
 
         // add session object to repository
         var createdSession = await sessionRepository.AddAsync(newSession);

@@ -1,6 +1,5 @@
 ﻿using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
-using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +16,6 @@ public static class InfrastructureSignalRServiceExtension
     ConfigurationManager config
     )
   {
-    services.AddSingleton<ISessionOwnershipService, SessionOwnershipService>();
     
     services.AddSingleton<IAutonomousMessageReceiver, AutonomousHubMessageForwarder>();
     services.AddSingleton<IManualMessageReceiver, ManualHubMessageForwarder>();

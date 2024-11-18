@@ -1,13 +1,11 @@
 using System.Reflection;
 using Ardalis.SharedKernel;
 using Asp.Versioning;
-using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure;
 using Leuze_AGV_Handling_Service.Infrastructure.Persistent;
 using Leuze_AGV_Handling_Service.Infrastructure.Ros2;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
 using MediatR;
 using Serilog;
 
@@ -90,8 +88,12 @@ public static class Program
     {
         var mediatRAssemblies = new[]
         {
-            Assembly.GetAssembly(typeof(Session)),                // Core
-            Assembly.GetAssembly(typeof(CreateSessionCommand))    // UseCases
+            Assembly.Load("Leuze_AGV_Handling_Service.Core"),                       // Core
+            Assembly.Load("Leuze_AGV_Handling_Service.UseCases"),                   // UseCases
+            Assembly.Load("Leuze_AGV_Handling_Service.Infrastructure"),             // Infrastructure
+            Assembly.Load("Leuze_AGV_Handling_Service.Infrastructure.Persistent"),  // Infrastructure.Persistent
+            Assembly.Load("Leuze_AGV_Handling_Service.Infrastructure.Ros2"),        // Infrastructure.Ros2
+            Assembly.Load("Leuze_AGV_Handling_Service.Infrastructure.SignalR")      // Infrastructure.SignalR
         };
         _builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
         _builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

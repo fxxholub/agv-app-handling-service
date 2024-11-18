@@ -1,5 +1,5 @@
 ﻿using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.List;
 using Microsoft.EntityFrameworkCore;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Persistent.InMemoryDb.Queries;

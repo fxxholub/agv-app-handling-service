@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Leuze_AGV_Handling_Service.Core\Leuze_AGV_Handling_Service.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Session\CQRS\Actions\" />
+  </ItemGroup>
+
 </Project>

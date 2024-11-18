@@ -3,7 +3,7 @@ using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
-namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
+namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 
 /// <summary>
 /// Fetches Session. Safe operation.
@@ -16,7 +16,7 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
   {
     var spec = new SessionByIdWithActionsAndProcessesSpec(request.SessionId);
     var entity = await repository.FirstOrDefaultAsync(spec, cancellationToken);
-    if (entity == null) return Result.NotFound();
+    if (entity is null) return Result.NotFound();
 
     return new SessionDto(
       entity.Id,

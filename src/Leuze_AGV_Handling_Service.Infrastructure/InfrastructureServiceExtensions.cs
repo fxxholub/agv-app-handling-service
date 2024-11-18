@@ -24,7 +24,7 @@ public static class InfrastructureServiceExtensions
   {
     
     ////// core stuff ////////
-    services.AddSingleton<ISessionManagerService, SessionManagerService>();
+    services.AddSingleton<ISessionExecutorService, SessionExecutorService>();
     
     services.AddScoped<IStartSessionService, StartSessionService>();
     services.AddScoped<IEndSessionService, EndSessionService>();
@@ -35,11 +35,12 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<IAutonomousMessageChannel, AutonomousMessageChannel>();
     services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
 
+    ////// infrastructure stuff ///////
     services.AddSingleton<SessionWatchdogService>();
     services.AddSingleton<ISessionWatchdogService>(sp => sp.GetRequiredService<SessionWatchdogService>());
     services.AddHostedService(sp => sp.GetRequiredService<SessionWatchdogService>());
     
-    ////// infrastructure stuff ///////
+    
     services.AddScoped<IProcessMonitorService, SshProcessMonitorService>();
     // services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
     

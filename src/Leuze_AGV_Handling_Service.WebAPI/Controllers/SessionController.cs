@@ -1,13 +1,12 @@
 using Ardalis.Result;
 using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Delete;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.End;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.GetCurrent;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.List;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Start;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Delete;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.List;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 using Leuze_AGV_Handling_Service.WebAPI.Models.Session;
 using MediatR;
@@ -20,7 +19,7 @@ namespace Leuze_AGV_Handling_Service.WebAPI.Controllers;
 [ApiController]
 public class SessionController(IMediator mediator) : ControllerBase
 {
-    
+    // TODO: only admin can list all
     [HttpGet]
     public async Task<IActionResult> SessionsGetAll()
     {
@@ -28,7 +27,7 @@ public class SessionController(IMediator mediator) : ControllerBase
         
         if (result.IsSuccess)
         {
-            var response = result.Value.Select(session => SessionsToResponse(session)).ToList(); 
+            var response = result.Value.Select(session => SessionToResponse(session)).ToList(); 
             return Ok(response);
         }
     
@@ -36,27 +35,13 @@ public class SessionController(IMediator mediator) : ControllerBase
     }
     
     [HttpGet("{sessionId:int}")]
-    public async Task<IActionResult> SessionsGetById(int sessionId)
+    public async Task<IActionResult> SessionsGet(int sessionId)
     {
         var result = await mediator.Send(new GetSessionQuery(sessionId)); 
         
         if (result.IsSuccess)
         {
-            var response = SessionsToResponse(result);
-            return Ok(response);
-        }
-
-        return NotFound();
-    }
-    
-    [HttpGet("current")]
-    public async Task<IActionResult> SessionsGetCurrent()
-    {
-        var result = await mediator.Send(new GetCurrentSessionQuery()); 
-        
-        if (result.IsSuccess)
-        {
-            var response = SessionsToResponse(result);
+            var response = SessionToResponse(result);
             return Ok(response);
         }
 
@@ -66,7 +51,7 @@ public class SessionController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> SessionsPost([FromBody] SessionRequestModel request)
     {
-        var command = SessionsFromRequest(request);
+        var command = SessionFromRequest(request);
         var result = await mediator.Send(command);
       
         if (result.IsSuccess)
@@ -75,7 +60,7 @@ public class SessionController(IMediator mediator) : ControllerBase
             
             if (resultEntity.IsSuccess)
             {
-                var response = SessionsToResponse(resultEntity.Value);
+                var response = SessionToResponse(resultEntity.Value);
                 return Ok(response);
             }
         }
@@ -95,48 +80,30 @@ public class SessionController(IMediator mediator) : ControllerBase
 
         return NotFound();
     }
-    
-    [HttpPost("{sessionId:int}/actions")]
-    public async Task<IActionResult> SessionsActionsPost(int sessionId, [FromBody] ActionRequestModel request)
-    {
-        Result<int> result;
 
-        // TODO exception catching
-        ActionCommand actionCommand = Enum.Parse<ActionCommand>(request.Command ?? throw new ArgumentNullException());
-            
-        if (actionCommand is ActionCommand.Start)
+    private static CreateSessionCommand SessionFromRequest(SessionRequestModel request)
+    {
+        HandlingMode handlingMode = Enum.Parse<HandlingMode>(request.HandlingMode ?? throw new ArgumentNullException());
+        Lifespan lifespan;
+        switch (handlingMode)
         {
-            result = await mediator.Send(new StartSessionCommand(sessionId));
-        }
-        else if (actionCommand is ActionCommand.End)
-        {
-            result = await mediator.Send(new EndSessionCommand(sessionId));
-        }
-        else
-        {
-            result = Result.Invalid();
-        }
-      
-        if (result.IsSuccess)
-        {
-            return Ok();
+            case HandlingMode.Autonomous:
+                lifespan = Lifespan.Extended;
+                break;
+            case HandlingMode.Manual:
+                lifespan = Lifespan.Exclusive;
+                break;
+            default:
+                throw new NotImplementedException($"Handling mode '{request.HandlingMode}' unknown");
         }
         
-        return StatusCode(500, $"Error creating session");
+        return new CreateSessionCommand(
+            handlingMode,
+            lifespan
+        );
     }
 
-    private static CreateSessionCommand SessionsFromRequest(SessionRequestModel request)
-    {
-      return new CreateSessionCommand(
-          Enum.Parse<HandlingMode>(request.HandlingMode ?? throw new ArgumentNullException()),
-        request.MappingEnabled,
-        request.InputMapRef,
-        request.OutputMapRef,
-        request.OutputMapName
-      );
-    }
-
-    private static SessionResponseModel SessionsToResponse(Result<SessionDto> result)
+    private static SessionResponseModel SessionToResponse(Result<SessionDto> result)
     {
         return new SessionResponseModel(
             result.Value.Id,

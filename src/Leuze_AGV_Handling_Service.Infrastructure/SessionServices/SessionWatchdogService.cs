@@ -35,9 +35,9 @@ public class SessionWatchdogService(
     public async Task Watch()
     {
         using var scope = serviceProvider.CreateScope();
-        var sessionManager = scope.ServiceProvider.GetRequiredService<ISessionManagerService>();
+        var checkService = scope.ServiceProvider.GetRequiredService<ICheckSessionService>();
+        var endService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
 
         if (_watchedSessionId is null)
         {
@@ -47,17 +47,20 @@ public class SessionWatchdogService(
 
         try
         {
-            var checkResult = await sessionManager.CheckSession(_watchedSessionId.Value);
+            var checkResult = await checkService.CheckSession(_watchedSessionId.Value);
 
             if (!checkResult.IsSuccess)
-                logger.LogInformation("Session Watchdog check failed.");
+                logger.LogError("Session Watchdog check failed.");
 
-            if (!checkResult.Value)
-            {
-                var endResult = await sessionManager.EndSession(_watchedSessionId.Value);
-                await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
-                await StopWatching();
-            }
+            if (checkResult.Value) return;
+            
+            var endResult = await endService.EndSession(_watchedSessionId.Value);
+            
+            if (!endResult.IsSuccess)
+                logger.LogError("Session Watchdog end on bad check failed.");
+            
+            await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
+            await StopWatching();
         }
         catch (Exception ex)
         {

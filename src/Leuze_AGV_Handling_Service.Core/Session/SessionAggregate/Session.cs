@@ -9,10 +9,13 @@ namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 /// </summary>
 /// <param name="handlingMode"></param>
 public class Session(
-  HandlingMode handlingMode
+  HandlingMode handlingMode,
+  Lifespan lifespan
   ) : EntityBase, IAggregateRoot
 {
   public HandlingMode HandlingMode { get; private set; } = handlingMode;
+  
+  public Lifespan Lifespan { get; private set; } = lifespan;
   public SessionState State { get; private set; } = SessionState.None;
   
   private readonly List<Action> _actions = new List<Action>();

@@ -9,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.Core.Messages.Services;
 /// </summary>
 /// <param name="senderTarget">Send messages channel end.</param>
 /// <param name="receiverTarget">Receive messages channel end.</param>
-public class ManualMessageChannel(IManualMessageSender senderTarget/*, IManualMessageReceiver receiverTarget*/) : MessageChannelBase, IManualMessageChannel
+public class ManualMessageChannel(IManualMessageSender senderTarget/*, IManualMessageReceiver receiverTarget*/) : IManualMessageChannel
 {
     // public async Task ReceiveMap(MapDto map)
     // {
@@ -21,9 +21,6 @@ public class ManualMessageChannel(IManualMessageSender senderTarget/*, IManualMe
 
     public async Task SendJoy(JoyDto joy)
     {
-        if (await IsEnabled())
-        {
-            await senderTarget.SendJoy(joy);
-        }
+        await senderTarget.SendJoy(joy);
     }
 }

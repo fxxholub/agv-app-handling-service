@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
 using Microsoft.Extensions.Logging;
 
@@ -27,6 +28,11 @@ public class DeleteSessionService(
         if (aggregate == null) return Result.NotFound();
         
         // delete the object from repository
+        if (aggregate.State == SessionState.Started)
+        {
+            logger.LogInformation($"...Could not delete Session which is actively running.");
+            return Result.Conflict();
+        }
         await repository.DeleteAsync(aggregate);
         await repository.SaveChangesAsync();
         

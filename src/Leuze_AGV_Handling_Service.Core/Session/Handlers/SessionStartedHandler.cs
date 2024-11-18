@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Handlers;
 
-public class SessionStartedEventHandler(ISessionWatchdogService watchdog) : INotificationHandler<SessionStartedEvent>
+public class SessionStartedHandler(ISessionWatchdogService watchdog) : INotificationHandler<SessionStartedEvent>
 {
     public Task Handle(SessionStartedEvent domainEvent, CancellationToken cancellationToken)
     {

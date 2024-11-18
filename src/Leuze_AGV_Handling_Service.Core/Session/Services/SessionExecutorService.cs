@@ -32,7 +32,12 @@ public class SessionExecutorService(
     /// </summary>
     /// <param name="sessionId"></param>
     /// <param name="connectionId"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// - Task Result.Success()
+    /// - Task Result.Unauthorized()
+    /// - Task Result.Conflict()
+    /// - Task Result.Error()
+    /// </returns>
     public async Task<Result> StartSessionAndReserveConnection(int sessionId, string connectionId)
     {
         // authorization
@@ -48,7 +53,7 @@ public class SessionExecutorService(
         
         // retrieve session entity
         var session = await repository.FirstOrDefaultAsync(new SessionByIdSpec(sessionId));
-        if (session is null) return Result.NotFound();
+        if (session is null) return Result.Error();
         
         // retrieve starting service
         var startService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
@@ -78,7 +83,7 @@ public class SessionExecutorService(
                 // session can now be started
                 break;
             default:
-                throw new NotImplementedException($"Lifespan '{session.Lifespan}' unknown");
+                throw new Exception($"Lifespan '{session.Lifespan}' unknown");
         }
         
         // start the session
@@ -90,7 +95,7 @@ public class SessionExecutorService(
         _currentSessionId = sessionId;
         _currentConnectionId = connectionId;
 
-        return Result.Success(startResult.Value);
+        return Result.Success();
     }
 
     /// <summary>
@@ -102,7 +107,11 @@ public class SessionExecutorService(
     /// </summary>
     /// <param name="sessionId"></param>
     /// <param name="connectionId"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// - Task Result.Success()
+    /// - Task Result.Unauthorized()
+    /// - Task Result.Error()
+    /// </returns>
     public async Task<Result> EndSessionOfConnection(int sessionId, string connectionId)
     {
         // authorize
@@ -130,10 +139,14 @@ public class SessionExecutorService(
     /// - Exlusive: End the Session first, then release connection and session. 
     /// - Extended: Release connection, the session will remain active.
     /// 
-    /// Authorization connectionId.
+    /// Authorization by connectionId.
     /// </summary>
     /// <param name="connectionId"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// - Task Result.Success()
+    /// - Task Result.Unauthorized()
+    /// - Task Result.Error()
+    /// </returns>
     public async Task<Result> LeaveSessionAndConnection(string connectionId)
     {
         // authorize
@@ -154,7 +167,7 @@ public class SessionExecutorService(
         
         // retrieve the session entity
         var session = await repository.FirstOrDefaultAsync(new SessionByIdSpec(_currentSessionId.Value));
-        if (session is null) return Result.NotFound();
+        if (session is null) return Result.Error();
         
         // lifespan rules
         switch (session.Lifespan)
@@ -176,24 +189,38 @@ public class SessionExecutorService(
                 
                 break;
             default:
-                throw new NotImplementedException($"Current Lifespan '{session.Lifespan}' unknown");
+                throw new Exception($"Current Lifespan '{session.Lifespan}' unknown");
         }
 
         return Result.Success();
     }
 
+    /// <summary>
+    /// Comparator method, if current (active or null) connection equals the one in param.
+    /// </summary>
+    /// <param name="connectionId"></param>
+    /// <returns>
+    /// - Task Result.Success() [bool] 
+    /// </returns>
     public Task<Result<bool>> IsCurrentConnection(string connectionId)
     {
         var result = Result.Success(_currentConnectionId == connectionId);
         return Task.FromResult(result);
     }
 
+    /// <summary>
+    /// Comparator method, if current (active or null) session equals the one in param.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns>
+    /// - Task Result.Success() [bool] 
+    /// </returns>
     public Task<Result<bool>> IsCurrentSession(int sessionId)
     {
         var result = Result.Success(_currentSessionId == sessionId);
         return Task.FromResult(result);
     }
-
+    
     private bool IsCurrentConnectionActive()
     {
         return _currentConnectionId is not null;

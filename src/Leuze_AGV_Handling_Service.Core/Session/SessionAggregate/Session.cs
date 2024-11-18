@@ -49,8 +49,9 @@ public class Session(
   /// Starts a session`s underlying processes, checks if they started - updates states based on that.
   /// </summary>
   /// <param name="processMonitorService"></param>
+  /// <param name="initCheckDelay"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task StartAsync(IProcessMonitorService processMonitorService)
+  public async Task StartAsync(IProcessMonitorService processMonitorService, int initCheckDelay)
   {
     _actions.Add(new Action(ActionCommand.Start, Id));
     
@@ -62,7 +63,7 @@ public class Session(
       }
     }
 
-    await Task.Delay(100);
+    await Task.Delay(initCheckDelay);
 
     bool allGood = true;
     foreach (var process in _processes)

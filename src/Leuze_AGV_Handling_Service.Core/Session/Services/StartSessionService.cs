@@ -22,6 +22,7 @@ public class StartSessionService(
     IMediator mediator
 ) : IStartSessionService
 {
+    private const int SessionStartCheckDelay = 100;
 
     public async Task<Result> StartSession(int sessionId)
     {
@@ -32,7 +33,7 @@ public class StartSessionService(
         
         if (aggregate == null) return Result.NotFound();
         
-        await aggregate.StartAsync(processMonitorService);
+        await aggregate.StartAsync(processMonitorService, SessionStartCheckDelay);
 
         await repository.UpdateAsync(aggregate);
         await repository.SaveChangesAsync();

@@ -94,7 +94,7 @@ public class SessionController(IMediator mediator) : ControllerBase
                 lifespan = Lifespan.Exclusive;
                 break;
             default:
-                throw new NotImplementedException($"Handling mode '{request.HandlingMode}' unknown");
+                throw new Exception($"Handling mode '{request.HandlingMode}' unknown");
         }
         
         return new CreateSessionCommand(

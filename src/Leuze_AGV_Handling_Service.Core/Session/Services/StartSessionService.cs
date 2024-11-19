@@ -1,8 +1,10 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+using Leuze_AGV_Handling_Service.Core.Session.Events;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
@@ -16,9 +18,11 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 public class StartSessionService(
     IRepository<SessionAggregate.Session> repository,
     IProcessMonitorService processMonitorService,
-    ILogger<StartSessionService> logger
+    ILogger<StartSessionService> logger,
+    IMediator mediator
 ) : IStartSessionService
 {
+    private const int SessionStartCheckDelay = 100;
 
     public async Task<Result> StartSession(int sessionId)
     {
@@ -29,7 +33,7 @@ public class StartSessionService(
         
         if (aggregate == null) return Result.NotFound();
         
-        await aggregate.StartAsync(processMonitorService);
+        await aggregate.StartAsync(processMonitorService, SessionStartCheckDelay);
 
         await repository.UpdateAsync(aggregate);
         await repository.SaveChangesAsync();
@@ -39,6 +43,9 @@ public class StartSessionService(
             logger.LogInformation($"...start of Session {sessionId} err.");
             return Result.Error();
         }
+        
+        var domainEvent = new SessionStartedEvent(sessionId);
+        await mediator.Publish(domainEvent);
         
         logger.LogInformation($"...started Session {sessionId}.");
 

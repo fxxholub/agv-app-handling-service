@@ -1,12 +1,15 @@
+using System.Runtime.CompilerServices;
+using Ardalis.Result;
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Create;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.End;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Get;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Start;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Leave;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.IsCurrentConnection;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -22,105 +25,117 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 public class ManualHandlingHub(
     IMediator mediator,
     ILogger<ManualHandlingHub> logger,
-    ISessionOwnershipService ownership,
     IManualMessageChannel messageChannel
     ) : Hub<IManualHandlingHub>, IManualMessageSender
 {
+    // HUB ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     [SignalRHidden]
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (await ownership.IsReservedByMe(Context.ConnectionId))
+        var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
+        switch (result.Status)
         {
-            var sessionId = await ownership.GetSessionId();
-            if (sessionId.HasValue)
-            {
-                var result = await mediator.Send(new EndSessionCommand(sessionId.Value));
-                if (result.IsSuccess)
-                {
-                    var isFree = await ownership.Free(Context.ConnectionId);
-                    if (!isFree) logger.LogError("Manual Session Disconnect Free error.");
-                }
-                else
-                {
-                    logger.LogError("Manual Session Disconnect End error.");
-                }
-            }
-        }
+            case (ResultStatus.Ok):
+                return;
+            default:
+                logger.LogError($"Manual Session Leave failed: {result.Status}. Leaved forcefully.");
+                break;
+        } 
 
         await base.OnDisconnectedAsync(exception);
     }
     
-    public async Task<SessionResponseModel> SendCreateSession(CreateSessionRequestModel request)
+    // Session CRUD ///////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public async Task<SessionResponseModel> SendCreateSession()
     {
-        // session can only be created if has no owner and no session exists
-        if (! await ownership.IsNone())
-            throw new HubException("Manual Session Create error - cannot be created, since another user owns one.");
+        // create the session entity
+        var createResult = await mediator.Send(new CreateSessionCommand(
+            HandlingMode.Manual, Lifespan.Exclusive));
         
-        var command = new CreateSessionCommand(
-            HandlingMode.Manual,
-            request.MappingEnabled,
-            request.InputMapRef,
-            request.OutputMapRef,
-            request.OutputMapName);
+        switch (createResult.Status)
+        {
+            case (ResultStatus.Ok):
+                break;
+            default:
+                logger.LogError       ($"Manual Session Create failed: {createResult.Status}. Unknown reason.");
+                throw new HubException($"Manual Session Create failed: {createResult.Status}. Unknown reason.");
+        }
         
-        var result = await mediator.Send(command);
-        if (!result.IsSuccess) throw new HubException("Manual Session Create error.");
+        // return the created entity
+        var resultEntity = await mediator.Send(new GetSessionQuery(createResult.Value));
         
-        var isReserved = await ownership.Reserve(result.Value, Context.ConnectionId);
-        if (!isReserved) throw new HubException("Manual Session Create error - could not be reserved.");
-        
-        var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
-        if (!resultEntity.IsSuccess) throw new HubException("Manual Session Create error - could not get session response data");
+        switch (createResult.Status)
+        {
+            case (ResultStatus.Ok):
+                break;
+            default:
+                logger.LogError       ($"Manual Session Create failed: {createResult.Status}. Could not return the created entity.");
+                throw new HubException($"Manual Session Create failed: {createResult.Status}. Could not return the created entity.");
+        }
 
         return SessionResponseModel.ToModel(resultEntity.Value);
     }
     
-    public async Task<SessionResponseModel> SendStartSession()
+    // Session Actions ////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public async Task SendStartSession(int sessionId)
     {
-        if (! await ownership.IsReservedByMe(Context.ConnectionId))
-            throw new HubException("Manual Session Start error - session could not be started, it is owned by somebody else or it has not been yet created.");
-
-        var sessionId = await ownership.GetSessionId();
-        if (sessionId.HasValue)
+        var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
+        switch (result.Status)
         {
-            var result = await mediator.Send(new StartSessionCommand(sessionId.Value));
-            if (!result.IsSuccess) throw new HubException("Manual Session Start error.");
-            
-            var resultEntity = await mediator.Send(new GetSessionQuery(sessionId.Value));
-            if (!resultEntity.IsSuccess) throw new HubException("Manual Session Start error - could not get session response data");
-            
-            return SessionResponseModel.ToModel(resultEntity.Value);
+            case (ResultStatus.Ok):
+                return;
+            case (ResultStatus.Unauthorized):
+                logger.LogWarning     ($"Manual Session Start failed: {result.Status}.");
+                throw new HubException($"Manual Session Start failed: {result.Status}.");
+            case (ResultStatus.Conflict):
+                logger.LogWarning     ($"Manual Session Start failed: {result.Status}. Another Session is probably running.");
+                throw new HubException($"Manual Session Start failed: {result.Status}. Another Session is probably running.");
+            default:
+                logger.LogError       ($"Manual Session Start failed: {result.Status}. Unknown reason.");
+                throw new HubException($"Manual Session Start failed: {result.Status}. Unknown reason.");
         }
-
-        throw new HubException("Manual Session Start error - current session not found.");
     }
 
-    public async Task<SessionResponseModel> SendEndSession()
+    public async Task SendEndSession(int sessionId)
     {
-        if (! await ownership.IsReservedByMe(Context.ConnectionId))
-            throw new HubException("Manual Session End error - session could not be ended, it is owned by somebody else or it has not been yet created.");
-
-        var sessionId = await ownership.GetSessionId();
-        if (sessionId.HasValue)
+        var result = await mediator.Send(new EndSessionCommand(sessionId, Context.ConnectionId));
+        switch (result.Status)
         {
-            var result = await mediator.Send(new EndSessionCommand(sessionId.Value));
-            if (!result.IsSuccess) throw new HubException("Manual Session End error.");
-            
-            var isFree = await ownership.Free(Context.ConnectionId);
-            if (!isFree) throw new HubException("Manual Session End error - could not free session.");
-            
-            var resultEntity = await mediator.Send(new GetSessionQuery(sessionId.Value));
-            if (!resultEntity.IsSuccess) throw new HubException("Manual Session End error - could not get session response data");
-                
-            return SessionResponseModel.ToModel(resultEntity.Value);
+            case (ResultStatus.Ok):
+                return;
+            case (ResultStatus.Unauthorized):
+                logger.LogWarning     ($"Manual Session End failed: {result.Status}.");
+                throw new HubException($"Manual Session End failed: {result.Status}.");
+            default:
+                logger.LogError       ($"Manual Session End failed: {result.Status}. Unknown reason.");
+                throw new HubException($"Manual Session End failed: {result.Status}. Unknown reason.");
         }
-        
-        throw new HubException("Manual Session End error - current session not found.");
     }
+    
+    public async Task SendLeaveSession(int sessionId)
+    {
+        var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
+        switch (result.Status)
+        {
+            case (ResultStatus.Ok):
+                return;
+            case (ResultStatus.Unauthorized):
+                logger.LogWarning     ($"Manual Session End failed: {result.Status}.");
+                throw new HubException($"Manual Session End failed: {result.Status}.");
+            default:
+                logger.LogError       ($"Manual Session End failed: {result.Status}. Unknown reason.");
+                throw new HubException($"Manual Session End failed: {result.Status}. Unknown reason.");
+        }
+    }
+    
+    // ROS Messages ///////////////////////////////////////////////////////////////////////////////////////////////////
     
     public async Task SendJoy(JoyDto joy)
     {
-        if (await ownership.IsReservedByMe(Context.ConnectionId)) await messageChannel.SendJoy(joy);
+        if (mediator.Send(new IsCurrentConnectionQuery(Context.ConnectionId)).Result.Value)
+            await messageChannel.SendJoy(joy);
     }
 }

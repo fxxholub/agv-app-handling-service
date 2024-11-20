@@ -21,21 +21,32 @@ public class EndSessionService(
 ) : IEndSessionService
 {
 
+    /// <summary>
+    /// Ends the session, effectivelly killing its processes and bringing off the running (Started) state.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns>
+    /// - Task Result.Success(): on success.
+    /// - Task Result.NotFound(): if session by sessionId is not found.
+    /// </returns>
     public async Task<Result> EndSession(int sessionId)
     {
-        logger.LogInformation($"Ending Session {sessionId}...");
+        logger.LogInformation($"Ending Session {sessionId}.");
         
+        // load the entity from repository
         var spec = new SessionByIdWithActionsAndProcessesWithCommandsSpec(sessionId);
         SessionAggregate.Session? aggregate = await repository.FirstOrDefaultAsync(spec);
         
         if (aggregate == null) return Result.NotFound();
 
+        // end it
         await aggregate.EndAsync(processMonitorService);
 
+        // commit changes in the reopsitory
         await repository.UpdateAsync(aggregate);
         await repository.SaveChangesAsync();
         
-        logger.LogInformation($"...ended Session {sessionId}.");
+        logger.LogInformation($"Ended Session {sessionId}.");
 
         return Result.Success();
     }

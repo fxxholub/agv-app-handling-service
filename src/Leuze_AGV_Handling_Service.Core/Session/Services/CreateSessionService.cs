@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 
 /// <summary>
-/// Creates session entity.
+/// Creates session entity and populates session with its processes. Stores the session in repository.
 /// </summary>
 /// <param name="sessionRepository"></param>
 /// <param name="processProviderService"></param>
@@ -18,9 +18,17 @@ public class CreateSessionService(
     ILogger<CreateSessionService> logger
 ) : ICreateSessionService
 {
+    /// <summary>
+    /// Creates Session entity and stores it into repository. Creation involves load of processes in it.
+    /// </summary>
+    /// <param name="handlingMode"></param>
+    /// <param name="lifespan"></param>
+    /// <returns>
+    /// - Task Result.Success(): returns id of the created session.
+    /// </returns>
     public async Task<Result<int>> CreateSession(HandlingMode handlingMode, Lifespan lifespan)
     {
-        logger.LogInformation("Creating Session...");
+        logger.LogInformation("Creating Session.");
         
         // create session object
         var newSession = new SessionAggregate.Session(handlingMode, lifespan);
@@ -34,10 +42,11 @@ public class CreateSessionService(
             createdSession.AddProcess(process);
         }
         
+        // commit to the repository
         await sessionRepository.UpdateAsync(createdSession);
         await sessionRepository.SaveChangesAsync();
         
-        logger.LogInformation($"...created Session {createdSession.Id}.");
+        logger.LogInformation($"Created Session {createdSession.Id}.");
 
         return Result.Success(createdSession.Id);
     }

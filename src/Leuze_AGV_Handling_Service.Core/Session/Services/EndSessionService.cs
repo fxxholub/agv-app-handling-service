@@ -1,9 +1,7 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
-using Leuze_AGV_Handling_Service.Core.Session.Events;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;

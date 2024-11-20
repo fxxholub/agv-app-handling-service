@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Ardalis.Result;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Utils;
 

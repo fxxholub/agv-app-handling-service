@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Leuze_AGV_Handling_Service.Infrastructure.SessionServices;
 
 /// <summary>
-/// Watchod service.
+/// Watchdog hosted service. Periodically checks actively running session, if its processes did not fail.
 /// </summary>
 public class SessionWatchdogService(
     IServiceProvider serviceProvider,
@@ -64,7 +64,7 @@ public class SessionWatchdogService(
         }
         catch (Exception ex)
         {
-            logger.LogError($"Session Watchdog error check: {ex.Message}");
+            logger.LogError($"Session Watchdog check error: {ex.Message}");
             throw;
         }
     }

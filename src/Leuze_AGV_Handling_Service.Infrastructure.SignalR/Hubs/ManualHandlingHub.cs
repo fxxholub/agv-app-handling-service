@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-using Ardalis.Result;
 using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;

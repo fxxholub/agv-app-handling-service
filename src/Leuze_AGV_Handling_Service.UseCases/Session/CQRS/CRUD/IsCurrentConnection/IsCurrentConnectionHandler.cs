@@ -5,9 +5,9 @@ using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.IsCurrentConnection;
 
 /// <summary>
-/// Fetches Session. Safe operation.
+/// Boolean test if connection is current active connection (if any, else returns false).
 /// </summary>
-/// <param name="repository"></param>
+/// <param name="sessionExecutor"></param>
 public class IsCurrentConnectionHandler(ISessionExecutorService sessionExecutor)
   : IQueryHandler<IsCurrentConnectionQuery, Result<bool>>
 {

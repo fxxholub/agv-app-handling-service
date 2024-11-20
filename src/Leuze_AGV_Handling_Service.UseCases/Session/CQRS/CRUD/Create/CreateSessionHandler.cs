@@ -5,9 +5,9 @@ using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 
 /// <summary>
-/// Creates Session.
+/// Creates Session. Entity repository creation operation.
 /// </summary>
-/// <param name="sessionManager"></param>
+/// <param name="createService"></param>
 public class CreateSessionHandler(ICreateSessionService createService) 
   : ICommandHandler<CreateSessionCommand, Result<int>>
 {

@@ -6,7 +6,7 @@ using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 
 /// <summary>
-/// Fetches Session. Safe operation.
+/// Fetches Session. Safe repository operation. Does not change anything in the repository nor does it trigger any events.
 /// </summary>
 /// <param name="repository"></param>
 public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session> repository)

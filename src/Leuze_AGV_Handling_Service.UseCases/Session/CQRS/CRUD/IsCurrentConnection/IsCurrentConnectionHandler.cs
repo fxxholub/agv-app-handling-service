@@ -15,6 +15,13 @@ public class IsCurrentConnectionHandler(ISessionExecutorService sessionExecutor)
 {
   public async Task<Result<bool>> Handle(IsCurrentConnectionQuery request, CancellationToken cancellationToken)
   {
-    return await sessionExecutor.IsCurrentConnection(request.ConnectionId);
+    try
+    {
+      return await sessionExecutor.IsCurrentConnection(request.ConnectionId);
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error requesting IsCurrentConnection."]));
+    }
   }
 }

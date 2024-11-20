@@ -13,6 +13,13 @@ public class EndSessionHandler(ISessionExecutorService sessionExecutor)
 {
   public async Task<Result> Handle(EndSessionCommand request, CancellationToken cancellationToken)
   {
-    return await sessionExecutor.EndSessionOfConnection(request.SessionId, request.ConnectionId);
+    try
+    {
+      return await sessionExecutor.EndSessionOfConnection(request.SessionId, request.ConnectionId);
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error executing end session."]));
+    }
   }
 }

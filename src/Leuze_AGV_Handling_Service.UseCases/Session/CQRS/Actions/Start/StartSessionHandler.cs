@@ -12,6 +12,13 @@ public class StartSessionHandler(ISessionExecutorService sessionExecutor)
 {
   public async Task<Result> Handle(StartSessionCommand request, CancellationToken cancellationToken)
   {
-    return await sessionExecutor.StartSessionAndReserveConnection(request.SessionId, request.ConnectionId);
+    try
+    {
+      return await sessionExecutor.StartSessionAndReserveConnection(request.SessionId, request.ConnectionId);
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error executing start session."]));
+    }
   }
 }

@@ -22,7 +22,8 @@ public class StartSessionService(
     IMediator mediator
 ) : IStartSessionService
 {
-    private const int SessionStartCheckDelay = 100;
+    // delay between actual process execution and its initial check to deduce if it has started successfully
+    private const int SessionStartCheckDelay = 100; // s
 
     /// <summary>
     /// Starts the session, effectively executing its processes and bringing it into the running (Started) state.
@@ -53,8 +54,8 @@ public class StartSessionService(
         // check the start operation outcome
         if (aggregate.State != SessionState.Started)
         {
-            logger.LogWarning($"Start of Session {sessionId} errored.");
-            return Result.Error();
+            logger.LogWarning($"Start of Session {sessionId} errored. Some process/es did not start.");
+            return Result.Error(new ErrorList(["Start of Session {sessionId} errored. Some process/es did not start."]));
         }
         
         // raise event indicating the session start

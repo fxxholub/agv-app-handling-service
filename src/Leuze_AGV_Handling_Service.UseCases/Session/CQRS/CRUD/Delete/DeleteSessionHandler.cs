@@ -13,6 +13,13 @@ public class DeleteSessionHandler(IDeleteSessionService deleteService)
 {
   public async Task<Result> Handle(DeleteSessionCommand request, CancellationToken cancellationToken)
   {
-    return await deleteService.DeleteSession(request.SessionId);
+    try
+    {
+      return await deleteService.DeleteSession(request.SessionId);
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error requesting delete session."]));
+    }
   }
 }

@@ -12,6 +12,13 @@ public class LeaveSessionHandler(ISessionExecutorService sessionExecutor)
 {
   public async Task<Result> Handle(LeaveSessionCommand request, CancellationToken cancellationToken)
   {
-    return await sessionExecutor.LeaveSessionAndConnection(request.ConnectionId);
+    try
+    {
+      return await sessionExecutor.LeaveSessionAndConnection(request.ConnectionId);
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error executing leave session."]));
+    }
   }
 }

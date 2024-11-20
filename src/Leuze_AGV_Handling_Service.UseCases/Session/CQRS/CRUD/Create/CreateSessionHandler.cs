@@ -13,9 +13,16 @@ public class CreateSessionHandler(ICreateSessionService createService)
 {
   public async Task<Result<int>> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
   {
-    return await createService.CreateSession(
-      request.HandlingMode,
-      request.Lifespan
-    );
+    try
+    {
+      return await createService.CreateSession(
+        request.HandlingMode,
+        request.Lifespan
+      );
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error requesting create session."]));
+    }
   }
 }

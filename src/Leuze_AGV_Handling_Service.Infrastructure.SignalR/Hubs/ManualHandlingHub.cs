@@ -34,14 +34,8 @@ public class ManualHandlingHub(
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
-        switch (result.Status)
-        {
-            case (ResultStatus.Ok):
-                return;
-            default:
-                logger.LogError($"Manual Session Leave failed: {result.Status}. Leaved forcefully.");
-                break;
-        } 
+        if (!result.IsSuccess)
+            logger.LogWarning($"{result.Status}: {result.Errors}.");
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -54,26 +48,14 @@ public class ManualHandlingHub(
         var createResult = await mediator.Send(new CreateSessionCommand(
             HandlingMode.Manual, Lifespan.Exclusive));
         
-        switch (createResult.Status)
-        {
-            case (ResultStatus.Ok):
-                break;
-            default:
-                logger.LogError       ($"Manual Session Create failed: {createResult.Status}. Unknown reason.");
-                throw new HubException($"Manual Session Create failed: {createResult.Status}. Unknown reason.");
-        }
+        if (!createResult.IsSuccess)
+            throw new HubException($"{createResult.Status}: {createResult.Errors}.");
         
         // return the created entity
         var resultEntity = await mediator.Send(new GetSessionQuery(createResult.Value));
         
-        switch (createResult.Status)
-        {
-            case (ResultStatus.Ok):
-                break;
-            default:
-                logger.LogError       ($"Manual Session Create failed: {createResult.Status}. Could not return the created entity.");
-                throw new HubException($"Manual Session Create failed: {createResult.Status}. Could not return the created entity.");
-        }
+        if (!resultEntity.IsSuccess)
+            throw new HubException($"{resultEntity.Status}: {resultEntity.Errors}.");
 
         return SessionResponseModel.ToModel(resultEntity.Value);
     }
@@ -83,52 +65,25 @@ public class ManualHandlingHub(
     public async Task SendStartSession(int sessionId)
     {
         var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
-        switch (result.Status)
-        {
-            case (ResultStatus.Ok):
-                return;
-            case (ResultStatus.Unauthorized):
-                logger.LogWarning     ($"Manual Session Start failed: {result.Status}.");
-                throw new HubException($"Manual Session Start failed: {result.Status}.");
-            case (ResultStatus.Conflict):
-                logger.LogWarning     ($"Manual Session Start failed: {result.Status}. Another Session is probably running.");
-                throw new HubException($"Manual Session Start failed: {result.Status}. Another Session is probably running.");
-            default:
-                logger.LogError       ($"Manual Session Start failed: {result.Status}. Unknown reason.");
-                throw new HubException($"Manual Session Start failed: {result.Status}. Unknown reason.");
-        }
+        
+        if (!result.IsSuccess)
+            throw new HubException($"{result.Status}: {result.Errors}.");
     }
 
     public async Task SendEndSession(int sessionId)
     {
         var result = await mediator.Send(new EndSessionCommand(sessionId, Context.ConnectionId));
-        switch (result.Status)
-        {
-            case (ResultStatus.Ok):
-                return;
-            case (ResultStatus.Unauthorized):
-                logger.LogWarning     ($"Manual Session End failed: {result.Status}.");
-                throw new HubException($"Manual Session End failed: {result.Status}.");
-            default:
-                logger.LogError       ($"Manual Session End failed: {result.Status}. Unknown reason.");
-                throw new HubException($"Manual Session End failed: {result.Status}. Unknown reason.");
-        }
+        
+        if (!result.IsSuccess)
+            throw new HubException($"{result.Status}: {result.Errors}.");
     }
     
     public async Task SendLeaveSession(int sessionId)
     {
         var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
-        switch (result.Status)
-        {
-            case (ResultStatus.Ok):
-                return;
-            case (ResultStatus.Unauthorized):
-                logger.LogWarning     ($"Manual Session End failed: {result.Status}.");
-                throw new HubException($"Manual Session End failed: {result.Status}.");
-            default:
-                logger.LogError       ($"Manual Session End failed: {result.Status}. Unknown reason.");
-                throw new HubException($"Manual Session End failed: {result.Status}. Unknown reason.");
-        }
+        
+        if (!result.IsSuccess)
+            throw new HubException($"{result.Status}: {result.Errors}.");
     }
     
     // ROS Messages ///////////////////////////////////////////////////////////////////////////////////////////////////

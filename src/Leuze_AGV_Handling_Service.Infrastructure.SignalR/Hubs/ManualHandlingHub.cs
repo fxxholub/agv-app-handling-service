@@ -2,12 +2,14 @@ using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Utils;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Leave;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.IsCurrentConnection;
+using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -45,15 +47,13 @@ public class ManualHandlingHub(
         // create the session entity
         var createResult = await mediator.Send(new CreateSessionCommand(
             HandlingMode.Manual, Lifespan.Exclusive));
-        
-        if (!createResult.IsSuccess)
-            throw new HubException($"{createResult.Status}: {createResult.Errors}.");
+
+        ResultChecker<int>.Check(createResult);
         
         // return the created entity
         var resultEntity = await mediator.Send(new GetSessionQuery(createResult.Value));
         
-        if (!resultEntity.IsSuccess)
-            throw new HubException($"{resultEntity.Status}: {resultEntity.Errors}.");
+        ResultChecker<SessionDto>.Check(resultEntity);
 
         return SessionResponseModel.ToModel(resultEntity.Value);
     }
@@ -64,24 +64,21 @@ public class ManualHandlingHub(
     {
         var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
         
-        if (!result.IsSuccess)
-            throw new HubException($"{result.Status}: {result.Errors}.");
+        ResultChecker<bool>.Check(result);
     }
 
     public async Task SendEndSession(int sessionId)
     {
         var result = await mediator.Send(new EndSessionCommand(sessionId, Context.ConnectionId));
         
-        if (!result.IsSuccess)
-            throw new HubException($"{result.Status}: {result.Errors}.");
+        ResultChecker<bool>.Check(result);
     }
     
     public async Task SendLeaveSession(int sessionId)
     {
         var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
         
-        if (!result.IsSuccess)
-            throw new HubException($"{result.Status}: {result.Errors}.");
+        ResultChecker<bool>.Check(result);
     }
     
     // ROS Messages ///////////////////////////////////////////////////////////////////////////////////////////////////

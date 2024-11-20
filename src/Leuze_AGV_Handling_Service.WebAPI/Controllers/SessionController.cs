@@ -22,28 +22,22 @@ public class SessionController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> SessionsGetAll()
     {
         var result = await mediator.Send(new ListSessionsQuery());
+
+        if (!result.IsSuccess) return BadRequest();
         
-        if (result.IsSuccess)
-        {
-            var response = result.Value.Select(session => SessionToResponse(session)).ToList(); 
-            return Ok(response);
-        }
-    
-        return BadRequest();
+        var response = result.Value.Select(session => SessionToResponse(session)).ToList(); 
+        return Ok(response);
     }
     
     [HttpGet("{sessionId:int}")]
     public async Task<IActionResult> SessionsGet(int sessionId)
     {
-        var result = await mediator.Send(new GetSessionQuery(sessionId)); 
-        
-        if (result.IsSuccess)
-        {
-            var response = SessionToResponse(result);
-            return Ok(response);
-        }
+        var result = await mediator.Send(new GetSessionQuery(sessionId));
 
-        return NotFound();
+        if (!result.IsSuccess) return NotFound();
+        
+        var response = SessionToResponse(result);
+        return Ok(response);
     }
     
     [HttpPost]
@@ -51,19 +45,15 @@ public class SessionController(IMediator mediator) : ControllerBase
     {
         var command = SessionFromRequest(request);
         var result = await mediator.Send(command);
-      
-        if (result.IsSuccess)
-        {
-            var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
-            
-            if (resultEntity.IsSuccess)
-            {
-                var response = SessionToResponse(resultEntity.Value);
-                return Ok(response);
-            }
-        }
+
+        if (!result.IsSuccess) return StatusCode(500, $"Error creating session");
         
-        return StatusCode(500, $"Error creating session");
+        var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
+
+        if (!resultEntity.IsSuccess) return StatusCode(500, $"Error retrieving created session");
+        
+        var response = SessionToResponse(resultEntity.Value);
+        return Ok(response);
     }
     
     [HttpDelete("{sessionId:int}")]
@@ -71,12 +61,10 @@ public class SessionController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new DeleteSessionCommand(sessionId));
 
-        if (result.IsSuccess)
-        {
-            return NoContent();
-        }
+        if (!result.IsSuccess)
+            return NotFound();
 
-        return NotFound();
+        return NoContent();
     }
 
     private static CreateSessionCommand SessionFromRequest(SessionRequestModel request)

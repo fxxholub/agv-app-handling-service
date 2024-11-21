@@ -46,12 +46,10 @@ public static class Program
         
         _builder.Services.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy",
-                // settings for local testing
-                builder => builder.WithOrigins("*") // Blazor app origin
-                    .AllowAnyMethod()                       // Allow any HTTP method (GET, POST, etc.)
-                    .AllowAnyHeader());              // Allow any headers
-            // .AllowCredentials());                 // Allow credentials if needed
+            options.AddPolicy("CorsPolicy", builder =>
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
         });
         
         ConfigureSerilog();                                       // Serilog

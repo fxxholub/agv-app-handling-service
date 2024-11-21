@@ -64,7 +64,11 @@ public static class Program
         _builder.Services.AddEndpointsApiExplorer();              // Swagger
         _builder.Services.AddSwaggerGen(options =>                // Swagger SignalR
         {
-            options.AddSignalRSwaggerGen();
+            options.AddSignalRSwaggerGen(config =>
+            {
+                var signalRAssembly = Assembly.Load("Leuze_AGV_Handling_Service.Infrastructure.SignalR");
+                config.ScanAssembly(signalRAssembly);
+            });
         });
         
         ConfigureApiVersioning();
@@ -151,8 +155,7 @@ public static class Program
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             });
         }
-
-        // produces signalR cors issues
-        // app.UseHttpsRedirection();
+        
+        app.UseHttpsRedirection();
     }
 }

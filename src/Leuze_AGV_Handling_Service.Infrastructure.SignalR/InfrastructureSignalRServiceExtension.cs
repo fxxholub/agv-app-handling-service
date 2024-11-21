@@ -1,5 +1,6 @@
 ﻿using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,8 @@ public static class InfrastructureSignalRServiceExtension
     
     services.AddSingleton<IAutonomousMessageReceiver, AutonomousHubMessageForwarder>();
     services.AddSingleton<IManualMessageReceiver, ManualHubMessageForwarder>();
+    services.AddScoped<IAutonomousClientNotifier, AutonomousHubMessageForwarder>();
+    services.AddScoped<IManualClientNotifier, ManualHubMessageForwarder>();
     
     return services;
   }

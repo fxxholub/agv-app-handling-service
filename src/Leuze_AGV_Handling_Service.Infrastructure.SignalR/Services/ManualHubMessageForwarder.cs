@@ -1,4 +1,7 @@
 using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
 
@@ -7,16 +10,14 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
 /// </summary>
 /// <param name="hubContext"></param>
 public class ManualHubMessageForwarder(
-    // IHubContext<ManualHandlingHub, IManualHandlingHub> hubContext
+    IHubContext<ManualHandlingHub, IManualHandlingHub> hubContext
     )
-    : IManualMessageReceiver
+    : IManualMessageReceiver, IManualClientNotifier
 {
-    // public async Task ReceiveMap(MapDto map)
-    // {
-    //     await hubContext.Clients.All.ReceiveMap(map);
-    // }
-    // public async Task ReceiveSessionError(string reason)
-    // {
-    //     await hubContext.Clients.All.ReceiveSessionError(reason);
-    // }
+    public async Task ReceiveSessionUnexpectedEnd(string errorMessage)
+    {
+        await hubContext.Clients.All.ReceiveSessionUnexpectedEnd(errorMessage);
+    }
+    
+    // ROS stuff ////////////////////////////////////////////////////////////////////////////////
 }

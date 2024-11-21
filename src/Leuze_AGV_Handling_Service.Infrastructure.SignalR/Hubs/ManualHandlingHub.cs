@@ -8,6 +8,7 @@ using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Leave;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
+using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Delete;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.IsCurrentConnection;
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 using MediatR;
@@ -42,20 +43,34 @@ public class ManualHandlingHub(
     
     // Session CRUD ///////////////////////////////////////////////////////////////////////////////////////////////////
     
+    public async Task<SessionResponseModel> SendGetSession(int sessionId)
+    {
+        var result = await mediator.Send(new GetSessionQuery(sessionId));
+
+        ResultChecker<SessionDto>.Check(result);
+        
+        return SessionResponseModel.ToModel(result.Value);
+    }
+    
     public async Task<SessionResponseModel> SendCreateSession()
     {
-        // create the session entity
         var createResult = await mediator.Send(new CreateSessionCommand(
             HandlingMode.Manual, Lifespan.Exclusive));
 
         ResultChecker<int>.Check(createResult);
         
-        // return the created entity
         var resultEntity = await mediator.Send(new GetSessionQuery(createResult.Value));
         
         ResultChecker<SessionDto>.Check(resultEntity);
 
         return SessionResponseModel.ToModel(resultEntity.Value);
+    }
+    
+    public async Task SendDeleteSession(int sessionId)
+    {
+        var result = await mediator.Send(new DeleteSessionCommand(sessionId));
+
+        ResultChecker<int>.Check(result);
     }
     
     // Session Actions ////////////////////////////////////////////////////////////////////////////////////////////////

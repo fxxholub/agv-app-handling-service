@@ -4,7 +4,6 @@ using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.List;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Persistent;
 

@@ -6,7 +6,7 @@ using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 
 /// <summary>
-/// Fetches Session. Safe operation.
+/// Fetches Session. Safe repository operation. Does not change anything in the repository nor does it trigger any events.
 /// </summary>
 /// <param name="repository"></param>
 public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session> repository)
@@ -14,32 +14,39 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
 {
   public async Task<Result<SessionDto>> Handle(GetSessionQuery request, CancellationToken cancellationToken)
   {
-    var spec = new SessionByIdWithActionsAndProcessesSpec(request.SessionId);
-    var entity = await repository.FirstOrDefaultAsync(spec, cancellationToken);
-    if (entity is null) return Result.NotFound();
+    try
+    {
+      var spec = new SessionByIdWithActionsAndProcessesSpec(request.SessionId);
+      var entity = await repository.FirstOrDefaultAsync(spec, cancellationToken);
+      if (entity is null) return Result.NotFound();
 
-    return new SessionDto(
-      entity.Id,
-      entity.HandlingMode,
-      entity.ErrorReason,
-      entity.State,
-      entity.Actions.Select(action => new ActionDto(
-        action.Command,
-        action.SessionId,
-        action.CreatedDate
+      return new SessionDto(
+        entity.Id,
+        entity.HandlingMode,
+        entity.ErrorReason,
+        entity.State,
+        entity.Actions.Select(action => new ActionDto(
+          action.Command,
+          action.SessionId,
+          action.CreatedDate
+          )).ToList(),
+        entity.Processes.Select(process => new ProcessDto(
+          process.Name,
+          process.HostName,
+          process.HostAddr,
+          process.UserName,
+          process.SessionId,
+          process.ErrorReason,
+          process.Pid,
+          process.State,
+          process.CreatedDate
         )).ToList(),
-      entity.Processes.Select(process => new ProcessDto(
-        process.Name,
-        process.HostName,
-        process.HostAddr,
-        process.UserName,
-        process.SessionId,
-        process.ErrorReason,
-        process.Pid,
-        process.State,
-        process.CreatedDate
-      )).ToList(),
-      entity.CreatedDate
-    );
+        entity.CreatedDate
+      );
+    }
+    catch
+    {
+      return Result.Error(new ErrorList(["Unknown error requesting get session."]));
+    }
   }
 }

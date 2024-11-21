@@ -3,12 +3,11 @@ using Asp.Versioning;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Delete;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.List;
-using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 using Leuze_AGV_Handling_Service.WebAPI.Models.Session;
+using Leuze_AGV_Handling_Service.WebAPI.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,48 +23,41 @@ public class SessionController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> SessionsGetAll()
     {
         var result = await mediator.Send(new ListSessionsQuery());
+
+        if (!result.IsSuccess) return BadRequest();
         
-        if (result.IsSuccess)
-        {
-            var response = result.Value.Select(session => SessionToResponse(session)).ToList(); 
-            return Ok(response);
-        }
-    
-        return BadRequest();
+        var response = result.Value.Select(session => SessionToResponse(session)).ToList(); 
+        return Ok(response);
     }
     
     [HttpGet("{sessionId:int}")]
     public async Task<IActionResult> SessionsGet(int sessionId)
     {
-        var result = await mediator.Send(new GetSessionQuery(sessionId)); 
-        
-        if (result.IsSuccess)
-        {
-            var response = SessionToResponse(result);
-            return Ok(response);
-        }
+        var result = await mediator.Send(new GetSessionQuery(sessionId));
 
-        return NotFound();
+        if (!result.IsSuccess) return NotFound();
+        
+        var response = SessionToResponse(result);
+        return Ok(response);
     }
     
     [HttpPost]
     public async Task<IActionResult> SessionsPost([FromBody] SessionRequestModel request)
     {
-        var command = SessionFromRequest(request);
-        var result = await mediator.Send(command);
-      
-        if (result.IsSuccess)
-        {
-            var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
-            
-            if (resultEntity.IsSuccess)
-            {
-                var response = SessionToResponse(resultEntity.Value);
-                return Ok(response);
-            }
-        }
+        var resultCommand = SessionFromRequest(request);
         
-        return StatusCode(500, $"Error creating session");
+        if (!resultCommand.IsSuccess) return StatusCode(500, ResultChecker<CreateSessionCommand>.ErrorMessageJson(resultCommand));
+        
+        var result = await mediator.Send(resultCommand.Value);
+
+        if (!result.IsSuccess) return StatusCode(500, ResultChecker<int>.ErrorMessageJson(result));
+        
+        var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
+
+        if (!resultEntity.IsSuccess) return StatusCode(500, ResultChecker<SessionDto>.ErrorMessageJson(resultEntity));
+        
+        var response = SessionToResponse(resultEntity.Value);
+        return Ok(response);
     }
     
     [HttpDelete("{sessionId:int}")]
@@ -73,34 +65,49 @@ public class SessionController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new DeleteSessionCommand(sessionId));
 
-        if (result.IsSuccess)
-        {
-            return NoContent();
-        }
+        if (!result.IsSuccess)
+            return NotFound();
 
-        return NotFound();
+        return NoContent();
     }
 
-    private static CreateSessionCommand SessionFromRequest(SessionRequestModel request)
+    private static Result<CreateSessionCommand> SessionFromRequest(SessionRequestModel request)
     {
-        HandlingMode handlingMode = Enum.Parse<HandlingMode>(request.HandlingMode ?? throw new ArgumentNullException());
-        Lifespan lifespan;
-        switch (handlingMode)
+        try
         {
-            case HandlingMode.Autonomous:
-                lifespan = Lifespan.Extended;
-                break;
-            case HandlingMode.Manual:
-                lifespan = Lifespan.Exclusive;
-                break;
-            default:
-                throw new Exception($"Handling mode '{request.HandlingMode}' unknown");
+            HandlingMode handlingMode =
+                Enum.Parse<HandlingMode>(request.HandlingMode ?? throw new ArgumentNullException());
+
+            Lifespan lifespan;
+            switch (handlingMode)
+            {
+                case HandlingMode.Autonomous:
+                    lifespan = Lifespan.Extended;
+                    break;
+                case HandlingMode.Manual:
+                    lifespan = Lifespan.Exclusive;
+                    break;
+                default:
+                    throw new Exception($"Handling mode '{request.HandlingMode}' unknown");
+            }
+
+            return Result.Success(new CreateSessionCommand(
+                handlingMode,
+                lifespan
+            ));
         }
-        
-        return new CreateSessionCommand(
-            handlingMode,
-            lifespan
-        );
+        catch (ArgumentNullException)
+        {
+            return Result.Error(new ErrorList(["HandlingMode null."]));
+        }
+        catch (ArgumentException)
+        {
+            return Result.Error(new ErrorList(["HandlingMode invalid."]));
+        }
+        catch (Exception ex)
+        {
+            return Result.Error(new ErrorList([ex.Message]));
+        }
     }
 
     private static SessionResponseModel SessionToResponse(Result<SessionDto> result)

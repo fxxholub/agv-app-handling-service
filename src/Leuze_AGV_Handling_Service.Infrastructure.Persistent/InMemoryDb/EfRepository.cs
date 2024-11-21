@@ -1,6 +1,5 @@
 ﻿using Ardalis.SharedKernel;
 using Ardalis.Specification.EntityFrameworkCore;
-using Leuze_AGV_Handling_Service.Infrastructure.Persistent.InMemoryDb;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Persistent.InMemoryDb;
 

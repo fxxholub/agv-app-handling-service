@@ -1,7 +1,9 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+using Leuze_AGV_Handling_Service.Core.Session.Events;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate.Specifications;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Core.Session.Services;
@@ -15,7 +17,8 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 public class EndSessionService(
     IRepository<SessionAggregate.Session> repository,
     IProcessMonitorService processMonitorService,
-    ILogger<EndSessionService> logger
+    ILogger<EndSessionService> logger,
+    IMediator mediator
 ) : IEndSessionService
 {
 
@@ -43,6 +46,10 @@ public class EndSessionService(
         // commit changes in the reopsitory
         await repository.UpdateAsync(aggregate);
         await repository.SaveChangesAsync();
+        
+        // raise event indicating the session end
+        var domainEvent = new SessionEndedEvent(sessionId);
+        await mediator.Publish(domainEvent);
         
         logger.LogInformation($"Ended Session {sessionId}.");
 

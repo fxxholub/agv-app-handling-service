@@ -1,5 +1,5 @@
 ﻿
-namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
+namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models.Session;
 
 public class ProcessResponseModel(
   string name,

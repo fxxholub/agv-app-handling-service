@@ -1,7 +1,4 @@
-﻿using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
-using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
-using Leuze_AGV_Handling_Service.Core.Messages.Services;
-using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+﻿using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.Services;
 using Leuze_AGV_Handling_Service.Infrastructure.Exceptions;
 using Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
@@ -30,9 +27,6 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<ICheckSessionService, CheckSessionService>();
     services.AddScoped<ICreateSessionService, CreateSessionService>();
     services.AddScoped<IDeleteSessionService, DeleteSessionService>();
-    
-    services.AddSingleton<IAutonomousMessageChannel, AutonomousMessageChannel>();
-    services.AddSingleton<IManualMessageChannel, ManualMessageChannel>();
 
     ////// infrastructure stuff ///////
     services.AddSingleton<SessionWatchdogService>();

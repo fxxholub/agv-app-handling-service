@@ -1,5 +1,4 @@
-using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
+using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 /// <summary>
 /// Ros2 subscriber of autonomous messages.
 /// </summary>
-public class AutonomousSubscriber : BackgroundService, IAutonomousMessageReceiver
+public class AutonomousSubscriber : BackgroundService, IAutonomousSubscriber
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<AutonomousSubscriber> _logger;
@@ -33,16 +32,8 @@ public class AutonomousSubscriber : BackgroundService, IAutonomousMessageReceive
     {
         await foreach (var msg in _mapSubscriber.ReadAllAsync(cancellationToken))
         {
-            await ReceiveMap(new MapDto(msg.Data));
-        }
-    }
-
-    public async Task ReceiveMap(MapDto map)
-    {
-        using (var scope = _serviceProvider.CreateScope())
-        {
-            var messageChannel = scope.ServiceProvider.GetRequiredService<IAutonomousMessageChannel>();
-            await messageChannel.ReceiveMap(map);
+            // await ReceiveMap(new MapDto(msg.Data));
+            _logger.LogInformation("Map received");
         }
     }
 }

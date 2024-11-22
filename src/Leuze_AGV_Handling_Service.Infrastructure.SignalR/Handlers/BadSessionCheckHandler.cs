@@ -1,4 +1,3 @@
-using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;

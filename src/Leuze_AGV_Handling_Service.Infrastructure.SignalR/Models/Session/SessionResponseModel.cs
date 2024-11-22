@@ -1,7 +1,7 @@
 ﻿
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 
-namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
+namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models.Session;
 
 public class SessionResponseModel(
   int id,

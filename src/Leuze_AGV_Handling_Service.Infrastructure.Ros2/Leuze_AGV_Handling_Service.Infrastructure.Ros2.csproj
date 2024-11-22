@@ -16,4 +16,8 @@
       <ProjectReference Include="..\Leuze_AGV_Handling_Service.Core\Leuze_AGV_Handling_Service.Core.csproj" />
       <ProjectReference Include="..\Leuze_AGV_Handling_Service.UseCases\Leuze_AGV_Handling_Service.UseCases.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
 </Project>

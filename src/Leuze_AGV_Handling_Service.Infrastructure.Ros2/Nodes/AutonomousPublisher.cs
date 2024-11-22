@@ -1,4 +1,4 @@
-using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
+using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Interfaces;
 using Microsoft.Extensions.Logging;
 using Rcl;
 
@@ -7,7 +7,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 /// <summary>
 /// Ros2 publisher of autonomous messages.
 /// </summary>
-public class AutonomousPublisher : IAutonomousMessageSender
+public class AutonomousPublisher : IAutonomousPublisher
 {
     private readonly ILogger<AutonomousPublisher> _logger;
 

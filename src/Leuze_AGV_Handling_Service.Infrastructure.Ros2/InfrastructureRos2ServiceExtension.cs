@@ -1,5 +1,4 @@
-﻿using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Autonomous;
-using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
+﻿using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +18,8 @@ public static class InfrastructureRos2ServiceExtension
     
     services.AddHostedService<AutonomousSubscriber>();
     services.AddHostedService<ManualSubscriber>();
-    services.AddSingleton<IAutonomousMessageSender, AutonomousPublisher>();
-    services.AddSingleton<IManualMessageSender, ManualPublisher>();
+    services.AddSingleton<IAutonomousPublisher, AutonomousPublisher>();
+    services.AddSingleton<IManualPublisher, ManualPublisher>();
 
     return services;
   }

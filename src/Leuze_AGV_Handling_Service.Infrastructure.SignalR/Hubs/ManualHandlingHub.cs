@@ -1,8 +1,8 @@
-using Leuze_AGV_Handling_Service.Core.Messages.DTOs;
-using Leuze_AGV_Handling_Service.Core.Messages.Interfaces.Manual;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
+using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models.Session;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Utils;
+using Leuze_AGV_Handling_Service.UseCases.Messaging.Topics;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Leave;
@@ -21,13 +21,11 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 /// <summary>
 /// Manual handling mode Hub
 /// </summary>
-/// <param name="messageChannel"></param>
 [SignalRHub(path: "/api/v1/signalr/manual")]
 public class ManualHandlingHub(
     IMediator mediator,
-    ILogger<ManualHandlingHub> logger,
-    IManualMessageChannel messageChannel
-    ) : Hub<IManualHandlingHub>, IManualMessageSender
+    ILogger<ManualHandlingHub> logger
+    ) : Hub<IManualHandlingHub>, IManualPublisher
 {
     // HUB ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -98,9 +96,9 @@ public class ManualHandlingHub(
     
     // ROS Messages ///////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task SendJoy(JoyDto joy)
+    public async Task PublishJoyTopic(float x, float y, float w)
     {
         if (mediator.Send(new IsCurrentConnectionQuery(Context.ConnectionId)).Result.Value)
-            await messageChannel.SendJoy(joy);
+            await mediator.Publish(new JoyTopic(x, y, w));
     }
 }

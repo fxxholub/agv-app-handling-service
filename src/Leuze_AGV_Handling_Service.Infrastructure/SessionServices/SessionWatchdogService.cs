@@ -1,6 +1,7 @@
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.UseCases.Session.Notifications.Events;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -62,10 +63,14 @@ public class SessionWatchdogService(
             await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
             await StopWatching();
         }
+        catch (DbUpdateConcurrencyException)
+        {
+            logger.LogWarning($"Session Watchdog check exception. Session no longer exists.");
+            await StopWatching();
+        }
         catch (Exception ex)
         {
             logger.LogError($"Session Watchdog check error: {ex.Message}");
-            throw;
         }
     }
 

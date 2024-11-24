@@ -152,6 +152,11 @@ public static class Program
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             });
+            
+            foreach (var c in _builder.Configuration.AsEnumerable())
+            {
+                Console.WriteLine(c.Key + " = " + c.Value);
+            }
         }
         
         app.UseHttpsRedirection();

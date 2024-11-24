@@ -8,8 +8,6 @@ EXPOSE 8081
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 AS build
 ARG BUILD_CONFIGURATION=${BUILD_CONFIGURATION}
-ARG ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-ARG ASPNETCORE_URLS=${ASPNETCORE_URLS}
 ARG TARGET_RUNTIME=linux-arm64
 WORKDIR /src
 COPY ["Directory.Build.props", "."]
@@ -26,7 +24,6 @@ WORKDIR "/src/src/Leuze_AGV_Handling_Service.WebAPI"
 RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -r $TARGET_RUNTIME --self-contained -o /app/publish
 
 # Final stage
-# FROM arm64v8/ros:humble-ros-core-jammy AS final
 FROM arm64v8/ros:humble-ros-base-jammy AS final
 ARG PROCESS_SCRIPTS_PATH=${PROCESS_SCRIPTS_PATH}
 ENV PROCESS_SCRIPTS_PATH_INNER=ProcessScripts

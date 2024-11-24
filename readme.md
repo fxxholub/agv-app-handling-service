@@ -52,10 +52,5 @@ Make `.env` file in the project root. This file is already __gitignored__.
 example file with all listed variables:
 
 ```
-ASPNETCORE_URLS=http://+:8080
-ASPNETCORE_ENVIRONMENT=Development
-
-BUILD_CONFIGURATION=Debug
-
 PROCESS_SCRIPTS_PATH=/MyProcessScripts
 ```

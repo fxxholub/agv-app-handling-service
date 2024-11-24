@@ -33,7 +33,8 @@ public class AutonomousSubscriber : BackgroundService, IAutonomousSubscriber
         await foreach (var msg in _mapSubscriber.ReadAllAsync(cancellationToken))
         {
             // await ReceiveMap(new MapDto(msg.Data));
-            _logger.LogInformation("Map received");
+            // TODO:
+            await Task.Delay(10);
         }
     }
 }

@@ -145,18 +145,13 @@ public static class Program
         app.UseAuthorization();
         app.MapControllers();
         
-        if (true/*app.Environment.IsDevelopment()*/)
+        if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             });
-            
-            foreach (var c in _builder.Configuration.AsEnumerable())
-            {
-                Console.WriteLine(c.Key + " = " + c.Value);
-            }
         }
         
         app.UseHttpsRedirection();

@@ -20,4 +20,6 @@ EXPOSE 8081
 
 WORKDIR /app
 COPY --from=build /app .
+COPY ./tests/ProcessScripts /app/ProcessScripts
+
 CMD ./Leuze_AGV_Handling_Service.WebAPI

@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
+using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.List;
 
@@ -8,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.List;
 /// Fetches multiple Sessions. Safe repository operation. Does not change anything in the repository nor does it trigger any events.
 /// </summary>
 /// <param name="query"></param>
-public class ListSessionsHandler(IListSessionsQueryService query)
+public class ListSessionsHandler(IListSessionsQueryService query, ILogger<ListSessionsHandler> logger)
   : IQueryHandler<ListSessionsQuery, Result<IEnumerable<SessionDto>>>
 {
   public async Task<Result<IEnumerable<SessionDto>>> Handle(ListSessionsQuery request, CancellationToken cancellationToken)
@@ -45,9 +46,10 @@ public class ListSessionsHandler(IListSessionsQueryService query)
 
       return Result.Success(result);
     }
-    catch
+    catch (Exception ex)
     {
-      return Result.Error(new ErrorList(["Unknown error requesting list all sessions."]));
+      logger.LogDebug(ex, $"Session list error.");
+      return Result.Error(new ErrorList(["Unhandled exception.", ex.Message]));
     }
   }
 }

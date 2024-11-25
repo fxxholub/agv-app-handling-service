@@ -5,6 +5,7 @@ using Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 using Leuze_AGV_Handling_Service.Infrastructure.SessionServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure;
 
@@ -37,10 +38,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IProcessMonitorService, SshProcessMonitorService>();
     // services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
     
-    services.AddSingleton<IProcessProviderService>(provider => 
-      new FileProcessProviderService(
-        Environment.GetEnvironmentVariable("PROCESS_SCRIPTS_PATH_INNER") ?? throw new EnvironmentVariableNullException()
-      ));
+    services.AddSingleton<IProcessProviderService, FileProcessProviderService>();
     // services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
 
     return services;

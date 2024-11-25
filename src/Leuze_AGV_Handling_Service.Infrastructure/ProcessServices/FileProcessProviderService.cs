@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -11,34 +12,42 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 /// </summary>
 public class FileProcessProviderService : IProcessProviderService
 {
-    private readonly string _processScriptsPath;
     private readonly Dictionary<HandlingMode, List<Process>> _loadedProcesses = new();
 
     /// <summary>
     /// Fetches process scripts and makes process instances out of them.
     /// Follows the rule set specified in /ProcessScripts readme.md.
     /// </summary>
-    /// <param name="processScriptsPath"></param>
     /// <exception cref="DirectoryNotFoundException"></exception>
     /// <exception cref="InvalidEnumArgumentException"></exception>
     /// <exception cref="FormatException"></exception>
     /// <exception cref="InvalidDataException"></exception>
-    public FileProcessProviderService(string processScriptsPath)
+    public FileProcessProviderService(IConfiguration configuration, ILogger<FileProcessProviderService> logger)
     {
-        _processScriptsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, processScriptsPath);
+        var processScriptsPath = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            configuration["ProcessScripts:Path"] ?? throw new ArgumentException("Appsettings ProcessScripts:Path not found.")
+            );
         
+        logger.LogInformation($"FileProcessProvider will load scripts from {processScriptsPath}");
+
         // get ProcessScripts directory
-        if (!Directory.Exists(_processScriptsPath))
+        if (!Directory.Exists(processScriptsPath))
         {
-            throw new DirectoryNotFoundException($"ProcessScripts directory '{_processScriptsPath}' was not found.");
+            throw new DirectoryNotFoundException($"ProcessScripts directory '{processScriptsPath}' was not found.");
         }
-        if (Path.GetFileNameWithoutExtension(_processScriptsPath) != "ProcessScripts")
+        if (Path.GetFileNameWithoutExtension(processScriptsPath) != "ProcessScripts")
         {
-            throw new DirectoryNotFoundException($"ProcessScripts directory must be named ProcessScripts directory, is '{Path.GetFileNameWithoutExtension(_processScriptsPath)}'.");
+            throw new DirectoryNotFoundException($"ProcessScripts directory must be named ProcessScripts directory, is '{Path.GetFileNameWithoutExtension(processScriptsPath)}'.");
         }
         
         // get folders (hosts / host connections)
-        var hostFolders = Directory.GetDirectories(_processScriptsPath);
+        var hostFolders = Directory.GetDirectories(processScriptsPath);
+
+        if (hostFolders.Length == 0)
+        {
+            logger.LogWarning("FileProcessProvider no host folder loaded.");
+        }
         
         // prepare handling modes for later check
         var handlingModes = new List<HandlingMode>(Enum.GetValues<HandlingMode>());
@@ -63,6 +72,11 @@ public class FileProcessProviderService : IProcessProviderService
             
             // get hosts subfolders - handling modes
             var handlingFolders = Directory.GetDirectories(hostFolder);
+            
+            if (handlingFolders.Length == 0)
+            {
+                logger.LogWarning($"FileProcessProvider no handling mode folder loaded for host {Path.GetFileName(hostFolder)}.");
+            }
 
             // hosts handling folders
             foreach (var handlingFolder in handlingFolders)
@@ -77,6 +91,11 @@ public class FileProcessProviderService : IProcessProviderService
                 
                 // get .sh scripts
                 var scriptFiles = Directory.GetFiles(handlingFolder, "*.sh");
+                
+                if (handlingFolders.Length == 0)
+                {
+                    logger.LogWarning($"FileProcessProvider no scripts loaded for host {Path.GetFileName(hostFolder)} for mode {handlingFolderName}.");
+                }
                 
                 // script files
                 foreach (var scriptFile in scriptFiles)
@@ -132,7 +151,12 @@ public class FileProcessProviderService : IProcessProviderService
         
     public IEnumerable<Process> GetProcesses(HandlingMode handlingMode)
     {
-        return _loadedProcesses[handlingMode];
+        if (_loadedProcesses.TryGetValue(handlingMode, out var processList))
+        {
+            return processList;
+        }
+        
+        return [];
     }
 
     private static ProcessConfig ParseConfig(string configPath)

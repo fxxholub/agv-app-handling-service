@@ -3,7 +3,7 @@
 services:
   app:
     image: leuze_agv_handling_service
-    platform: linux/arm64
+    platform: linux/arm64 # Dockerfile base images based on: linux/amd64, linux/arm64, linux/arm64/v8
     env_file:
       - .env
     environment:
@@ -13,7 +13,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BUILD_CONFIGURATION: Debug
+        BUILD_CONFIGURATION: Debug # Debug or Release (defaults to Release in Dockerfile)
     ports:
       - "8080:8080"
       - "8081:8081"

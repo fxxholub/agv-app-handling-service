@@ -36,11 +36,9 @@ public static class InfrastructureServiceExtensions
 
     services.AddScoped<IProcessMonitorServiceFactory, ProcessMonitorServiceFactory>();
     
-    services.AddScoped<IProcessMonitorService, SshProcessMonitorService>();
-    services.AddScoped<IProcessMonitorService, DockerProcessMonitorService>();
-    // services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
+    services.AddScoped<SshProcessMonitorService>();
+    services.AddScoped<DockerProcessMonitorService>();
     
-    // services.AddSingleton<IProcessProviderService, FileProcessProviderService>();
     services.AddSingleton<IProcessProviderService, ProcessProviderService>();
 
     return services;

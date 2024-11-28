@@ -15,8 +15,8 @@ namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 /// <param name="sessionId"></param>
 public class Process(
   string name,
-  DriverType driveType,
-  string? hostName,
+  DriverType driverType,
+  string hostName,
   string? hostAddr,
   string? userName,
   string? password,
@@ -26,7 +26,7 @@ public class Process(
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
 
-    public DriverType DriverType { get; private set; } = driveType;
+    public DriverType DriverType { get; private set; } = driverType;
     public string? HostName { get; private set; } = hostName;
     
     // Both SSH and Docker stuff

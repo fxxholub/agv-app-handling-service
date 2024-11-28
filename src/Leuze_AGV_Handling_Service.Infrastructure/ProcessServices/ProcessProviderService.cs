@@ -61,7 +61,7 @@ public class ProcessProviderService : IProcessProviderService
             return processList;
         }
 
-        return Enumerable.Empty<Process>();
+        return [];
     }
 
     private void AddProcessToAllModes(ProcessC confProcess)

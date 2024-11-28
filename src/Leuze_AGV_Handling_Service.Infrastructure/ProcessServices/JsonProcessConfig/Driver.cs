@@ -44,17 +44,31 @@ public class Driver
     private void ValidateDockerAuth()
     {
         if (string.IsNullOrWhiteSpace(Auth?.Username) || string.IsNullOrWhiteSpace(Auth?.Password))
+        {
             throw new InvalidOperationException("Docker Driver requires 'Username' and 'Password' in 'Auth' when provided.");
+        }
+
         if (!string.IsNullOrEmpty(Auth?.PrivateKeyFile))
+        {
             throw new InvalidOperationException("Docker Driver does not support 'PrivateKeyFile' in 'Auth'.");
+        }
     }
 
     private void ValidateSshAuth()
     {
-        bool hasCredentials = !string.IsNullOrWhiteSpace(Auth?.Username) && !string.IsNullOrWhiteSpace(Auth?.Password);
-        bool hasPrivateKey = !string.IsNullOrWhiteSpace(Auth?.PrivateKeyFile);
+        if (string.IsNullOrWhiteSpace(Auth?.Username))
+        {
+            throw new InvalidOperationException("SSH Driver requires 'Username' in 'Auth'.");
+        }
 
-        if (!hasCredentials && !hasPrivateKey)
-            throw new InvalidOperationException("SSH Driver requires either 'Username' and 'Password' or 'PrivateKeyFile' in 'Auth'.");
+        if (string.IsNullOrWhiteSpace(Auth?.PrivateKeyFile))
+        {
+            throw new InvalidOperationException("SSH Driver requires 'PrivateKeyFile' in 'Auth'.");
+        }
+
+        if (!string.IsNullOrEmpty(Auth?.Password))
+        {
+            throw new InvalidOperationException("SSH Driver does not support 'Password' in 'Auth'.");
+        }
     }
 }

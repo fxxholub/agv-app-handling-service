@@ -1,35 +1,35 @@
 {
-  "manual": [
+  "common": [
     {
-      "name": "package1",
+      "name": "dummy_pub",
       "hostName": "host1",
       "driver": {
         "type": "ssh",
-        "address": "192.168.1.1",
+        "address": "172.17.0.1",
         "auth": {
-          "privateKeyFile": "key1.pem"
+          "username": "jholub",
+          "privateKeyFile": "host1.pk"
         },
         "commands": [
-          "command1",
-          "command2"
+          "source /opt/ros/humble/setup.bash",
+          "ros2 topic pub /dummy std_msgs/msg/String \"data: 'something'\" --rate 1"
         ]
       }
-    }
-  ],
-  "autonomous": [
+    },
     {
-      "name": "package2",
+      "name": "dummy_sub",
       "hostName": "host2",
       "driver": {
-        "type": "docker",
-        "address": "192.168.1.2",
+        "type": "ssh",
+        "address": "172.17.0.1",
         "auth": {
-          "username": "docker_user",
-          "password": "docker_password"
+          "username": "jholub",
+          "privateKeyFile": "host2.pk"
         },
-        "image": "docker-image-name",
-        "tag": "latest",
-        "platform": "linux/amd64"
+        "commands": [
+          "source /opt/ros/humble/setup.bash",
+          "ros2 topic echo /joy"
+        ]
       }
     }
   ]

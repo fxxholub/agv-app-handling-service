@@ -1,7 +1,7 @@
+using Docker.DotNet;
+using Docker.DotNet.Models;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
-using Leuze_AGV_Handling_Service.Infrastructure.Exceptions;
-using Renci.SshNet;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
@@ -11,56 +11,87 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 public class DockerProcessMonitorService: IProcessMonitorService
 {
     /// <summary>
-    /// TODO:
+    /// Starts a containerized process via Docker API.
     /// </summary>
-    /// <param name="process"></param>
-    /// <returns></returns>
+    /// <param name="process">The process to start.</param>
+    /// <returns>The container ID if successful, empty string otherwise.</returns>
     public async Task<string> StartProcess(Process process)
     {
-        return await Task.FromResult("123");
+        ValidateProcessProperties(process);
+
+        DockerClient client = new DockerClientConfiguration(
+                new Uri(process.HostAddr!)) // ! is safe because of validation
+            .CreateClient();
+
+        bool started = await client.Containers.StartContainerAsync(
+            process.DockerContainerId,
+            new ContainerStartParameters()
+        );
+
+        return (started ? process.DockerContainerId : string.Empty) ?? string.Empty;
     }
 
     /// <summary>
-    /// TODO:
+    /// Checks if a containerized process is running via Docker API.
     /// </summary>
-    /// <param name="process"></param>
-    /// <returns></returns>
-    /// <exception cref="EnvironmentVariableNullException"></exception>
-    /// <exception cref="Exception"></exception>
+    /// <param name="process">The process to check.</param>
+    /// <returns>True if the container is running; false otherwise.</returns>
     public async Task<bool> CheckProcess(Process process)
     {
-        return await Task.FromResult(true);
+        ValidateProcessProperties(process);
+
+        DockerClient client = new DockerClientConfiguration(
+                new Uri(process.HostAddr!)) // ! is safe because of validation
+            .CreateClient();
+
+        var containerList = await client.Containers.ListContainersAsync(
+            new ContainersListParameters
+            {
+                Filters = new Dictionary<string, IDictionary<string, bool>>
+                {
+                    { "id", new Dictionary<string, bool> { { process.DockerContainerId ?? string.Empty, true } } }
+                }
+            });
+
+        return containerList.Any(c => c.State == "running");
     }
 
     /// <summary>
-    /// Makes SSH connection and kills process as entire process tree.
+    /// Stops a containerized process via Docker API.
     /// </summary>
-    /// <param name="process"></param>
+    /// <param name="process">The process to stop.</param>
     public async Task KillProcess(Process process)
     {
-        await Task.Delay(100);
+        ValidateProcessProperties(process);
+
+        DockerClient client = new DockerClientConfiguration(
+                new Uri(process.HostAddr!)) // ! is safe because of validation
+            .CreateClient();
+
+        await client.Containers.StopContainerAsync(
+            process.DockerContainerId,
+            new ContainerStopParameters
+            {
+                WaitBeforeKillSeconds = 5
+            },
+            CancellationToken.None);
     }
 
-    // /// <summary>
-    // /// Validates process properties for SSH connection usage.
-    // /// </summary>
-    // /// <param name="process"></param>
-    // /// <returns></returns>
-    // /// <exception cref="ArgumentException"></exception>
-    // private (string, string, string) ValidateProcessProperties(Process process)
-    // {
-    //     if (String.IsNullOrEmpty(process.HostAddr))
-    //     {
-    //         throw new ArgumentException($"Process handled with SSH requires HostAddr.");
-    //     }
-    //     if (String.IsNullOrEmpty(process.UserName))
-    //     {
-    //         throw new ArgumentException($"Process handled with SSH requires UserName.");
-    //     }
-    //     if (String.IsNullOrEmpty(process.PrivateKeyPath))
-    //     {
-    //         throw new ArgumentException($"Process handled with SSH requires PrivateKeyPath.");
-    //     }
-    //     return (process.HostAddr, process.UserName, process.PrivateKeyPath);
-    // }
+    /// <summary>
+    /// Validates required properties of the process for Docker operations.
+    /// </summary>
+    /// <param name="process">The process to validate.</param>
+    /// <exception cref="ArgumentException">Thrown when a required property is missing or invalid.</exception>
+    private void ValidateProcessProperties(Process process)
+    {
+        if (string.IsNullOrWhiteSpace(process.HostAddr))
+        {
+            throw new ArgumentException("Docker process requires a valid 'HostAddr'.");
+        }
+
+        if (string.IsNullOrWhiteSpace(process.DockerContainerId))
+        {
+            throw new ArgumentException("Docker process requires a valid 'DockerContainerId'.");
+        }
+    }
 }

@@ -108,9 +108,7 @@ public class ProcessProviderService : IProcessProviderService
             password,
             null,
             privateKeyFile,
-            confProcess.Driver.Image,
-            confProcess.Driver.Tag,
-            confProcess.Driver.Platform
+            confProcess.Driver.ContainerId
         );
         
         // add sh commands (if any)

@@ -22,9 +22,7 @@ public class Process(
   string? password,
   int? sessionId,
   string? sshPrivateKeyPath,
-  string? dockerImage,
-  string? dockerTag,
-  string? dockerPlatform
+  string? dockerContainerId
   ) : EntityBase
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
@@ -44,9 +42,7 @@ public class Process(
     public IEnumerable<ProcessCommand> Commands => _commands.AsReadOnly();
     
     // Docker based stuff
-    public string? DockerImage { get; private set; } = dockerImage;
-    public string? DockerTag { get; private set; } = dockerTag;
-    public string? DockerPlatform { get; private set; } = dockerPlatform;
+    public string? DockerContainerId { get; private set; } = dockerContainerId;
     
     public int? SessionId { get; set; }  = sessionId;
 

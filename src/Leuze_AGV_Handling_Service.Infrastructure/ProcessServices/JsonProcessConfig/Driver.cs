@@ -11,11 +11,7 @@ public class Driver
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? Commands { get; set; } // Only for SSH
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Image { get; set; } // Only for Docker
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Tag { get; set; } // Only for Docker
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Platform { get; set; } // Only for Docker
+    public string? ContainerId { get; set; } // Only for Docker
 
     public void Validate()
     {
@@ -91,11 +87,8 @@ public class Driver
     
     private void ValidateDockerProperties()
     {
-        if (string.IsNullOrWhiteSpace(Image))
-            throw new InvalidOperationException("Docker Driver requires 'Image' to be specified.");
-
-        if (string.IsNullOrWhiteSpace(Tag))
-            throw new InvalidOperationException("Docker Driver requires 'Tag' to be specified.");
+        if (string.IsNullOrWhiteSpace(ContainerId))
+            throw new InvalidOperationException("Docker Driver requires 'ContainerId' to be specified.");
 
         if (Commands != null && Commands.Count > 0)
             throw new InvalidOperationException("Docker Driver does not support 'Commands'.");
@@ -106,13 +99,7 @@ public class Driver
         if (Commands == null)
             throw new InvalidOperationException("SSH Driver requires 'Commands' to be provided (can be empty).");
 
-        if (!string.IsNullOrEmpty(Image))
-            throw new InvalidOperationException("SSH Driver does not support 'Image'.");
-
-        if (!string.IsNullOrEmpty(Tag))
-            throw new InvalidOperationException("SSH Driver does not support 'Tag'.");
-
-        if (!string.IsNullOrEmpty(Platform))
-            throw new InvalidOperationException("SSH Driver does not support 'Platform'.");
+        if (!string.IsNullOrEmpty(ContainerId))
+            throw new InvalidOperationException("SSH Driver does not support 'ContainerId'.");
     }
 }

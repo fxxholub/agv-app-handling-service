@@ -17,19 +17,12 @@
       }
     },
     {
-      "name": "dummy_sub",
+      "name": "docker_ubuntu_loop",
       "hostName": "host2",
       "driver": {
-        "type": "ssh",
-        "address": "172.17.0.1",
-        "auth": {
-          "username": "jholub",
-          "privateKeyFile": "host2.pk"
-        },
-        "commands": [
-          "source /opt/ros/humble/setup.bash",
-          "ros2 topic echo /joy"
-        ]
+        "type": "docker",
+        "address": "unix:///var/run/docker.sock",
+        "containerId": "ab50ae8e47ac"
       }
     }
   ]

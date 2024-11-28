@@ -2,8 +2,9 @@
 # Custom .gitignore commands
 ################################################################################
 
-.env
-.private_key
+*.env
+*.private_key
+*.pk
 
 *.realm
 *.realm.lock

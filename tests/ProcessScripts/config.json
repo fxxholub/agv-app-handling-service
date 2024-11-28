@@ -1,0 +1,29 @@
+{
+  "common": [
+    {
+      "name": "dummy_pub",
+      "hostName": "host1",
+      "driver": {
+        "type": "ssh",
+        "address": "172.17.0.1",
+        "auth": {
+          "username": "jholub",
+          "privateKeyFile": "host1.pk"
+        },
+        "commands": [
+          "source /opt/ros/humble/setup.bash",
+          "ros2 topic pub /dummy std_msgs/msg/String \"data: 'something'\" --rate 1"
+        ]
+      }
+    },
+    {
+      "name": "docker_ubuntu_loop",
+      "hostName": "host2",
+      "driver": {
+        "type": "docker",
+        "address": "unix:///var/run/docker.sock",
+        "containerId": "ab50ae8e47ac"
+      }
+    }
+  ]
+}

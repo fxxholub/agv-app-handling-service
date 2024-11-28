@@ -5,8 +5,6 @@ namespace Leuze_AGV_Handling_Service.UseCases.Session.DTOs;
 public record ProcessDto(
   string Name,
   string? HostName,
-  string? HostAddr,
-  string? UserName,
   int? SessionId,
   string? ErrorReason,
   string Pid,

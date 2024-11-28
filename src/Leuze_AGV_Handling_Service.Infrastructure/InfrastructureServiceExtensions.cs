@@ -33,13 +33,13 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<SessionWatchdogService>();
     services.AddSingleton<ISessionWatchdogService>(sp => sp.GetRequiredService<SessionWatchdogService>());
     services.AddHostedService(sp => sp.GetRequiredService<SessionWatchdogService>());
+
+    services.AddScoped<IProcessMonitorServiceFactory, ProcessMonitorServiceFactory>();
     
+    services.AddScoped<SshProcessMonitorService>();
+    services.AddScoped<DockerProcessMonitorService>();
     
-    services.AddScoped<IProcessMonitorService, SshProcessMonitorService>();
-    // services.AddScoped<IProcessHandlerService, FakeProcessHandlerService>();
-    
-    services.AddSingleton<IProcessProviderService, FileProcessProviderService>();
-    // services.AddSingleton<IProcessProviderService, FakeProcessProviderService>();
+    services.AddSingleton<IProcessProviderService, ProcessProviderService>();
 
     return services;
   }

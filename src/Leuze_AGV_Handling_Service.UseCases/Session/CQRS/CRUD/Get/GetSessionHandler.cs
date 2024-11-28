@@ -34,8 +34,6 @@ public class GetSessionHandler(IRepository<Core.Session.SessionAggregate.Session
         entity.Processes.Select(process => new ProcessDto(
           process.Name,
           process.HostName,
-          process.HostAddr,
-          process.UserName,
           process.SessionId,
           process.ErrorReason,
           process.Pid,

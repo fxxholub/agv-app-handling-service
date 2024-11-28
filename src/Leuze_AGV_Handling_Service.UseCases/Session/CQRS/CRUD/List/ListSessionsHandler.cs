@@ -32,8 +32,6 @@ public class ListSessionsHandler(IListSessionsQueryService query, ILogger<ListSe
           entity.Processes.Select(process => new ProcessDto(
             process.Name,
             process.HostName,
-            process.HostAddr,
-            process.UserName,
             process.SessionId,
             process.ErrorReason,
             process.Pid,

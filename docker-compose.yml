@@ -17,5 +17,6 @@ services:
     ports:
       - "8080:8080"
       - "8081:8081"
-    # volumes:
-    #   - ./tests/ProcessScripts:/app/ProcessScripts
+    volumes:
+      # - ./tests/ProcessScripts:/app/ProcessScripts
+      - /var/run/docker.sock:/var/run/docker.sock

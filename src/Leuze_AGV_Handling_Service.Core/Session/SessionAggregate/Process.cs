@@ -21,7 +21,10 @@ public class Process(
   string? userName,
   string? password,
   int? sessionId,
-  string? privateKeyPath
+  string? sshPrivateKeyPath,
+  string? dockerImage,
+  string? dockerTag,
+  string? dockerPlatform
   ) : EntityBase
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
@@ -36,14 +39,14 @@ public class Process(
     public string? Password { get; private set; } = password;
     
     // SSH based stuff
-    public string? PrivateKeyPath { get; private set; } = privateKeyPath;
+    public string? SshPrivateKeyPath { get; private set; } = sshPrivateKeyPath;
     private readonly List<ProcessCommand> _commands = new List<ProcessCommand>();
     public IEnumerable<ProcessCommand> Commands => _commands.AsReadOnly();
     
     // Docker based stuff
-    public string? Image { get; private set; } // For Docker
-    public string? Tag { get; private set; }   // For Docker
-    public string? Platform { get; private set; } // For Docker
+    public string? DockerImage { get; private set; } = dockerImage;
+    public string? DockerTag { get; private set; } = dockerTag;
+    public string? DockerPlatform { get; private set; } = dockerPlatform;
     
     public int? SessionId { get; set; }  = sessionId;
 
@@ -60,8 +63,9 @@ public class Process(
     /// <param name="commands"></param>
     public void AddCommands(IEnumerable<ProcessCommand> commands)
     {
-      Guard.Against.NullOrEmpty(commands);
-      _commands.AddRange(commands);
+      var processCommands = commands.ToList();
+      Guard.Against.NullOrEmpty(processCommands);
+      _commands.AddRange(processCommands);
     }
 
     /// <summary>

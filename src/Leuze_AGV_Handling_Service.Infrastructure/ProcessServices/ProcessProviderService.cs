@@ -99,7 +99,7 @@ public class ProcessProviderService : IProcessProviderService
             throw new ArgumentException($"Invalid driver type: {confProcess.Driver.Type}");
         }
 
-        return new Process(
+        var process =  new Process(
             confProcess.Name,
             driverType,
             confProcess.HostName,
@@ -107,7 +107,16 @@ public class ProcessProviderService : IProcessProviderService
             username,
             password,
             null,
-            privateKeyFile
+            privateKeyFile,
+            confProcess.Driver.Image,
+            confProcess.Driver.Tag,
+            confProcess.Driver.Platform
         );
+        
+        // add sh commands (if any)
+        if (confProcess.Driver.Commands is not null)
+            process.AddCommands(confProcess.Driver.Commands.Select(line => new ProcessCommand(line)));
+
+        return process;
     }
 }

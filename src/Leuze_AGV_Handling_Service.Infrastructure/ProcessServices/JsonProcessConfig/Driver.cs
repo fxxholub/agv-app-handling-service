@@ -39,6 +39,23 @@ public class Driver
                     throw new InvalidOperationException($"Unsupported Driver 'Type': {Type}");
             }
         }
+        else
+        {
+            // If Auth is required for both drivers, you can uncomment the following line:
+            // throw new InvalidOperationException("Auth cannot be null.");
+        }
+
+        switch (Type.ToLower())
+        {
+            case "docker":
+                ValidateDockerProperties();
+                break;
+            case "ssh":
+                ValidateSshProperties();
+                break;
+            default:
+                throw new InvalidOperationException($"Unsupported Driver 'Type': {Type}");
+        }
     }
 
     private void ValidateDockerAuth()
@@ -70,5 +87,32 @@ public class Driver
         {
             throw new InvalidOperationException("SSH Driver does not support 'Password' in 'Auth'.");
         }
+    }
+    
+    private void ValidateDockerProperties()
+    {
+        if (string.IsNullOrWhiteSpace(Image))
+            throw new InvalidOperationException("Docker Driver requires 'Image' to be specified.");
+
+        if (string.IsNullOrWhiteSpace(Tag))
+            throw new InvalidOperationException("Docker Driver requires 'Tag' to be specified.");
+
+        if (Commands != null && Commands.Count > 0)
+            throw new InvalidOperationException("Docker Driver does not support 'Commands'.");
+    }
+
+    private void ValidateSshProperties()
+    {
+        if (Commands == null)
+            throw new InvalidOperationException("SSH Driver requires 'Commands' to be provided (can be empty).");
+
+        if (!string.IsNullOrEmpty(Image))
+            throw new InvalidOperationException("SSH Driver does not support 'Image'.");
+
+        if (!string.IsNullOrEmpty(Tag))
+            throw new InvalidOperationException("SSH Driver does not support 'Tag'.");
+
+        if (!string.IsNullOrEmpty(Platform))
+            throw new InvalidOperationException("SSH Driver does not support 'Platform'.");
     }
 }

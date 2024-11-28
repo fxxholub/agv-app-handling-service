@@ -21,8 +21,4 @@
     <Compile Remove="Messages\Interfaces\IAutonomousMessageExtensible.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Session\Services\ProcessConfiguration\" />
-  </ItemGroup>
-
 </Project>

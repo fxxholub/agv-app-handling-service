@@ -1,56 +1,114 @@
 # Leuze AGV Handling Service
 
-__TODO:__
+TODO:
 
-## Process scripts SSH connections
+# Demo
 
-Process scripts describe processes, which are managed (started, checked and killed) by the application.
+TODO:
 
-Those processes are in most cases just different running ROS2 nodes.
+# Process configuration
 
-Different processes are used for different handling mode and for different robots. Also, processes can be run on different computers - not just locally.
+## What is a process?
 
-Example setup can be found in `tests/ProcessScripts/` directory.
+When `Session` is started, the actual things that starts are configurable background processes.
 
-The following guide explains how to setup process scripts if needed.
+Those background processes are meant to be ROS2 preconfigured packages started by `ros2 run`, `ros2 launch`, or similar technique.
 
-- Create your own __directory__ - lets call it __MyProcessScripts__ for purpose of this guide.
-- Every __host__ (or rather host connection) is represented by its own folder in this directory.
-- Host __configuration__ is done with `config.json` file with keys: `hostName`, `hostAddr` and `hostUser`. The file must be placed in the host`s folder.
-- SSH __private key__ (per host) must be stored in `.priate_key` file in host`s folder, since this file is __gitignored__.
-- As of writing this guide, only __Manual__ and __Autonomous__ handling modes are present in the app. For __each host__, create `Manual` and `Autonomous` subfolders if you want host to run them, plus add `Common` subfolder if needed. __Common__ scripts will be run for every handling mode.
-- First, `Common` subfolder scripts will be run when new session is created and started.
-- Then, `<HandlingMode>` subfolders scripts will be run, based on the the `HandlingMode` of the started __handling Session__.
-- Every `Common`/`<HandlingMode>` subfolder must directly contain the `.sh` process files. Each file descripts one process.
-- `.sh` files will be read line after line, those lines will be contatenated with `&&` (line will be processed only if line before were processed succesfully)
-- Last line is meant to contain some long running (possibly while looping) process - it will be run on background and its PID will be returned and monitored by the system.
-- Finally, add environment variable `PROCESS_SCRIPTS_PATH=/MyProcessScripts` to the `.env` file. App will then register the processes at the docker build time.
+## How is a process started?
 
-example file structure:
+### HandlingMode
+Every handling mode, such as `Autonomous` or `Manual`, has can have its own set of processes.
 
+Also, `Common` processes can be defined, those will run for any handling mode selected.
+
+### Driver
+
+There are two ways to run the processes:
+- Docker
+- SSH
+
+Docker based driver can be used to run an already existing containers.
+
+SSH driver can be used to run any linux command.
+
+## Where is a processes started?
+
+The process can be started on the local machine or a remote computer.
+
+- Docker - to run a container, only its ID is needed
+- SSH - one just needs an existing SSH key configuration
+
+## How to configure the processes?
+
+JSON for the win!
+
+```json
+{
+  "common": [
+    {
+      "name": "some_process",
+      "hostName": "my_local_docker_desktop", // yes, works crossplatform
+      "driver": {
+        "type": "docker",
+        "address": "unix:///var/run/docker.sock",
+        "containerId": "ab50ae8e47ac"
+      }
+    },
+    {
+      "name": "dummy_ros_process",
+      "hostName": "my_local_pc",
+      "driver": {
+        "type": "ssh", // works only with linux targets
+        "address": "172.17.0.1", // since this app is dockerized
+        "auth": {
+          "username": "my_pc_username",
+          "privateKeyFile": "ssh_private_key_from_my_pc_to_my_pc.pk"
+        },
+        "commands": [
+          "source /opt/ros/humble/setup.bash", // start ROS on my PC
+          "ros2 topic echo /joy"
+        ]
+      }
+    },
+  ],
+  "manual": [
+    {
+      "name": "some_other_containerized_process",
+      "hostName": "local_linux_docker_engine",
+      "driver": {
+        "type": "docker",
+        "address": "unix:///var/run/docker.sock",
+        "containerId": "ya50ae1e67ad"
+      }
+    }
+  ]
+}
 ```
-.
-└── MyProcessScripts/
-    └── host1/
-        ├── Common/
-        │   └── 1_some_common_script.sh
-        ├── Autonomous/
-        │   ├── 2_some_autonomous_process.sh
-        │   └── 3_some_other_autonomous_process.sh
-        ├── Manual/
-        │   └── 4_some_manual_process.sh
-        ├── config.json
-        └── .private_key
-```
 
-__Note:__ Add `MyProcessScripts` to gitignore if you are going to push to the repo.
+How to:
+1. create dir in the root of the project, e.g. `MyProcessConfig`
+2. create `config.json` file with your configuration
+3. add your private key files (if any)
+4. set the volume in the `docker-compose.yml` to register your config dir
+5. `docker compose up`
+
+A few rules apply:
+- Docker supports both Desktop and raw Engine (Win, Mac, Linux)
+- Docker works only locally now
+- SSH works only if both host and target are linux
+    - host - because SSH from dockerized app to the host machine only works with Docker Engine
+    - target - because SSH driver uses unix commands to controll the remote shell
+
+A few notes:
+- SSH is not really a safe option
+- Docker currently uses unix socket, not that safe either
 
 ## Environment variables
 
 Make `.env` file in the project root. This file is already __gitignored__.
 
-example file with all listed variables:
+example file with all used variables:
 
 ```
-PROCESS_SCRIPTS_PATH=/MyProcessScripts
+none for now
 ```

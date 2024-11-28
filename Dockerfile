@@ -30,6 +30,5 @@ EXPOSE 8081
 WORKDIR /app
 
 COPY --from=publish /app/publish .
-COPY ./tests/ProcessScripts ./ProcessScripts
 
 ENTRYPOINT ["dotnet", "Leuze_AGV_Handling_Service.WebAPI.dll"]

@@ -15,23 +15,36 @@ namespace Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 /// <param name="sessionId"></param>
 public class Process(
   string name,
+  DriverType driveType,
   string? hostName,
   string? hostAddr,
   string? userName,
+  string? password,
   int? sessionId,
   string? privateKeyPath
   ) : EntityBase
 {
     public string Name { get; private set; } = Guard.Against.NullOrEmpty(name);
-    
+
+    public DriverType DriverType { get; private set; } = driveType;
     public string? HostName { get; private set; } = hostName;
+    
+    // Both SSH and Docker stuff
     public string? HostAddr { get; private set; } = hostAddr;
     public string? UserName { get; private set; } = userName;
     
+    public string? Password { get; private set; } = password;
+    
+    // SSH based stuff
     public string? PrivateKeyPath { get; private set; } = privateKeyPath;
-
     private readonly List<ProcessCommand> _commands = new List<ProcessCommand>();
     public IEnumerable<ProcessCommand> Commands => _commands.AsReadOnly();
+    
+    // Docker based stuff
+    public string? Image { get; private set; } // For Docker
+    public string? Tag { get; private set; }   // For Docker
+    public string? Platform { get; private set; } // For Docker
+    
     public int? SessionId { get; set; }  = sessionId;
 
     public string Pid { get; private set; } = string.Empty;
@@ -54,10 +67,11 @@ public class Process(
     /// <summary>
     /// Starts process with given Process Handler, marks process with Pid if succeded.
     /// </summary>
-    /// <param name="processMonitorService"></param>
+    /// <param name="processMonitorFactory"></param>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task StartAsync(IProcessMonitorService processMonitorService)
+    public async Task StartAsync(IProcessMonitorServiceFactory processMonitorFactory)
     {
+      var processMonitorService = processMonitorFactory.GetService(DriverType);
       var pid = await processMonitorService.StartProcess(this);
       if (string.IsNullOrEmpty(pid))
       {
@@ -75,11 +89,12 @@ public class Process(
     /// <summary>
     /// Checks if process is alive with given Process Handler.
     /// </summary>
-    /// <param name="processMonitorService"></param>
+    /// <param name="processMonitorFactory"></param>
     /// <returns></returns>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task<bool> CheckAsync(IProcessMonitorService processMonitorService)
+    public async Task<bool> CheckAsync(IProcessMonitorServiceFactory processMonitorFactory)
     {
+      var processMonitorService = processMonitorFactory.GetService(DriverType);
       if (State is ProcessState.None)
       {
         throw new ProcessInvalidOperationException(
@@ -97,15 +112,16 @@ public class Process(
       }
 
       return isOk;
-    } 
-    
+    }
+
     /// <summary>
     /// Kills process with given Process Handler.
     /// </summary>
-    /// <param name="processMonitorService"></param>
+    /// <param name="processMonitorFactory"></param>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task KillAsync(IProcessMonitorService processMonitorService)
+    public async Task KillAsync(IProcessMonitorServiceFactory processMonitorFactory)
     {
+      var processMonitorService = processMonitorFactory.GetService(DriverType);
       if (State is ProcessState.None)
       {
         throw new ProcessInvalidOperationException(

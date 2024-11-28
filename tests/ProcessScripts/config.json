@@ -1,0 +1,36 @@
+{
+  "manual": [
+    {
+      "name": "package1",
+      "hostName": "host1",
+      "driver": {
+        "type": "ssh",
+        "address": "192.168.1.1",
+        "auth": {
+          "privateKeyFile": "key1.pem"
+        },
+        "commands": [
+          "command1",
+          "command2"
+        ]
+      }
+    }
+  ],
+  "autonomous": [
+    {
+      "name": "package2",
+      "hostName": "host2",
+      "driver": {
+        "type": "docker",
+        "address": "192.168.1.2",
+        "auth": {
+          "username": "docker_user",
+          "password": "docker_password"
+        },
+        "image": "docker-image-name",
+        "tag": "latest",
+        "platform": "linux/amd64"
+      }
+    }
+  ]
+}

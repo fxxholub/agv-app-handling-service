@@ -12,11 +12,11 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 /// Ends session`s underlying processes.
 /// </summary>
 /// <param name="repository"></param>
-/// <param name="processMonitorService"></param>
+/// <param name="processMonitorFactory"></param>
 /// <param name="logger"></param>
 public class EndSessionService(
     IRepository<SessionAggregate.Session> repository,
-    IProcessMonitorService processMonitorService,
+    IProcessMonitorServiceFactory processMonitorFactory,
     ILogger<EndSessionService> logger,
     IMediator mediator
 ) : IEndSessionService
@@ -41,7 +41,7 @@ public class EndSessionService(
         if (aggregate == null) return Result.NotFound();
 
         // end it
-        await aggregate.EndAsync(processMonitorService);
+        await aggregate.EndAsync(processMonitorFactory);
 
         // commit changes in the reopsitory
         await repository.UpdateAsync(aggregate);

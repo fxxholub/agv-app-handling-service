@@ -7,24 +7,31 @@ Handling service is a ROS2 programs __management__ and __messaging__ application
 
 # Contents
 
-- [Description](#description)
+- [About](#about)
 - [Demo](#demo)
 - [Process configuration](#process-configuration)
 - [Environment variables](#environment-variables)
 
-# Description
+# About
 
 TODO
 
 # Demo
 
-The `docker-compose.yml` is already prepared to run the demo configuration of the app.
+Run the app and manage dockerized ROS2 dummy packages. Then exchange joystick and map messages with them.
+
+## Prerequisities
+
+- Linux or Mac
+- Docker (Engine or Desktop)
 
 ## How to setup
 
+The [`docker-compose.yml`](./docker-compose.yml) is already prepared to run the demo [configuration](#process-configuration) of the app.
+
 1) `docker compose up --build --no-start`
 2) `docker ps -a`
-3) paste the __CONTAINER ID__ of __manual_joystick_listener__ and __common_map_talker__ to `./demo/config.json`
+3) paste the __CONTAINER ID__ of __manual_joystick_listener__ and __common_map_talker__ to [`./demo/ProcessConfig/config.json`](./demo/ProcessConfig/config.json)
 4) `docker compose up app`
 
 ## How to use
@@ -32,11 +39,11 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
 1) create Postman websocket request to `ws://localhost:8080/api/v1/signalr/manual`
 2) hit `Connect`
 3) send SignalR connection message (including the whitespace after `}`):
-    ```
+    ```json
     {"protocol": "json", "version": 1 }
     ```
 4) send `SendSessionCreate` and `SendStartSession`:
-    ```
+    ```json
     {
         "type": 1,
         "target": "SendCreateSession",
@@ -44,7 +51,7 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
         "invocationId": "123"
     }
     ```
-    ```
+    ```json
     {
         "type": 1,
         "target": "SendStartSession",
@@ -57,7 +64,7 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
 6) inspect __manual_joystick_listener__. Do:
     - `docker logs -f leuze_agv_handling_service-demo_ros_joy_listener-1`
     -  send `PublishJoyTopic` message with Postman.
-        ```
+        ```json
         {
             "type": 1,
             "target": "PublishJoyTopic",
@@ -67,7 +74,7 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
     - watch the log in the terminal. It should print something like:
         `[joystick_sub]: Received Twist: linear=geometry_msgs.msg.Vector3(x=-1.2312300205230713, y=-3.213210105895996, z=0.0), angular=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=-2.312309980392456)`
 8) send `SendEndSession` message:
-    ```
+    ```json
     {
         "type": 1,
         "target": "SendEndSession",
@@ -77,7 +84,7 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
     ```
 9) docker services __manual_joystick_listener__ and __common_map_talker__ should be down. Check with `docker ps`.
 10) send `SendStartSession` again.
-11) kill some ROS2 service and see the other come down too. `docker kill <container_id>`. You should be receivng `ReceiveSessionUnexpectedEnd` message in Postman. Check if the services are down with `docker ps`.
+11) kill any ROS2 service and see the other come down too. `docker kill <container_id>`. You should be receivng `ReceiveSessionUnexpectedEnd` message in Postman. Check if the services are down with `docker ps`.
 
 # Process configuration
 
@@ -85,12 +92,12 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
 
 When `Session` is started, the actual things that starts are configurable background processes.
 
-Those background processes are meant to be ROS2 preconfigured packages started by `ros2 run`, `ros2 launch`, or similar technique.
+Those background processes are meant to be ROS2 preconfigured packages started by `ros2 run`, `ros2 launch`, or similar.
 
 ## How is a process started?
 
 ### HandlingMode
-Every handling mode, such as `Autonomous` or `Manual`, has can have its own set of processes.
+Every handling mode, such as `Autonomous` or `Manual`, can have its own set of processes.
 
 Also, `Common` processes can be defined, those will run for any handling mode selected.
 
@@ -162,7 +169,7 @@ How to:
 1. create dir in the root of the project, e.g. `MyProcessConfig`
 2. create `config.json` file with your configuration
 3. add your private key files (if any)
-4. set the volume in the `docker-compose.yml` to register your config dir
+4. set the volume in the [`docker-compose.yml`](./docker-compose.yml) to register your config dir
 5. `docker compose up`
 
 A few rules apply:

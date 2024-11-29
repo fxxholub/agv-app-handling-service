@@ -1,3 +1,4 @@
+using Docker.DotNet;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.UseCases.Session.Notifications.Events;
 using MediatR;

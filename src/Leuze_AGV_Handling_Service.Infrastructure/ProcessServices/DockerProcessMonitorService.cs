@@ -20,7 +20,7 @@ public class DockerProcessMonitorService: IProcessMonitorService
         ValidateProcessProperties(process);
 
         DockerClient client = new DockerClientConfiguration(
-                new Uri(process.HostAddr!)) // ! is safe because of validation
+                new Uri(process.HostAddr!))
             .CreateClient();
 
         bool started = await client.Containers.StartContainerAsync(
@@ -41,7 +41,7 @@ public class DockerProcessMonitorService: IProcessMonitorService
         ValidateProcessProperties(process);
 
         DockerClient client = new DockerClientConfiguration(
-                new Uri(process.HostAddr!)) // ! is safe because of validation
+                new Uri(process.HostAddr!))
             .CreateClient();
 
         var containerList = await client.Containers.ListContainersAsync(
@@ -65,15 +65,12 @@ public class DockerProcessMonitorService: IProcessMonitorService
         ValidateProcessProperties(process);
 
         DockerClient client = new DockerClientConfiguration(
-                new Uri(process.HostAddr!)) // ! is safe because of validation
+                new Uri(process.HostAddr!))
             .CreateClient();
 
-        await client.Containers.StopContainerAsync(
+        await client.Containers.KillContainerAsync(
             process.DockerContainerId,
-            new ContainerStopParameters
-            {
-                WaitBeforeKillSeconds = 5
-            },
+            new ContainerKillParameters(),
             CancellationToken.None);
     }
 

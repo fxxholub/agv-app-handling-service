@@ -48,8 +48,11 @@ public class CheckSessionService(
         // commit changes (if any) to the repository
         await repository.UpdateAsync(aggregate);
         await repository.SaveChangesAsync();
-        
-        logger.LogInformation($"Checked Session {sessionId} with result {checkOk}.");
+
+        if (!checkOk)
+        {
+            logger.LogInformation($"Checked Session {sessionId} with result {checkOk}.");
+        }
 
         return Result.Success(checkOk);
     }

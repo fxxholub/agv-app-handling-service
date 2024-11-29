@@ -4,7 +4,8 @@ TODO:
 
 # Demo
 
-TODO:
+`docker compose up --build --no-start`
+`docker compose up app`
 
 # Process configuration
 

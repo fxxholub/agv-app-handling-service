@@ -22,10 +22,10 @@ public class ManualSubscriber : BackgroundService, IManualSubscriber
         _mediator = mediator;
             
         _logger = logger;
-        _logger.LogInformation($"Handling Ros2 handling_service_autonomous_sub node started.");
+        _logger.LogInformation($"Handling Ros2 handling_service_manual_sub node started.");
         
         var context = new RclContext();
-        var node = context.CreateNode("handling_service_autonomous_sub");
+        var node = context.CreateNode("handling_service_manual_sub");
         
         _mapSubscriber = node.CreateSubscription<Ros2CommonMessages.Nav.OccupancyGrid>("/map");
     }

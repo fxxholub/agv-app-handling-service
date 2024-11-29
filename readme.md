@@ -1,11 +1,72 @@
 # Leuze AGV Handling Service
 
-TODO:
+Handling service is a ROS2 programs __management__ and __messaging__ application.
+
+- It executes ROS2 services as processes in background
+- It routes ROS2 pub/sub messages in the SignalR API
 
 # Demo
 
-`docker compose up --build --no-start`
-`docker compose up app`
+The `docker-compose.yml` is already prepared to run the demo configuration of the app.
+
+## How to setup
+
+1) `docker compose up --build --no-start`
+2) `docker ps -a`
+3) paste the __CONTAINER ID__ of __manual_joystick_listener__ and __common_map_talker__ to `./demo/config.json`
+4) `docker compose up app`
+
+## How to use
+
+1) create Postman websocket request to `ws://localhost:8080/api/v1/signalr/manual`
+2) hit `Connect`
+3) send SignalR connection message (including the whitespace after `}`):
+    ```
+    {"protocol": "json", "version": 1 }
+    ```
+4) send `SendSessionCreate` and `SendStartSession`:
+    ```
+    {
+        "type": 1,
+        "target": "SendCreateSession",
+        "arguments": [],
+        "invocationId": "123"
+    }
+    ```
+    ```
+    {
+        "type": 1,
+        "target": "SendStartSession",
+        "arguments": [1],
+        "invocationId": "1234"
+    }
+    ```
+5) docker services __manual_joystick_listener__ and __common_map_talker__ should be started. Check with `docker ps`.
+7) inspect __manual_joystick_listener__. Postman should be receiving `SubscribeMapTopic` message.
+6) inspect __manual_joystick_listener__. Do:
+    - `docker logs -f leuze_agv_handling_service-demo_ros_joy_listener-1`
+    -  send `PublishJoyTopic` message with Postman.
+        ```
+        {
+            "type": 1,
+            "target": "PublishJoyTopic",
+            "arguments": [123.123, 321.321, 231.231]
+        }
+        ```
+    - watch the log in the docker terminal. It should print something like:
+        `[joystick_sub]: Received Twist: linear=geometry_msgs.msg.Vector3(x=-1.2312300205230713, y=-3.213210105895996, z=0.0), angular=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=-2.312309980392456)`
+8) send `SendEndSession` message:
+    ```
+    {
+        "type": 1,
+        "target": "SendEndSession",
+        "arguments": [1],
+        "invocationId": "12345"
+    }
+    ```
+9) docker services __manual_joystick_listener__ and __common_map_talker__ should be down. Check with `docker ps`.
+10) send `SendStartSession` again.
+11) kill some ROS2 service and see the other come down too. `docker kill <container_id>`. You should be receivng `ReceiveSessionUnexpectedEnd` message in Postman. Check if the services are down with `docker ps`.
 
 # Process configuration
 

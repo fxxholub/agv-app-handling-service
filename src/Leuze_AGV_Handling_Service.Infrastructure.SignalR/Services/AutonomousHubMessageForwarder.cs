@@ -23,7 +23,7 @@ public class AutonomousHubMessageForwarder(
 
     public async Task SubscribeMapTopic(MapDto map)
     {
-        await hubContext.Clients.All.SusbcribeMapTopic(map);
+        await hubContext.Clients.All.SubscribeMapTopic(map);
     }
 
 }

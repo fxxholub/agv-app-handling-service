@@ -56,13 +56,14 @@ public class SessionWatchdogService(
 
             // check ok return
             if (checkResult.Value) return;
+            await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
 
             var endResult = await endService.EndSession(_watchedSessionId.Value);
 
             if (!endResult.IsSuccess)
                 logger.LogError("Session Watchdog end on bad check failed.");
 
-            await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
+            await StopWatching();
         }
         catch (DbUpdateConcurrencyException)
         {

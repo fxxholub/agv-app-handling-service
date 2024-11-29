@@ -6,5 +6,5 @@ public interface IManualHandlingHub
 {
     Task ReceiveSessionUnexpectedEnd(string errorMessage);
     
-    public Task SusbcribeMapTopic(MapDto map);
+    public Task SubscribeMapTopic(MapDto map);
 }

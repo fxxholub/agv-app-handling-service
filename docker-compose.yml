@@ -4,8 +4,6 @@ services:
   app:
     image: leuze_agv_handling_service
     platform: linux/arm64 # Dockerfile base images based on: linux/amd64, linux/arm64, linux/arm64/v8
-    env_file:
-      - .env
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     build:

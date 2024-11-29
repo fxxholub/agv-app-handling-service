@@ -3,7 +3,18 @@
 Handling service is a ROS2 programs __management__ and __messaging__ application.
 
 - It executes ROS2 services as processes in background
-- It routes ROS2 pub/sub messages in the SignalR API
+- It routes ROS2 pub/sub messages to the SignalR API
+
+# Contents
+
+- [Description](#description)
+- [Demo](#demo)
+- [Process configuration](#process-configuration)
+- [Environment variables](#environment-variables)
+
+# Description
+
+TODO
 
 # Demo
 
@@ -42,7 +53,7 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
     }
     ```
 5) docker services __manual_joystick_listener__ and __common_map_talker__ should be started. Check with `docker ps`.
-7) inspect __manual_joystick_listener__. Postman should be receiving `SubscribeMapTopic` message.
+7) inspect __common_map_talker__. Postman should be receiving `SubscribeMapTopic` message.
 6) inspect __manual_joystick_listener__. Do:
     - `docker logs -f leuze_agv_handling_service-demo_ros_joy_listener-1`
     -  send `PublishJoyTopic` message with Postman.
@@ -53,7 +64,7 @@ The `docker-compose.yml` is already prepared to run the demo configuration of th
             "arguments": [123.123, 321.321, 231.231]
         }
         ```
-    - watch the log in the docker terminal. It should print something like:
+    - watch the log in the terminal. It should print something like:
         `[joystick_sub]: Received Twist: linear=geometry_msgs.msg.Vector3(x=-1.2312300205230713, y=-3.213210105895996, z=0.0), angular=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=-2.312309980392456)`
 8) send `SendEndSession` message:
     ```

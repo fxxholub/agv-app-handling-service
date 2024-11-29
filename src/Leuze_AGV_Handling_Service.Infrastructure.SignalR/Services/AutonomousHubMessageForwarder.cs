@@ -1,5 +1,6 @@
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
+using Leuze_AGV_Handling_Service.UseCases.Messaging.DTOs;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Services;
@@ -19,5 +20,10 @@ public class AutonomousHubMessageForwarder(
     }
     
     // ROS stuff ////////////////////////////////////////////////////////////////////////////////
+
+    public async Task SusbcribeMapTopic(MapDto map)
+    {
+        await hubContext.Clients.All.SusbcribeMapTopic(map);
+    }
 
 }

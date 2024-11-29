@@ -1,0 +1,11 @@
+services:
+  agv_demo_map_talker:
+    image: common_map_talker
+    build:
+      context: ./common_map_talker
+      dockerfile: Dockerfile
+  agv_demo_joy_listener:
+    image: manual_joystick_listener
+    build:
+      context: ./manual_joystick_listener
+      dockerfile: Dockerfile

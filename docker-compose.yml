@@ -7,7 +7,6 @@ services:
     env_file:
       - .env
     environment:
-      ASPNETCORE_URLS: http://0.0.0.0:8080
       ASPNETCORE_ENVIRONMENT: Development
     build:
       context: .

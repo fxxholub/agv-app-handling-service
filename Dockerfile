@@ -27,6 +27,8 @@ FROM fxxholub/ros2-dotnet:humble-core-runtime-8.0 AS startup
 EXPOSE 8080
 EXPOSE 8081
 
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+
 WORKDIR /app
 
 COPY --from=publish /app/publish .

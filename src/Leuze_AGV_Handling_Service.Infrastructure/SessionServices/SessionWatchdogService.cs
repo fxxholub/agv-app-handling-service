@@ -1,3 +1,4 @@
+using Docker.DotNet;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.UseCases.Session.Notifications.Events;
 using MediatR;
@@ -53,20 +54,20 @@ public class SessionWatchdogService(
             if (!checkResult.IsSuccess)
                 logger.LogError("Session Watchdog check failed.");
 
+            // check ok return
             if (checkResult.Value) return;
-            
+            await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
+
             var endResult = await endService.EndSession(_watchedSessionId.Value);
-            
+
             if (!endResult.IsSuccess)
                 logger.LogError("Session Watchdog end on bad check failed.");
-            
-            await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
+
             await StopWatching();
         }
         catch (DbUpdateConcurrencyException)
         {
             logger.LogWarning($"Session Watchdog check exception. Session no longer exists.");
-            await StopWatching();
         }
         catch (Exception ex)
         {

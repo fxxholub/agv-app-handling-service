@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 
@@ -8,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 /// Creates Session. Entity repository creation operation.
 /// </summary>
 /// <param name="createService"></param>
-public class CreateSessionHandler(ICreateSessionService createService) 
+public class CreateSessionHandler(ICreateSessionService createService, ILogger<CreateSessionHandler> logger) 
   : ICommandHandler<CreateSessionCommand, Result<int>>
 {
   public async Task<Result<int>> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
@@ -20,9 +21,10 @@ public class CreateSessionHandler(ICreateSessionService createService)
         request.Lifespan
       );
     }
-    catch
+    catch (Exception ex)
     {
-      return Result.Error(new ErrorList(["Unknown error requesting create session."]));
+      logger.LogDebug(ex, $"Session create error.");
+      return Result.Error(new ErrorList(["Unhandled exception.", ex.Message]));
     }
   }
 }

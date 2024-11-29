@@ -115,10 +115,10 @@ public class SshProcessMonitorService: IProcessMonitorService
         {
             throw new ArgumentException($"Process handled with SSH requires UserName.");
         }
-        if (String.IsNullOrEmpty(process.PrivateKeyPath))
+        if (String.IsNullOrEmpty(process.SshPrivateKeyPath))
         {
             throw new ArgumentException($"Process handled with SSH requires PrivateKeyPath.");
         }
-        return (process.HostAddr, process.UserName, process.PrivateKeyPath);
+        return (process.HostAddr, process.UserName, process.SshPrivateKeyPath);
     }
 }

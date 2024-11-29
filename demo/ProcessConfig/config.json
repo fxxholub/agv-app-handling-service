@@ -1,0 +1,24 @@
+{
+  "common": [
+    {
+      "name": "map_publisher",
+      "hostName": "local_docker",
+      "driver": {
+        "type": "docker",
+        "address": "unix:///var/run/docker.sock",
+        "containerId": "d2b483d0a85c"
+      }
+    }
+  ],
+  "manual": [
+    {
+      "name": "joystick_subscriber",
+      "hostName": "local_docker",
+      "driver": {
+        "type": "docker",
+        "address": "unix:///var/run/docker.sock",
+        "containerId": "77bdcdb35041"
+      }
+    }
+  ]
+}

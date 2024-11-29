@@ -53,7 +53,7 @@ public class SessionExecutorService(
         
         // retrieve session entity
         var session = await repository.FirstOrDefaultAsync(new SessionByIdSpec(sessionId));
-        if (session is null) return Result.Error();
+        if (session is null) return Result.Error(new ErrorList(["Error retrieving session entity while starting new session."]));
         
         // retrieve starting service
         var startService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
@@ -62,7 +62,7 @@ public class SessionExecutorService(
         switch (session.Lifespan)
         {
             case Lifespan.Exclusive:
-                if (IsCurrentSessionActive()) return Result.Conflict();
+                if (IsCurrentSessionActive() && !IsCurrentSession(sessionId).Result.Value) return Result.Conflict();
                 
                 // session can now be started
                 
@@ -74,7 +74,7 @@ public class SessionExecutorService(
                 // end the old session first
                 var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
                 var ended = await endSessionService.EndSession(_currentSessionId.Value);
-                if (!ended.IsSuccess) return Result.Error();
+                if (!ended.IsSuccess) return Result.Error(new ErrorList(["Error ending old session on session start."]));
                 
                 // cleanup after the old session
                 _currentSessionId = null;
@@ -89,7 +89,7 @@ public class SessionExecutorService(
         // start the session
         var startResult = await startService.StartSession(sessionId);
 
-        if (!startResult.IsSuccess) return Result.Error();
+        if (!startResult.IsSuccess) return Result.Error(new ErrorList(startResult.Errors));
         
         // set the current session and connection
         _currentSessionId = sessionId;
@@ -124,7 +124,7 @@ public class SessionExecutorService(
 
         // end the session
         var ended = await endSessionService.EndSession(sessionId);
-        if (!ended.IsSuccess) return Result.Error();
+        if (!ended.IsSuccess) return Result.Error(new ErrorList(ended.Errors));
 
         // release session
         _currentSessionId = null;
@@ -167,14 +167,14 @@ public class SessionExecutorService(
         
         // retrieve the session entity
         var session = await repository.FirstOrDefaultAsync(new SessionByIdSpec(_currentSessionId.Value));
-        if (session is null) return Result.Error();
+        if (session is null) return Result.Error(new ErrorList(["Error retrieving session entity while leaving ownership."]));
         
         // lifespan rules
         switch (session.Lifespan)
         {
             case Lifespan.Exclusive:
                 var ended = await EndSessionOfConnection(_currentSessionId.Value, connectionId);
-                if (!ended.IsSuccess) return Result.Error();
+                if (!ended.IsSuccess) return Result.Error(new ErrorList(ended.Errors));
                 
                 // release connection
                 _currentConnectionId = null;

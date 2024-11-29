@@ -11,11 +11,11 @@ namespace Leuze_AGV_Handling_Service.Core.Session.Services;
 ///
 /// </summary>
 /// <param name="repository"></param>
-/// <param name="processMonitorService"></param>
+/// <param name="processMonitorFactory"></param>
 /// <param name="logger"></param>
 public class CheckSessionService(
     IRepository<SessionAggregate.Session> repository,
-    IProcessMonitorService processMonitorService,
+    IProcessMonitorServiceFactory processMonitorFactory,
     ILogger<CheckSessionService> logger
 ) : ICheckSessionService
 {
@@ -43,13 +43,16 @@ public class CheckSessionService(
         if (aggregate == null) return Result.NotFound();
         
         // procees with the check operation
-        var checkOk = await aggregate.CheckAsync(processMonitorService);
+        var checkOk = await aggregate.CheckAsync(processMonitorFactory);
 
         // commit changes (if any) to the repository
         await repository.UpdateAsync(aggregate);
         await repository.SaveChangesAsync();
-        
-        logger.LogInformation($"Checked Session {sessionId} with result {checkOk}.");
+
+        if (!checkOk)
+        {
+            logger.LogInformation($"Checked Session {sessionId} with result {checkOk}.");
+        }
 
         return Result.Success(checkOk);
     }

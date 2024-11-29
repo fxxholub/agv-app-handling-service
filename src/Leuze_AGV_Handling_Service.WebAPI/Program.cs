@@ -145,7 +145,7 @@ public static class Program
         app.UseAuthorization();
         app.MapControllers();
         
-        if (true/*app.Environment.IsDevelopment()*/)
+        if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI(options =>

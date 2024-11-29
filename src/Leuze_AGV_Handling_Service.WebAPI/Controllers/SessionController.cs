@@ -125,8 +125,6 @@ public class SessionController(IMediator mediator) : ControllerBase
             result.Value.Processes.Select(process => new ProcessResponseModel(
                 process.Name,
                 process.HostName,
-                process.HostAddr,
-                process.UserName,
                 process.SessionId,
                 process.ErrorReason,
                 process.Pid,

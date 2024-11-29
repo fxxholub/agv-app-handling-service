@@ -48,29 +48,24 @@ public class Session(
   /// <summary>
   /// Starts a session`s underlying processes, checks if they started - updates states based on that.
   /// </summary>
-  /// <param name="processMonitorService"></param>
+  /// <param name="processMonitorFactory"></param>
   /// <param name="initCheckDelay"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task StartAsync(IProcessMonitorService processMonitorService, int initCheckDelay)
+  public async Task StartAsync(IProcessMonitorServiceFactory processMonitorFactory)
   {
     _actions.Add(new Action(ActionCommand.Start, Id));
     
+    bool allGood = true;
     foreach (var process in _processes)
     {
       if (process.State is not ProcessState.Started)
       {
-        await process.StartAsync(processMonitorService);
-      }
-    }
-
-    await Task.Delay(initCheckDelay);
-
-    bool allGood = true;
-    foreach (var process in _processes)
-    {
-      if (!await process.CheckAsync(processMonitorService))
-      {
-        allGood = false;
+        var result = await process.StartAsync(processMonitorFactory);
+        if (!result)
+        {
+          allGood = false;
+          break;
+        }
       }
     }
 
@@ -89,10 +84,10 @@ public class Session(
   /// <summary>
   /// Checks if underlying processes are alive, updates their state and session`s state based on that.
   /// </summary>
-  /// <param name="processMonitorService"></param>
+  /// <param name="processMonitorFactory"></param>
   /// <returns></returns>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task<bool> CheckAsync(IProcessMonitorService processMonitorService)
+  public async Task<bool> CheckAsync(IProcessMonitorServiceFactory processMonitorFactory)
   {
     if (State is SessionState.None)
     {
@@ -103,7 +98,7 @@ public class Session(
     bool allGood = true;
     foreach (var process in _processes)
     {
-      if (!await process.CheckAsync(processMonitorService)) allGood = false;
+      if (!await process.CheckAsync(processMonitorFactory)) allGood = false;
     }
 
     if (!allGood)
@@ -118,9 +113,9 @@ public class Session(
   /// <summary>
   /// Ends session - kills all underlying processes.
   /// </summary>
-  /// <param name="processMonitorService"></param>
+  /// <param name="processMonitorFactory"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task EndAsync(IProcessMonitorService processMonitorService)
+  public async Task EndAsync(IProcessMonitorServiceFactory processMonitorFactory)
   {
     _actions.Add(new Action(ActionCommand.End, Id));
     
@@ -132,7 +127,7 @@ public class Session(
     
     foreach (var process in _processes)
     {
-      await process.KillAsync(processMonitorService);
+      await process.KillAsync(processMonitorFactory);
     }
 
     State = SessionState.Ended;

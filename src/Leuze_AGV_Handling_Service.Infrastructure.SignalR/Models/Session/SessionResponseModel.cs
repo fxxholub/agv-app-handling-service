@@ -42,8 +42,6 @@ public class SessionResponseModel(
       dto.Processes.Select(process => new ProcessResponseModel(
         process.Name,
         process.HostName,
-        process.HostAddr,
-        process.UserName,
         process.SessionId,
         process.ErrorReason,
         process.Pid,

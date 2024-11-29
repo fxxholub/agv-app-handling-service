@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Delete;
 
@@ -8,7 +9,7 @@ namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Delete;
 /// Deletes Session. Entity repository deletion operation.
 /// </summary>
 /// <param name="deleteService"></param>
-public class DeleteSessionHandler(IDeleteSessionService deleteService)
+public class DeleteSessionHandler(IDeleteSessionService deleteService, ILogger<DeleteSessionHandler> logger)
   : ICommandHandler<DeleteSessionCommand, Result>
 {
   public async Task<Result> Handle(DeleteSessionCommand request, CancellationToken cancellationToken)
@@ -17,9 +18,10 @@ public class DeleteSessionHandler(IDeleteSessionService deleteService)
     {
       return await deleteService.DeleteSession(request.SessionId);
     }
-    catch
+    catch (Exception ex)
     {
-      return Result.Error(new ErrorList(["Unknown error requesting delete session."]));
+      logger.LogDebug(ex, $"Session {request.SessionId} delete error.");
+      return Result.Error(new ErrorList(["Unhandled exception.", ex.Message]));
     }
   }
 }

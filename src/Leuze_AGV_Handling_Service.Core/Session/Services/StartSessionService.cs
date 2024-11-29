@@ -19,12 +19,10 @@ public class StartSessionService(
     IRepository<SessionAggregate.Session> repository,
     IProcessMonitorServiceFactory processMonitorFactory,
     ILogger<StartSessionService> logger,
-    IMediator mediator
+    IMediator mediator,
+    IEndSessionService endService
 ) : IStartSessionService
 {
-    // delay between actual process execution and its initial check to deduce if it has started successfully
-    private const int SessionStartCheckDelay = 100; // s
-
     /// <summary>
     /// Starts the session, effectively executing its processes and bringing it into the running (Started) state.
     /// </summary>
@@ -45,7 +43,7 @@ public class StartSessionService(
         if (aggregate == null) return Result.NotFound();
         
         // execute the starting operation
-        await aggregate.StartAsync(processMonitorFactory, SessionStartCheckDelay);
+        await aggregate.StartAsync(processMonitorFactory);
 
         // commit the changes in the repository
         await repository.UpdateAsync(aggregate);
@@ -54,8 +52,9 @@ public class StartSessionService(
         // check the start operation outcome
         if (aggregate.State != SessionState.Started)
         {
-            logger.LogWarning($"Start of Session {sessionId} errored. Some process/es did not start.");
-            return Result.Error(new ErrorList(["Start of Session {sessionId} errored. Some process/es did not start."]));
+            logger.LogWarning($"Start of Session {sessionId} errored. Some process/es did not start. Ending Session.");
+            await endService.EndSession(sessionId);
+            return Result.Error(new ErrorList(["Start of Session {sessionId} errored. Some process/es did not start. Ending Session."]));
         }
         
         // raise event indicating the session start

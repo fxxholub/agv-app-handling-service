@@ -21,7 +21,7 @@ public class ManualHubMessageForwarder(
     
     // ROS stuff ////////////////////////////////////////////////////////////////////////////////
     
-    public async Task SusbcribeMapTopic(MapDto map)
+    public async Task SubscribeMapTopic(MapDto map)
     {
         await hubContext.Clients.All.SusbcribeMapTopic(map);
     }

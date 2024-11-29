@@ -2,13 +2,14 @@ using Docker.DotNet;
 using Docker.DotNet.Models;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
+using Microsoft.Extensions.Logging;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.ProcessServices;
 
 /// <summary>
 /// Handles process starting, checking and killing via Docker API.
 /// </summary>
-public class DockerProcessMonitorService: IProcessMonitorService
+public class DockerProcessMonitorService(ILogger<DockerProcessMonitorService> logger): IProcessMonitorService
 {
     /// <summary>
     /// Starts a containerized process via Docker API.
@@ -19,16 +20,25 @@ public class DockerProcessMonitorService: IProcessMonitorService
     {
         ValidateProcessProperties(process);
 
-        DockerClient client = new DockerClientConfiguration(
-                new Uri(process.HostAddr!))
-            .CreateClient();
+        try 
+        {
+            DockerClient client = new DockerClientConfiguration(
+                    new Uri(process.HostAddr!))
+                .CreateClient();
 
-        bool started = await client.Containers.StartContainerAsync(
-            process.DockerContainerId,
-            new ContainerStartParameters()
-        );
+            bool started = await client.Containers.StartContainerAsync(
+                process.DockerContainerId,
+                new ContainerStartParameters()
+            );
 
-        return (started ? process.DockerContainerId : string.Empty) ?? string.Empty;
+            return "-";
+        }
+        catch
+        {
+            logger.LogWarning($"Error when checking process {process.Name} id {process.Id} under session {process.SessionId}.");
+        }
+
+        return string.Empty;
     }
 
     /// <summary>
@@ -40,20 +50,29 @@ public class DockerProcessMonitorService: IProcessMonitorService
     {
         ValidateProcessProperties(process);
 
-        DockerClient client = new DockerClientConfiguration(
-                new Uri(process.HostAddr!))
-            .CreateClient();
+        try
+        {
+            DockerClient client = new DockerClientConfiguration(
+                    new Uri(process.HostAddr!))
+                .CreateClient();
 
-        var containerList = await client.Containers.ListContainersAsync(
-            new ContainersListParameters
-            {
-                Filters = new Dictionary<string, IDictionary<string, bool>>
+            var containerList = await client.Containers.ListContainersAsync(
+                new ContainersListParameters
                 {
-                    { "id", new Dictionary<string, bool> { { process.DockerContainerId ?? string.Empty, true } } }
-                }
-            });
+                    Filters = new Dictionary<string, IDictionary<string, bool>>
+                    {
+                        { "id", new Dictionary<string, bool> { { process.DockerContainerId ?? string.Empty, true } } }
+                    }
+                });
 
-        return containerList.Any(c => c.State == "running");
+            return containerList.Any(c => c.State == "running");
+        }
+        catch
+        {
+            logger.LogWarning($"Error when checking process {process.Name} id {process.Id} under session {process.SessionId}.");
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -64,14 +83,21 @@ public class DockerProcessMonitorService: IProcessMonitorService
     {
         ValidateProcessProperties(process);
 
-        DockerClient client = new DockerClientConfiguration(
-                new Uri(process.HostAddr!))
-            .CreateClient();
+        try
+        {
+            DockerClient client = new DockerClientConfiguration(
+                    new Uri(process.HostAddr!))
+                .CreateClient();
 
-        await client.Containers.KillContainerAsync(
-            process.DockerContainerId,
-            new ContainerKillParameters(),
-            CancellationToken.None);
+            await client.Containers.KillContainerAsync(
+                process.DockerContainerId,
+                new ContainerKillParameters(),
+                CancellationToken.None);
+        }
+        catch
+        {
+            logger.LogWarning($"Error when checking process {process.Name} id {process.Id} under session {process.SessionId}.");
+        }
     }
 
     /// <summary>

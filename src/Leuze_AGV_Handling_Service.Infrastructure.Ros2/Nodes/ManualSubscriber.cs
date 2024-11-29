@@ -2,6 +2,7 @@ using Leuze_AGV_Handling_Service.Infrastructure.Ros2.Interfaces;
 using Leuze_AGV_Handling_Service.UseCases.Messaging.DTOs;
 using Leuze_AGV_Handling_Service.UseCases.Messaging.Topics;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rcl;
@@ -13,13 +14,13 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 /// </summary>
 public class ManualSubscriber : BackgroundService, IManualSubscriber
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<AutonomousSubscriber> _logger;
     
     private readonly IRclSubscription<Ros2CommonMessages.Nav.OccupancyGrid> _mapSubscriber;
-    public ManualSubscriber(IMediator mediator, ILogger<AutonomousSubscriber> logger)
+    public ManualSubscriber(IServiceProvider serviceProvider, ILogger<AutonomousSubscriber> logger)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
             
         _logger = logger;
         _logger.LogInformation($"Handling Ros2 handling_service_manual_sub node started.");
@@ -40,7 +41,9 @@ public class ManualSubscriber : BackgroundService, IManualSubscriber
 
     public async Task SubscribeMapTopic(MapDto map)
     {
-        await _mediator.Publish(new MapTopic(map));
+        using var scope = _serviceProvider.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        await mediator.Publish(new MapTopic(map));
     }
 
     private MapDto OccupancyGrid2MapDto(Ros2CommonMessages.Nav.OccupancyGrid occupancyGrid)

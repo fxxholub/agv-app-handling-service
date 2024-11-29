@@ -69,7 +69,7 @@ public class Process(
     /// </summary>
     /// <param name="processMonitorFactory"></param>
     /// <exception cref="ProcessInvalidOperationException"></exception>
-    public async Task StartAsync(IProcessMonitorServiceFactory processMonitorFactory)
+    public async Task<bool> StartAsync(IProcessMonitorServiceFactory processMonitorFactory)
     {
       var processMonitorService = processMonitorFactory.GetService(DriverType);
       var pid = await processMonitorService.StartProcess(this);
@@ -77,12 +77,14 @@ public class Process(
       {
         State = ProcessState.Err;
         ErrorReason = "Process did not start successfully.";
+        return false;
       }
       else
       {
         State = ProcessState.Started;
         ErrorReason = null;
         Pid = pid;
+        return true;
       }
     }
 

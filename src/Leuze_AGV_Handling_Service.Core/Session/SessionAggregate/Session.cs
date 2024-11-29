@@ -51,26 +51,21 @@ public class Session(
   /// <param name="processMonitorFactory"></param>
   /// <param name="initCheckDelay"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
-  public async Task StartAsync(IProcessMonitorServiceFactory processMonitorFactory, int initCheckDelay)
+  public async Task StartAsync(IProcessMonitorServiceFactory processMonitorFactory)
   {
     _actions.Add(new Action(ActionCommand.Start, Id));
     
+    bool allGood = true;
     foreach (var process in _processes)
     {
       if (process.State is not ProcessState.Started)
       {
-        await process.StartAsync(processMonitorFactory);
-      }
-    }
-
-    await Task.Delay(initCheckDelay);
-
-    bool allGood = true;
-    foreach (var process in _processes)
-    {
-      if (!await process.CheckAsync(processMonitorFactory))
-      {
-        allGood = false;
+        var result = await process.StartAsync(processMonitorFactory);
+        if (!result)
+        {
+          allGood = false;
+          break;
+        }
       }
     }
 

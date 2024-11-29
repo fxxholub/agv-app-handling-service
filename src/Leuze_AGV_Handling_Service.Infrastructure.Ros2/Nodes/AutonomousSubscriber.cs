@@ -14,13 +14,13 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 /// </summary>
 public class AutonomousSubscriber : BackgroundService, IAutonomousSubscriber
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<AutonomousSubscriber> _logger;
     
     private readonly IRclSubscription<Ros2CommonMessages.Nav.OccupancyGrid> _mapSubscriber;
-    public AutonomousSubscriber(IMediator mediator, ILogger<AutonomousSubscriber> logger)
+    public AutonomousSubscriber(IServiceProvider serviceProvider, ILogger<AutonomousSubscriber> logger)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
             
         _logger = logger;
         _logger.LogInformation($"Handling Ros2 handling_service_autonomous_sub node started.");
@@ -41,7 +41,9 @@ public class AutonomousSubscriber : BackgroundService, IAutonomousSubscriber
 
     public async Task SubscribeMapTopic(MapDto map)
     {
-        await _mediator.Publish(new MapTopic(map));
+        using var scope = _serviceProvider.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        await mediator.Publish(new MapTopic(map));
     }
 
     private MapDto OccupancyGrid2MapDto(Ros2CommonMessages.Nav.OccupancyGrid occupancyGrid)

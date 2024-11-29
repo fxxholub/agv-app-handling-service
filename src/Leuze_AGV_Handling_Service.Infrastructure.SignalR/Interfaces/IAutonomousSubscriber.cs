@@ -4,5 +4,5 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 
 public interface IAutonomousSubscriber
 {
-    public Task SusbcribeMapTopic(MapDto map);
+    public Task SubscribeMapTopic(MapDto map);
 }

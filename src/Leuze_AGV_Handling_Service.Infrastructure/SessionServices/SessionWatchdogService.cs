@@ -54,20 +54,19 @@ public class SessionWatchdogService(
             if (!checkResult.IsSuccess)
                 logger.LogError("Session Watchdog check failed.");
 
+            // check ok return
             if (checkResult.Value) return;
-            
+
             var endResult = await endService.EndSession(_watchedSessionId.Value);
-            
+
             if (!endResult.IsSuccess)
                 logger.LogError("Session Watchdog end on bad check failed.");
-            
+
             await mediator.Publish(new BadSessionCheckEvent(_watchedSessionId.Value));
-            await StopWatching();
         }
         catch (DbUpdateConcurrencyException)
         {
             logger.LogWarning($"Session Watchdog check exception. Session no longer exists.");
-            await StopWatching();
         }
         catch (Exception ex)
         {

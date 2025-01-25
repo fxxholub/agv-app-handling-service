@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Leuze_AGV_Handling_Service.WebAPI.Controllers;
 
 [ApiVersion(1)]
-[Route("api/v{v:apiVersion}/rest/sessions")]
+[Route("api/v{v:apiVersion}/handling/rest/sessions")]
 [ApiController]
 public class SessionController(IMediator mediator) : ControllerBase
 {

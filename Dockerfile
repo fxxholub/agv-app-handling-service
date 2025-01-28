@@ -22,7 +22,7 @@ ARG BUILD_CONFIGURATION={$BUILD_CONFIGURATION:-Release}
 RUN dotnet publish "Leuze_AGV_Handling_Service.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Startup stage
-FROM fxxholub/ros2-dotnet:jazzy-core-runtime-8.0 AS startup
+FROM fxxholub/ros2-dotnet:humble-core-runtime-8.0 AS startup
 
 EXPOSE 8080
 EXPOSE 8081

@@ -79,6 +79,7 @@ public class ManualHandlingHub(
 
         if (result.IsSuccess)
         {
+            await Task.Delay(1000);
             await mediator.Publish(new AgvMode());
         }
         

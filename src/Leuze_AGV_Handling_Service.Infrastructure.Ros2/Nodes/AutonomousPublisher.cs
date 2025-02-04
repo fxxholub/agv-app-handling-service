@@ -25,11 +25,12 @@ public class AutonomousPublisher : IAutonomousPublisher
     
     public async Task PublishAgvModeTopic()
     {
-        var msg = new Ros2CommonMessages.Std.String
-        {
-            Data = "automatic",
-        };
-        
-        await _agvModePublisher.PublishAsync(msg);
+        await Task.Delay(1);
+        // var msg = new Ros2CommonMessages.Std.String
+        // {
+        //     Data = "automatic",
+        // };
+        //
+        // await _agvModePublisher.PublishAsync(msg);
     }
 }

@@ -25,7 +25,7 @@ public class ManualPublisher : IManualPublisher
         _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/cmd_vel");
     }
     
-    public async Task PublishAgvModeTopic()
+    public async Task PublishAgvModeManualTopic()
     {
         var msg = new Ros2CommonMessages.Std.String
         {

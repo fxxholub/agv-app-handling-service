@@ -78,8 +78,8 @@ public class AutonomousHandlingHub(
         
         if (result.IsSuccess)
         {
-            await Task.Delay(30000);
-            await mediator.Publish(new AgvMode());
+            await Task.Delay(5000);
+            await mediator.Publish(new AgvModeAutomaticTopic());
         }
         
         ResultChecker<bool>.Check(result);

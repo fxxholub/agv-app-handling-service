@@ -21,7 +21,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 /// <summary>
 /// Manual handling mode Hub
 /// </summary>
-[SignalRHub(path: "/api/v1/signalr/manual")]
+[SignalRHub(path: "/api/v1/handling/signalr/manual")]
 public class ManualHandlingHub(
     IMediator mediator,
     ILogger<ManualHandlingHub> logger
@@ -76,6 +76,11 @@ public class ManualHandlingHub(
     public async Task SendStartSession(int sessionId)
     {
         var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
+
+        if (result.IsSuccess)
+        {
+            await mediator.Publish(new AgvMode());
+        }
         
         ResultChecker<bool>.Check(result);
     }

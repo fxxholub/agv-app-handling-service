@@ -20,8 +20,7 @@ public class ManualPublisher : IManualPublisher
         
         var context = new RclContext();
         var node = context.CreateNode("handling_service_manual_pub");
-
-        // called joy for teleop_twist_joy package purposes
+        
         _agvModePublisher = node.CreatePublisher<Ros2CommonMessages.Std.String>("/AgvMode");
         _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/cmd_vel");
     }
@@ -44,8 +43,7 @@ public class ManualPublisher : IManualPublisher
             Linear = new Ros2CommonMessages.Geometry.Vector3(-x/1000, -y/1000, 0),
             Angular = new Ros2CommonMessages.Geometry.Vector3(0, 0, -w/1000)
         };
-
-        await PublishAgvModeTopic();
+        
         await _joyPublisher.PublishAsync(msg);
     }
 }

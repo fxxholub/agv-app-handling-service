@@ -11,7 +11,7 @@ public class AutonomousPublisher : IAutonomousPublisher
 {
     private readonly ILogger<AutonomousPublisher> _logger;
 
-    private readonly IRclPublisher<Ros2CommonMessages.Std.String> _joyPublisher;
+    private readonly IRclPublisher<Ros2CommonMessages.Std.String> _agvModePublisher;
     public AutonomousPublisher(ILogger<AutonomousPublisher> logger)
     {
         _logger = logger;
@@ -20,6 +20,16 @@ public class AutonomousPublisher : IAutonomousPublisher
         var context = new RclContext();
         var node = context.CreateNode("handling_service_autonomous_pub");
 
-        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Std.String>("/joy");
+        _agvModePublisher = node.CreatePublisher<Ros2CommonMessages.Std.String>("/AgvMode");
+    }
+    
+    public async Task PublishAgvModeTopic()
+    {
+        var msg = new Ros2CommonMessages.Std.String
+        {
+            Data = "automatic",
+        };
+        
+        await _agvModePublisher.PublishAsync(msg);
     }
 }

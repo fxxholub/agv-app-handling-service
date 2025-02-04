@@ -2,6 +2,7 @@ using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models.Session;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Utils;
+using Leuze_AGV_Handling_Service.UseCases.Messaging.Topics;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Create;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.End;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Leave;
@@ -19,11 +20,10 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 /// <summary>
 /// Autonomous handling mode Hub
 /// </summary>
-[SignalRHub(path: "/api/v1/signalr/autonomous")]
+[SignalRHub(path: "/api/v1/handling/signalr/autonomous")]
 public class AutonomousHandlingHub(
     IMediator mediator,
     ILogger<AutonomousHandlingHub> logger
-    // IAutonomousMessageChannel messageChannel
     ) : Hub<IAutonomousHandlingHub>, IAutonomousPublisher
 {
     // HUB ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +75,11 @@ public class AutonomousHandlingHub(
     public async Task SendStartSession(int sessionId)
     {
         var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
+        
+        if (result.IsSuccess)
+        {
+            await mediator.Publish(new AgvMode());
+        }
         
         ResultChecker<bool>.Check(result);
     }

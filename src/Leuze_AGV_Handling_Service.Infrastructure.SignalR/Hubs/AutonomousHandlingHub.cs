@@ -78,7 +78,7 @@ public class AutonomousHandlingHub(
         
         if (result.IsSuccess)
         {
-            await Task.Delay(5000);
+            await Task.Delay(20000);
             await mediator.Publish(new AgvModeAutomaticTopic());
         }
         

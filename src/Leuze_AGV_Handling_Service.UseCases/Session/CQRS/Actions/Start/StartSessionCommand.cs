@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
 
@@ -8,4 +9,4 @@ namespace Leuze_AGV_Handling_Service.UseCases.Session.CQRS.Actions.Start;
 /// </summary>
 /// <param name="SessionId"></param>
 /// <param name="ConnectionId"></param>
-public record StartSessionCommand(int SessionId, string ConnectionId) : ICommand<Result>;
+public record StartSessionCommand(int SessionId, string ConnectionId, HandlingMode HandlingMode) : ICommand<Result>;

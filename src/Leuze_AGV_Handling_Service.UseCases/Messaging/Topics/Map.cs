@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Leuze_AGV_Handling_Service.UseCases.Messaging.Topics;
 
-public record MapTopic(MapDto Map) : INotification;
+public record Map(MapDto map) : INotification;

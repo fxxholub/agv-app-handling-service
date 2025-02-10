@@ -1,3 +1,4 @@
+using System.Text.Unicode;
 using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Interfaces;
 using Leuze_AGV_Handling_Service.Infrastructure.SignalR.Models.Session;
@@ -41,7 +42,7 @@ public class ManualHandlingHub(
     
     // Session CRUD ///////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task<SessionResponseModel> SendGetSession(int sessionId)
+    public async Task<SessionResponseModel> GetSession(int sessionId)
     {
         var result = await mediator.Send(new GetSessionQuery(sessionId));
 
@@ -50,7 +51,7 @@ public class ManualHandlingHub(
         return SessionResponseModel.ToModel(result.Value);
     }
     
-    public async Task<SessionResponseModel> SendCreateSession()
+    public async Task<SessionResponseModel> CreateSession()
     {
         var createResult = await mediator.Send(new CreateSessionCommand(
             HandlingMode.Manual, Lifespan.Exclusive));
@@ -64,7 +65,7 @@ public class ManualHandlingHub(
         return SessionResponseModel.ToModel(resultEntity.Value);
     }
     
-    public async Task SendDeleteSession(int sessionId)
+    public async Task DeleteSession(int sessionId)
     {
         var result = await mediator.Send(new DeleteSessionCommand(sessionId));
 
@@ -73,27 +74,21 @@ public class ManualHandlingHub(
     
     // Session Actions ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task SendStartSession(int sessionId)
+    public async Task StartSession(int sessionId)
     {
-        var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
-
-        if (result.IsSuccess)
-        {
-            await Task.Delay(20000);
-            await mediator.Publish(new AgvModeManualTopic());
-        }
+        var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId, HandlingMode.Manual));
         
         ResultChecker<bool>.Check(result);
     }
 
-    public async Task SendEndSession(int sessionId)
+    public async Task EndSession(int sessionId)
     {
         var result = await mediator.Send(new EndSessionCommand(sessionId, Context.ConnectionId));
         
         ResultChecker<bool>.Check(result);
     }
     
-    public async Task SendLeaveSession(int sessionId)
+    public async Task LeaveSession(int sessionId)
     {
         var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
         
@@ -102,9 +97,9 @@ public class ManualHandlingHub(
     
     // ROS Messages ///////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task PublishJoyTopic(float x, float y, float w)
+    public async Task PublishCmdVel(float x, float y, float w)
     {
         if (mediator.Send(new IsCurrentConnectionQuery(Context.ConnectionId)).Result.Value)
-            await mediator.Publish(new JoyTopic(x, y, w));
+            await mediator.Publish(new CmdVel(x, y, w));
     }
 }

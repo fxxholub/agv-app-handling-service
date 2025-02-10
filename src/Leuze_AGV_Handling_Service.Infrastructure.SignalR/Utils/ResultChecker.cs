@@ -14,7 +14,9 @@ public static class ResultChecker<T>
             var errorPayload = new
             {
                 Status = result.Status.ToString(),
-                Errors = result.Errors
+                Errors = result.Errors.Concat(
+                result.ValidationErrors.Select(ve => ve.ErrorMessage)
+                )
             };
 
             // Serialize to JSON

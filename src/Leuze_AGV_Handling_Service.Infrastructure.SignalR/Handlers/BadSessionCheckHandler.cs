@@ -26,12 +26,12 @@ public class BadSessionCheckHandler(
 
         if (session.Value.HandlingMode == HandlingMode.Autonomous)
         {
-            await autonomousNotifier.ReceiveSessionUnexpectedEnd(
+            await autonomousNotifier.SessionUnexpectedEnd(
                 "Autonomous Session Check resulted in false, Session ended.");
         }
         if (session.Value.HandlingMode == HandlingMode.Manual)
         {
-            await manualNotifier.ReceiveSessionUnexpectedEnd(
+            await manualNotifier.SessionUnexpectedEnd(
                 "Manual Session Check resulted in false, Session ended.");
         }
     }

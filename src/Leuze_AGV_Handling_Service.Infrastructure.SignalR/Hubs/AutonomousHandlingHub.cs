@@ -40,7 +40,7 @@ public class AutonomousHandlingHub(
     
     // Session CRUD ///////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task<SessionResponseModel> SendGetSession(int sessionId)
+    public async Task<SessionResponseModel> GetSession(int sessionId)
     {
         var result = await mediator.Send(new GetSessionQuery(sessionId));
 
@@ -49,7 +49,7 @@ public class AutonomousHandlingHub(
         return SessionResponseModel.ToModel(result.Value);
     }
     
-    public async Task<SessionResponseModel> SendCreateSession()
+    public async Task<SessionResponseModel> CreateSession()
     {
         var createResult = await mediator.Send(new CreateSessionCommand(
             HandlingMode.Autonomous, Lifespan.Extended));
@@ -63,7 +63,7 @@ public class AutonomousHandlingHub(
         return SessionResponseModel.ToModel(resultEntity.Value);
     }
     
-    public async Task SendDeleteSession(int sessionId)
+    public async Task DeleteSession(int sessionId)
     {
         var result = await mediator.Send(new DeleteSessionCommand(sessionId));
 
@@ -72,27 +72,21 @@ public class AutonomousHandlingHub(
     
     // Session Actions ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task SendStartSession(int sessionId)
+    public async Task StartSession(int sessionId)
     {
-        var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId));
-        
-        if (result.IsSuccess)
-        {
-            await Task.Delay(20000);
-            await mediator.Publish(new AgvModeAutomaticTopic());
-        }
+        var result = await mediator.Send(new StartSessionCommand(sessionId, Context.ConnectionId, HandlingMode.Autonomous));
         
         ResultChecker<bool>.Check(result);
     }
 
-    public async Task SendEndSession(int sessionId)
+    public async Task EndSession(int sessionId)
     {
         var result = await mediator.Send(new EndSessionCommand(sessionId, Context.ConnectionId));
         
         ResultChecker<bool>.Check(result);
     }
     
-    public async Task SendLeaveSession(int sessionId)
+    public async Task LeaveSession(int sessionId)
     {
         var result = await mediator.Send(new LeaveSessionCommand(Context.ConnectionId));
         

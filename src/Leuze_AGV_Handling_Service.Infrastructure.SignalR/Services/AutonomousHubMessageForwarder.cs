@@ -14,16 +14,16 @@ public class AutonomousHubMessageForwarder(
     )
     : IAutonomousSubscriber, IAutonomousClientNotifier
 {
-    public async Task ReceiveSessionUnexpectedEnd(string errorMessage)
+    public async Task SessionUnexpectedEnd(string errorMessage)
     {
-        await hubContext.Clients.All.ReceiveSessionUnexpectedEnd(errorMessage);
+        await hubContext.Clients.All.SessionUnexpectedEnd(errorMessage);
     }
     
     // ROS stuff ////////////////////////////////////////////////////////////////////////////////
 
-    public async Task SubscribeMapTopic(MapDto map)
+    public async Task SubscribeMap(MapDto map)
     {
-        await hubContext.Clients.All.SubscribeMapTopic(map);
+        await hubContext.Clients.All.SubscribeMap(map);
     }
 
 }

@@ -2,7 +2,7 @@ using Leuze_AGV_Handling_Service.UseCases.Messaging.DTOs;
 
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Interfaces;
 
-public interface IManualSubscriber
+public interface ISubscriber
 {
-    public Task SubscribeMapTopic(MapDto map);
+    public Task SubscribeMap(MapDto map);
 }

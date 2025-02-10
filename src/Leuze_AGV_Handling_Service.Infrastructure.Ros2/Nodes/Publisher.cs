@@ -7,13 +7,13 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 /// <summary>
 /// Ros2 publisher of manual messages.
 /// </summary>
-public class ManualPublisher : IManualPublisher
+public class Publisher : IPublisher
 {
-    private readonly ILogger<ManualPublisher> _logger;
+    private readonly ILogger<Publisher> _logger;
 
     private readonly IRclPublisher<Ros2CommonMessages.Std.String> _agvModePublisher;
-    private readonly IRclPublisher<Ros2CommonMessages.Geometry.Twist> _joyPublisher;
-    public ManualPublisher(IServiceProvider serviceProvider, ILogger<ManualPublisher> logger)
+    private readonly IRclPublisher<Ros2CommonMessages.Geometry.Twist> _cmdVelPublisher;
+    public Publisher(IServiceProvider serviceProvider, ILogger<Publisher> logger)
     {
         _logger = logger;
         _logger.LogInformation($"Handling Ros2 handling_service_manual_pub node started.");
@@ -22,20 +22,20 @@ public class ManualPublisher : IManualPublisher
         var node = context.CreateNode("handling_service_manual_pub");
         
         _agvModePublisher = node.CreatePublisher<Ros2CommonMessages.Std.String>("/AgvMode");
-        _joyPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/cmd_vel");
+        _cmdVelPublisher = node.CreatePublisher<Ros2CommonMessages.Geometry.Twist>("/cmd_vel");
     }
     
-    public async Task PublishAgvModeManualTopic()
+    public async Task PublishAgvMode(string mode)
     {
         var msg = new Ros2CommonMessages.Std.String
         {
-            Data = "manual",
+            Data = mode
         };
         
         await _agvModePublisher.PublishAsync(msg);
     }
     
-    public async Task PublishJoyTopic(float x, float y, float w)
+    public async Task PublishCmdVel(float x, float y, float w)
     {
         var msg = new Ros2CommonMessages.Geometry.Twist
         {
@@ -44,6 +44,6 @@ public class ManualPublisher : IManualPublisher
             Angular = new Ros2CommonMessages.Geometry.Vector3(0, 0, -w/1000)
         };
         
-        await _joyPublisher.PublishAsync(msg);
+        await _cmdVelPublisher.PublishAsync(msg);
     }
 }

@@ -4,7 +4,7 @@ namespace Leuze_AGV_Handling_Service.Infrastructure.SignalR.Hubs;
 
 public interface IManualHandlingHub
 {
-    Task ReceiveSessionUnexpectedEnd(string errorMessage);
+    Task SessionUnexpectedEnd(string errorMessage);
     
-    public Task SubscribeMapTopic(MapDto map);
+    public Task SubscribeMap(MapDto map);
 }

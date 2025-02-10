@@ -16,10 +16,8 @@ public static class InfrastructureRos2ServiceExtension
     )
   {  
     
-    services.AddHostedService<AutonomousSubscriber>();
-    services.AddHostedService<ManualSubscriber>();
-    services.AddSingleton<IAutonomousPublisher, AutonomousPublisher>();
-    services.AddSingleton<IManualPublisher, ManualPublisher>();
+    services.AddHostedService<Subscriber>();
+    services.AddSingleton<IPublisher, Publisher>();
 
     return services;
   }

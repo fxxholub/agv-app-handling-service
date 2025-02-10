@@ -10,23 +10,23 @@ using Rcl;
 namespace Leuze_AGV_Handling_Service.Infrastructure.Ros2.Nodes;
 
 /// <summary>
-/// Ros2 subscriber of autonomous messages.
+/// Ros2 subscriber of manual messages.
 /// </summary>
-public class AutonomousSubscriber : BackgroundService, IAutonomousSubscriber
+public class Subscriber : BackgroundService, ISubscriber
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<AutonomousSubscriber> _logger;
+    private readonly ILogger<Subscriber> _logger;
     
     private readonly IRclSubscription<Ros2CommonMessages.Nav.OccupancyGrid> _mapSubscriber;
-    public AutonomousSubscriber(IServiceProvider serviceProvider, ILogger<AutonomousSubscriber> logger)
+    public Subscriber(IServiceProvider serviceProvider, ILogger<Subscriber> logger)
     {
         _serviceProvider = serviceProvider;
             
         _logger = logger;
-        _logger.LogInformation($"Handling Ros2 handling_service_autonomous_sub node started.");
+        _logger.LogInformation($"Handling Ros2 handling_service_manual_sub node started.");
         
         var context = new RclContext();
-        var node = context.CreateNode("handling_service_autonomous_sub");
+        var node = context.CreateNode("handling_service_manual_sub");
         
         _mapSubscriber = node.CreateSubscription<Ros2CommonMessages.Nav.OccupancyGrid>("/map");
     }
@@ -35,15 +35,15 @@ public class AutonomousSubscriber : BackgroundService, IAutonomousSubscriber
     {
         await foreach (var msg in _mapSubscriber.ReadAllAsync(cancellationToken))
         {
-            await SubscribeMapTopic(OccupancyGrid2MapDto(msg));
+            await SubscribeMap(OccupancyGrid2MapDto(msg));
         }
     }
 
-    public async Task SubscribeMapTopic(MapDto map)
+    public async Task SubscribeMap(MapDto map)
     {
         using var scope = _serviceProvider.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Publish(new MapTopic(map));
+        await mediator.Publish(new Map(map));
     }
 
     private MapDto OccupancyGrid2MapDto(Ros2CommonMessages.Nav.OccupancyGrid occupancyGrid)

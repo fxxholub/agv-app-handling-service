@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Leuze_AGV_Handling_Service.Core.Session.Interfaces;
+using Leuze_AGV_Handling_Service.Core.Session.SessionAggregate;
 using Leuze_AGV_Handling_Service.UseCases.Messaging.Topics;
 using Leuze_AGV_Handling_Service.UseCases.Session.CQRS.CRUD.Get;
 using MediatR;
@@ -30,7 +31,15 @@ public class StartSessionHandler(ISessionExecutorService sessionExecutor, ILogge
       
       if (startResult.IsSuccess)
       {
-        var agvMode = request.HandlingMode.ToString().ToLower();
+        var agvMode = "";
+        if (request.HandlingMode == HandlingMode.Autonomous)
+        {
+          agvMode = "automatic";
+        }
+        else if (request.HandlingMode == HandlingMode.Manual)
+        {
+          agvMode = "manual";
+        }
         await mediator.Publish(new AgvMode(agvMode), cancellationToken);
       }
 

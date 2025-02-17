@@ -1,4 +1,4 @@
-# Leuze AGV Handling Service
+# Handling Service
 
 Handling service is a ROS2 programs __management__ and __messaging__ application.
 

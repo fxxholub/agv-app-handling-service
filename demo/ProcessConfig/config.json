@@ -6,7 +6,7 @@
       "driver": {
         "type": "docker",
         "address": "unix:///var/run/docker.sock",
-        "containerId": "d2b483d0a85c"
+        "containerId": "common_map_talker"
       }
     }
   ],
@@ -17,7 +17,7 @@
       "driver": {
         "type": "docker",
         "address": "unix:///var/run/docker.sock",
-        "containerId": "77bdcdb35041"
+        "containerId": "manual_joystick_listener"
       }
     }
   ]

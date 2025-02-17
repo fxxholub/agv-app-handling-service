@@ -2,6 +2,7 @@
 
 services:
   app:
+    container_name: handling_service
     image: handling_service
     platform: linux/arm64 # Dockerfile base images based on: linux/amd64, linux/arm64, linux/arm64/v8
     environment:
@@ -18,11 +19,13 @@ services:
       - ./demo/ProcessConfig:/app/ProcessConfig # Demo processes
       - /var/run/docker.sock:/var/run/docker.sock # Needed to run processes with docker driver
   demo_ros_map_talker:
+    container_name: common_map_talker
     image: common_map_talker
     build:
       context: ./demo/common_map_talker
       dockerfile: Dockerfile
   demo_ros_joy_listener:
+    container_name: manual_joystick_listener
     image: manual_joystick_listener
     build:
       context: ./demo/manual_joystick_listener

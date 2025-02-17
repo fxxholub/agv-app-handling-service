@@ -29,24 +29,29 @@ Run the app and manage dockerized ROS2 dummy packages. Then exchange joystick an
 
 The [`docker-compose.yml`](./docker-compose.yml) is already prepared to run the demo [configuration](#process-configuration) of the app.
 
-1) `docker compose up --build --no-start`
-2) `docker ps -a`
-3) paste the __CONTAINER ID__ of __manual_joystick_listener__ and __common_map_talker__ to [`./demo/ProcessConfig/config.json`](./demo/ProcessConfig/config.json)
-4) `docker compose up app`
+a) if you use Docker container name in `config.json` (default)
+  1) `docker compose up --build --no-start`
+  2) `docker compose up app`
+
+b) if you use Docker container ID
+  1) `docker compose up --build --no-start`
+  2) `docker ps -a`
+  3) paste the __CONTAINER ID__ of __manual_joystick_listener__ and __common_map_talker__ to [`./demo/ProcessConfig/config.json`](./demo/ProcessConfig/config.json)
+  4) `docker compose up app`
 
 ## How to use
 
-1) create Postman websocket request to `ws://localhost:8080/api/v1/signalr/manual`
+1) create Postman websocket request to `ws://localhost:8080/api/v1/handling/signalr/manual`
 2) hit `Connect`
 3) send SignalR connection message (including the whitespace after `}`):
     ```json
     {"protocol": "json", "version": 1 }
     ```
-4) send `SendSessionCreate` and `SendStartSession`:
+4) send `SessionCreate` and `StartSession`:
     ```json
     {
         "type": 1,
-        "target": "SendCreateSession",
+        "target": "CreateSession",
         "arguments": [],
         "invocationId": "123"
     }
@@ -54,7 +59,7 @@ The [`docker-compose.yml`](./docker-compose.yml) is already prepared to run the 
     ```json
     {
         "type": 1,
-        "target": "SendStartSession",
+        "target": "StartSession",
         "arguments": [1],
         "invocationId": "1234"
     }
@@ -63,28 +68,28 @@ The [`docker-compose.yml`](./docker-compose.yml) is already prepared to run the 
 7) inspect __common_map_talker__. Postman should be receiving `SubscribeMapTopic` message.
 6) inspect __manual_joystick_listener__. Do:
     - `docker logs -f leuze_agv_handling_service-demo_ros_joy_listener-1`
-    -  send `PublishJoyTopic` message with Postman.
+    -  send `PublishCmdVel` message with Postman.
         ```json
         {
             "type": 1,
-            "target": "PublishJoyTopic",
+            "target": "PublishCmdVel",
             "arguments": [123.123, 321.321, 231.231]
         }
         ```
     - watch the log in the terminal. It should print something like:
         `[joystick_sub]: Received Twist: linear=geometry_msgs.msg.Vector3(x=-1.2312300205230713, y=-3.213210105895996, z=0.0), angular=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=-2.312309980392456)`
-8) send `SendEndSession` message:
+8) send `EndSession` message:
     ```json
     {
         "type": 1,
-        "target": "SendEndSession",
+        "target": "EndSession",
         "arguments": [1],
         "invocationId": "12345"
     }
     ```
 9) docker services __manual_joystick_listener__ and __common_map_talker__ should be down. Check with `docker ps`.
-10) send `SendStartSession` again.
-11) kill any ROS2 service and see the other come down too. `docker kill <container_id>`. You should be receivng `ReceiveSessionUnexpectedEnd` message in Postman. Check if the services are down with `docker ps`.
+10) send `StartSession` again.
+11) kill any ROS2 service and see the other come down too. `docker kill <container_id>`. You should be receivng `SessionUnexpectedEnd` message in Postman. Check if the services are down with `docker ps`.
 
 # Process configuration
 
@@ -131,7 +136,7 @@ JSON for the win!
       "driver": {
         "type": "docker",
         "address": "unix:///var/run/docker.sock",
-        "containerId": "ab50ae8e47ac"
+        "containerId": "ab50ae8e47ac" // or container name (which is more persistent)
       }
     },
     {

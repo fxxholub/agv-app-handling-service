@@ -52,20 +52,21 @@ public class DockerProcessMonitorService(ILogger<DockerProcessMonitorService> lo
 
         try
         {
-            DockerClient client = new DockerClientConfiguration(
-                    new Uri(process.HostAddr!))
-                .CreateClient();
+            DockerClient client = new DockerClientConfiguration(new Uri(process.HostAddr!)).CreateClient();
 
-            var containerList = await client.Containers.ListContainersAsync(
-                new ContainersListParameters
-                {
-                    Filters = new Dictionary<string, IDictionary<string, bool>>
-                    {
-                        { "id", new Dictionary<string, bool> { { process.DockerContainerId ?? string.Empty, true } } }
-                    }
-                });
+            // First, try using the container ID.
+            if (process.DockerContainerId != null && await IsContainerRunning(client, process.DockerContainerId, "id"))
+            {
+                return true;
+            }
 
-            return containerList.Any(c => c.State == "running");
+            // If no container found by ID, try using the container name.
+            if (process.DockerContainerId != null && await IsContainerRunning(client, process.DockerContainerId, "name"))
+            {
+                return true;
+            }
+
+            return false;
         }
         catch
         {
@@ -116,5 +117,19 @@ public class DockerProcessMonitorService(ILogger<DockerProcessMonitorService> lo
         {
             throw new ArgumentException("Docker process requires a valid 'DockerContainerId'.");
         }
+    }
+    
+    /// <summary>
+    /// Checks if a container is running by filtering with the specified key ("id" or "name").
+    /// </summary>
+    private async Task<bool> IsContainerRunning(DockerClient client, string identifier, string filterKey)
+    {
+        var filters = new Dictionary<string, IDictionary<string, bool>>
+        {
+            { filterKey, new Dictionary<string, bool> { { identifier, true } } }
+        };
+
+        var containerList = await client.Containers.ListContainersAsync(new ContainersListParameters { Filters = filters });
+        return containerList.Any(c => c.State == "running");
     }
 }

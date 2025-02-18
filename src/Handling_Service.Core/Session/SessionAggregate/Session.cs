@@ -38,7 +38,7 @@ public class Session(
     if (process.State is not ProcessState.None)
     {
       throw new SessionInvalidOperationException(
-        $"Invalid Session operation, cannot Add state which is in other state than {ProcessState.None.ToString()}.");
+        $"Invalid Session operation, cannot Add process which is in other state than {ProcessState.None.ToString()}.");
     }
     
     process.SessionId = Id;
@@ -49,7 +49,6 @@ public class Session(
   /// Starts a session`s underlying processes, checks if they started - updates states based on that.
   /// </summary>
   /// <param name="processMonitorFactory"></param>
-  /// <param name="initCheckDelay"></param>
   /// <exception cref="SessionInvalidOperationException"></exception>
   public async Task StartAsync(IProcessMonitorServiceFactory processMonitorFactory)
   {

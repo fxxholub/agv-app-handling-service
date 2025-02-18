@@ -9,7 +9,7 @@ namespace Handling_Service.Infrastructure.ProcessServices;
 
 public class ProcessProviderService : IProcessProviderService
 {
-    private readonly Dictionary<HandlingMode, List<Process>> _loadedProcesses = new();
+    private readonly Dictionary<HandlingMode, List<ProcessC>> _loadedProcesses = new();
 
     private readonly string? _processScriptsPath; 
 
@@ -18,7 +18,7 @@ public class ProcessProviderService : IProcessProviderService
         // Prepopulate _loadedProcesses with all keys from HandlingMode enum
         foreach (var mode in Enum.GetValues<HandlingMode>())
         {
-            _loadedProcesses[mode] = new List<Process>();
+            _loadedProcesses[mode] = new List<ProcessC>();
         }
 
         // Retrieve config file path from appsettings configuration
@@ -58,7 +58,7 @@ public class ProcessProviderService : IProcessProviderService
     {
         if (_loadedProcesses.TryGetValue(handlingMode, out var processList))
         {
-            return processList;
+            return processList.Select(CreateProcess).ToList();
         }
 
         return [];
@@ -66,17 +66,15 @@ public class ProcessProviderService : IProcessProviderService
 
     private void AddProcessToAllModes(ProcessC confProcess)
     {
-        var process = CreateProcess(confProcess);
         foreach (var mode in _loadedProcesses.Keys)
         {
-            _loadedProcesses[mode].Add(process);
+            _loadedProcesses[mode].Add(confProcess);
         }
     }
 
     private void AddProcessToMode(ProcessC confProcess, HandlingMode mode)
     {
-        var process = CreateProcess(confProcess);
-        _loadedProcesses[mode].Add(process);
+        _loadedProcesses[mode].Add(confProcess);
     }
 
     private Process CreateProcess(ProcessC confProcess)

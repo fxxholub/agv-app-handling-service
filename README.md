@@ -41,27 +41,23 @@ b) if you use Docker container ID
 
 ## How to use
 
-1) create Postman websocket request to `ws://localhost:8080/api/v1/handling/signalr/manual`
+1) create Postman websocket request to `ws://localhost:8080/api/v1/handling/signalr`
 2) hit `Connect`
 3) send SignalR connection message (including the whitespace after `}`):
     ```json
     {"protocol": "json", "version": 1 }
     ```
-4) send `SessionCreate` and `StartSession`:
+4) send `StartSession`:
     ```json
     {
-        "type": 1,
-        "target": "CreateSession",
-        "arguments": [],
-        "invocationId": "123"
-    }
-    ```
-    ```json
-    {
-        "type": 1,
-        "target": "StartSession",
-        "arguments": [1],
-        "invocationId": "1234"
+      "type": 1,
+      "target": "StartSession",
+      "arguments": [
+        {
+          "handlingMode": "Manual"
+        }
+      ],
+      "invocationId": "1234"
     }
     ```
 5) docker services __manual_joystick_listener__ and __common_map_talker__ should be started. Check with `docker ps`.
@@ -71,9 +67,9 @@ b) if you use Docker container ID
     -  send `PublishCmdVel` message with Postman.
         ```json
         {
-            "type": 1,
-            "target": "PublishCmdVel",
-            "arguments": [123.123, 321.321, 231.231]
+          "type": 1,
+          "target": "PublishCmdVel",
+          "arguments": [123.123, 321.321, 231.231]
         }
         ```
     - watch the log in the terminal. It should print something like:
@@ -81,10 +77,10 @@ b) if you use Docker container ID
 8) send `EndSession` message:
     ```json
     {
-        "type": 1,
-        "target": "EndSession",
-        "arguments": [1],
-        "invocationId": "12345"
+      "type": 1,
+      "target": "EndSession",
+      "arguments": [],
+      "invocationId": "12345"
     }
     ```
 9) docker services __manual_joystick_listener__ and __common_map_talker__ should be down. Check with `docker ps`.

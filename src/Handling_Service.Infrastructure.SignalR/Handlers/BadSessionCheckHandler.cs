@@ -8,8 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Handling_Service.Infrastructure.SignalR.Handlers;
 
 public class BadSessionCheckHandler(
-    IAutonomousClientNotifier autonomousNotifier,
-    IManualClientNotifier manualNotifier,
+    IClientNotifier notifier,
     ILogger<BadSessionCheckHandler> logger,
     IMediator mediator
     ) : INotificationHandler<BadSessionCheckEvent>
@@ -24,15 +23,7 @@ public class BadSessionCheckHandler(
             return;
         }
 
-        if (session.Value.HandlingMode == HandlingMode.Autonomous)
-        {
-            await autonomousNotifier.SessionUnexpectedEnd(
-                "Autonomous Session Check resulted in false, Session ended.");
-        }
-        if (session.Value.HandlingMode == HandlingMode.Manual)
-        {
-            await manualNotifier.SessionUnexpectedEnd(
-                "Manual Session Check resulted in false, Session ended.");
-        }
+        await notifier.SessionUnexpectedEnd(
+            "Session Check resulted in false, Session ended.");
     }
 }

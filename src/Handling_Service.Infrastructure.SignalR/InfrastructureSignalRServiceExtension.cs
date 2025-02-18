@@ -15,10 +15,8 @@ public static class InfrastructureSignalRServiceExtension
     ConfigurationManager config
     )
   {
-    services.AddScoped<IAutonomousSubscriber, AutonomousHubMessageForwarder>();
-    services.AddScoped<IManualSubscriber, ManualHubMessageForwarder>();
-    services.AddScoped<IAutonomousClientNotifier, AutonomousHubMessageForwarder>();
-    services.AddScoped<IManualClientNotifier, ManualHubMessageForwarder>();
+    services.AddScoped<ISubscriber, HubMessageForwarder>();
+    services.AddScoped<IClientNotifier, HubMessageForwarder>();
     
     return services;
   }

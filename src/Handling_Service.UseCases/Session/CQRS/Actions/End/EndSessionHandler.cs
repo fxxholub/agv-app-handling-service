@@ -11,25 +11,20 @@ namespace Handling_Service.UseCases.Session.CQRS.Actions.End;
 /// Ends Session. Effectively kills its processes and marks it as Ended.
 /// </summary>
 /// <param name="sessionExecutor"></param>
-public class EndSessionHandler(ISessionExecutorService sessionExecutor, ILogger<EndSessionHandler> logger, IMediator mediator)
+public class EndSessionHandler(ISessionExecutorService sessionExecutor, ILogger<EndSessionHandler> logger)
   : ICommandHandler<EndSessionCommand, Result>
 {
   public async Task<Result> Handle(EndSessionCommand request, CancellationToken cancellationToken)
   {
     try
     {
-      var endResult = await sessionExecutor.EndSessionOfConnection(request.SessionId, request.ConnectionId);
-      
-      if (endResult.IsSuccess)
-      {
-        await mediator.Publish(new AgvMode(""), cancellationToken);
-      }
+      var endResult = await sessionExecutor.EndSessionOfConnection(request.ConnectionId);
 
       return endResult;
     }
     catch (Exception ex)
     {
-      logger.LogDebug(ex, $"Connection {request.ConnectionId} Session {request.SessionId} end error.");
+      logger.LogDebug(ex, $"Connection {request.ConnectionId} Session end error.");
       return Result.Error(new ErrorList(["Unhandled exception.", ex.Message]));
     }
   }

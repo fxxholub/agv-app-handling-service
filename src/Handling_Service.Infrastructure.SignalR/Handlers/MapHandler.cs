@@ -4,11 +4,10 @@ using MediatR;
 
 namespace Handling_Service.Infrastructure.SignalR.Handlers;
 
-public class MapHandler(IManualSubscriber manualSubscriber, IAutonomousSubscriber autonomousSubscriber) : INotificationHandler<Map>
+public class MapHandler(ISubscriber subscriber) : INotificationHandler<Map>
 {
     public async Task Handle(Map message, CancellationToken cancellationToken)
     {
-        await manualSubscriber.SubscribeMap(message.map);
-        await autonomousSubscriber.SubscribeMap(message.map);
+        await subscriber.SubscribeMap(message.map);
     }
 }

@@ -30,66 +30,50 @@ public class SessionExecutorService(
     /// Authorization based on connectionId:
     /// Only executes if no connection has reservation or when the input connectionId has reservation.
     /// </summary>
-    /// <param name="sessionId"></param>
     /// <param name="connectionId"></param>
+    /// <param name="handlingMode"></param>
     /// <returns>
     /// - Task Result.Success()
     /// - Task Result.Unauthorized()
     /// - Task Result.Conflict()
     /// - Task Result.Error()
     /// </returns>
-    public async Task<Result> StartSessionAndReserveConnection(int sessionId, string connectionId)
+    public async Task<Result> StartSessionAndReserveConnection(string connectionId, HandlingMode handlingMode)
     {
-        // authorization
-        // start only if no connection active or connection my
-        if (!(!IsCurrentConnectionActive() || IsCurrentConnection(connectionId).Result.Value))
+        // authorization (allow if no connection set or connection mine)
+        if (_currentConnectionId is not null && _currentConnectionId != connectionId)
             return Result.Unauthorized();
         
         // create scope for a call of this singleton method
         using var scope = serviceProvider.CreateScope();
+
+        // if some session exists, restart it with new settings
+        if (_currentSessionId is not null)
+        {
+            // terminate old session (as it is authorized to be mine, or legacy extended session)
+            var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
+            var ended = await endSessionService.EndSession(_currentSessionId.Value);
+            if (!ended.IsSuccess) return Result.Error(new ErrorList(["Error ending old session on session start."]));
+            
+            _currentSessionId = null;
+        }
         
-        // retrieve repository
-        var repository = scope.ServiceProvider.GetRequiredService<IRepository<SessionAggregate.Session>>();
+        // retrieve create session service
+        var createSessionService = scope.ServiceProvider.GetRequiredService<ICreateSessionService>();
         
-        // retrieve session entity
-        var session = await repository.FirstOrDefaultAsync(new SessionByIdSpec(sessionId));
-        if (session is null) return Result.Error(new ErrorList(["Error retrieving session entity while starting new session."]));
+        // create a session before starting some
+        var createdResult = await createSessionService.CreateSession(handlingMode, HandlingModeLifespanMap(handlingMode));
+        if (!createdResult.IsSuccess)
+            return Result.Error(new ErrorList(["Error creating new session before session start."]));
+        var sessionId = createdResult.Value;
         
         // retrieve starting service
         var startService = scope.ServiceProvider.GetRequiredService<IStartSessionService>();
-
-        // lifespan rules
-        switch (session.Lifespan)
-        {
-            case Lifespan.Exclusive:
-                if (IsCurrentSessionActive() && !IsCurrentSession(sessionId).Result.Value) return Result.Conflict();
-                
-                // session can now be started
-                
-                break;
-            case Lifespan.Extended:
-                // if extended session no more active, session can now be started
-                if (_currentSessionId is null) break;
-                
-                // end the old session first
-                var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
-                var ended = await endSessionService.EndSession(_currentSessionId.Value);
-                if (!ended.IsSuccess) return Result.Error(new ErrorList(["Error ending old session on session start."]));
-                
-                // cleanup after the old session
-                _currentSessionId = null;
-                _currentConnectionId = null;
-                
-                // session can now be started
-                break;
-            default:
-                throw new Exception($"Lifespan '{session.Lifespan}' unknown");
-        }
         
         // start the session
         var startResult = await startService.StartSession(sessionId);
-
-        if (!startResult.IsSuccess) return Result.Error(new ErrorList(startResult.Errors));
+        if (!startResult.IsSuccess)
+            return Result.Error(new ErrorList(startResult.Errors));
         
         // set the current session and connection
         _currentSessionId = sessionId;
@@ -102,28 +86,30 @@ public class SessionExecutorService(
     /// End session operation. Just Ends the active session, releasing it at the end. Connection ownership remains.
     ///
     /// Session's lifespan has no effect here.
-    ///
-    /// Authorization by both sessionId and connectionId.
     /// </summary>
-    /// <param name="sessionId"></param>
     /// <param name="connectionId"></param>
     /// <returns>
     /// - Task Result.Success()
     /// - Task Result.Unauthorized()
+    /// - Task Result.Conflict()
     /// - Task Result.Error()
     /// </returns>
-    public async Task<Result> EndSessionOfConnection(int sessionId, string connectionId)
+    public async Task<Result> EndSessionOfConnection(string connectionId)
     {
         // authorize
-        if (!IsCurrentConnection(connectionId).Result.Value || !IsCurrentSession(sessionId).Result.Value)
+        if (_currentConnectionId != connectionId)
             return Result.Unauthorized();
-        
+
+        // conflict if no session started
+        if (_currentSessionId is null)
+            return Result.Conflict();
+
         // retrieve the ending service
         using var scope = serviceProvider.CreateScope();
         var endSessionService = scope.ServiceProvider.GetRequiredService<IEndSessionService>();
 
         // end the session
-        var ended = await endSessionService.EndSession(sessionId);
+        var ended = await endSessionService.EndSession(_currentSessionId.Value);
         if (!ended.IsSuccess) return Result.Error(new ErrorList(ended.Errors));
 
         // release session
@@ -138,8 +124,6 @@ public class SessionExecutorService(
     /// Based on Session's Lifespan, the execution will:
     /// - Exlusive: End the Session first, then release connection and session. 
     /// - Extended: Release connection, the session will remain active.
-    /// 
-    /// Authorization by connectionId.
     /// </summary>
     /// <param name="connectionId"></param>
     /// <returns>
@@ -150,14 +134,15 @@ public class SessionExecutorService(
     public async Task<Result> LeaveSessionAndConnection(string connectionId)
     {
         // authorize
-        if (!IsCurrentConnection(connectionId).Result.Value) return Result.Unauthorized();
+        if (_currentConnectionId != connectionId)
+            return Result.Unauthorized();
         
         // if no session active, just release the connection
         if (_currentSessionId is null)
         {
             _currentConnectionId = null;
             return Result.Success();
-        } 
+        }
         
         // create scope for a call of this singleton method
         using var scope = serviceProvider.CreateScope();
@@ -167,13 +152,13 @@ public class SessionExecutorService(
         
         // retrieve the session entity
         var session = await repository.FirstOrDefaultAsync(new SessionByIdSpec(_currentSessionId.Value));
-        if (session is null) return Result.Error(new ErrorList(["Error retrieving session entity while leaving ownership."]));
+        if (session is null) return Result.Error(new ErrorList(["Error retrieving session entity while leaving session."]));
         
         // lifespan rules
         switch (session.Lifespan)
         {
             case Lifespan.Exclusive:
-                var ended = await EndSessionOfConnection(_currentSessionId.Value, connectionId);
+                var ended = await EndSessionOfConnection(connectionId);
                 if (!ended.IsSuccess) return Result.Error(new ErrorList(ended.Errors));
                 
                 // release connection
@@ -220,14 +205,19 @@ public class SessionExecutorService(
         var result = Result.Success(_currentSessionId == sessionId);
         return Task.FromResult(result);
     }
-    
-    private bool IsCurrentConnectionActive()
+
+    private Lifespan HandlingModeLifespanMap(HandlingMode handlingMode)
     {
-        return _currentConnectionId is not null;
-    }
-    
-    private bool IsCurrentSessionActive()
-    {
-        return _currentSessionId is not null;
+        switch (handlingMode)
+        {
+            case HandlingMode.Manual:
+                return Lifespan.Exclusive;
+            case HandlingMode.Autonomous:
+                return Lifespan.Extended;
+            case HandlingMode.Automatic:
+                return Lifespan.Extended;
+            default:
+                return Lifespan.Exclusive;
+        }
     }
 }

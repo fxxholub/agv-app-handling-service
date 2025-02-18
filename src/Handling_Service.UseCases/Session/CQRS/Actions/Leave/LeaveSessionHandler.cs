@@ -11,7 +11,7 @@ namespace Handling_Service.UseCases.Session.CQRS.Actions.Leave;
 /// Leaves Session. Releases connection ownership. To be used in OnDisconnected methods or for manual releasing.
 /// </summary>
 /// <param name="sessionExecutor"></param>
-public class LeaveSessionHandler(ISessionExecutorService sessionExecutor, ILogger<LeaveSessionHandler> logger, IMediator mediator)
+public class LeaveSessionHandler(ISessionExecutorService sessionExecutor, ILogger<LeaveSessionHandler> logger)
   : ICommandHandler<LeaveSessionCommand, Result>
 {
   public async Task<Result> Handle(LeaveSessionCommand request, CancellationToken cancellationToken)
@@ -19,11 +19,6 @@ public class LeaveSessionHandler(ISessionExecutorService sessionExecutor, ILogge
     try
     {
       var leaveResult = await sessionExecutor.LeaveSessionAndConnection(request.ConnectionId);
-      
-      if (leaveResult.IsSuccess)
-      {
-        await mediator.Publish(new AgvMode(""), cancellationToken);
-      }
 
       return leaveResult;
     }

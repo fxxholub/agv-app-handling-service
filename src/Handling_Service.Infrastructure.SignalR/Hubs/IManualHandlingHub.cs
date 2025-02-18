@@ -2,7 +2,7 @@ using Handling_Service.UseCases.Messaging.DTOs;
 
 namespace Handling_Service.Infrastructure.SignalR.Hubs;
 
-public interface IManualHandlingHub
+public interface IHandlingHub
 {
     Task SessionUnexpectedEnd(string errorMessage);
     

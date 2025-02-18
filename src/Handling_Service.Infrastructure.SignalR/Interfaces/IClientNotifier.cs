@@ -1,6 +1,6 @@
 namespace Handling_Service.Infrastructure.SignalR.Interfaces;
 
-public interface IAutonomousClientNotifier
+public interface IClientNotifier
 {
     public Task SessionUnexpectedEnd(string errorMessage);
 }

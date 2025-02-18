@@ -138,9 +138,8 @@ public static class Program
     private static void ConfigureApp(WebApplication app)
     {
         app.UseCors("CorsPolicy");
-        
-        app.MapHub<AutonomousHandlingHub>($"/api/v1/handling/signalr/autonomous");
-        app.MapHub<ManualHandlingHub>($"/api/v1/handling/signalr/manual");
+
+        app.MapHub<HandlingHub>($"/api/v1/handling/signalr/manual");
         
         app.UseAuthorization();
         app.MapControllers();

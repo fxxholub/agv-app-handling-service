@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Ardalis.SharedKernel;
 using Asp.Versioning;
 using Handling_Service.Infrastructure;
@@ -57,7 +58,11 @@ public static class Program
         ConfigureMediatR();                                       // MediatR
 
         _builder.Services.AddControllers();                       // REST controllers
-        _builder.Services.AddSignalR();                           // SignalR hubs
+        _builder.Services.AddSignalR().AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.PayloadSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
         _builder.Services.AddEndpointsApiExplorer();              // Swagger
         _builder.Services.AddSwaggerGen(options =>                // Swagger SignalR
@@ -139,7 +144,7 @@ public static class Program
     {
         app.UseCors("CorsPolicy");
 
-        app.MapHub<HandlingHub>($"/api/v1/handling/signalr/manual");
+        app.MapHub<HandlingHub>($"/api/v1/handling/signalr");
         
         app.UseAuthorization();
         app.MapControllers();

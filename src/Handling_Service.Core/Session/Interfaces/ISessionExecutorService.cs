@@ -13,4 +13,6 @@ public interface ISessionExecutorService
     public Task<Result> LeaveSessionAndConnection(string connectionId);
 
     public Task<Result<bool>> IsCurrentConnection(string connectionId);
+    
+    public HandlingMode? CurrentHandlingMode();
 }

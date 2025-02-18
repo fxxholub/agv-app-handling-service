@@ -41,24 +41,24 @@ public class SessionController(IMediator mediator) : ControllerBase
         return Ok(response);
     }
     
-    [HttpPost]
-    public async Task<IActionResult> SessionsPost([FromBody] SessionRequestModel request)
-    {
-        var resultCommand = SessionFromRequest(request);
-        
-        if (!resultCommand.IsSuccess) return StatusCode(500, ResultChecker<CreateSessionCommand>.ErrorMessageJson(resultCommand));
-        
-        var result = await mediator.Send(resultCommand.Value);
-
-        if (!result.IsSuccess) return StatusCode(500, ResultChecker<int>.ErrorMessageJson(result));
-        
-        var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
-
-        if (!resultEntity.IsSuccess) return StatusCode(500, ResultChecker<SessionDto>.ErrorMessageJson(resultEntity));
-        
-        var response = SessionToResponse(resultEntity.Value);
-        return Ok(response);
-    }
+    // [HttpPost]
+    // public async Task<IActionResult> SessionsPost([FromBody] SessionRequestModel request)
+    // {
+    //     var resultCommand = SessionFromRequest(request);
+    //     
+    //     if (!resultCommand.IsSuccess) return StatusCode(500, ResultChecker<CreateSessionCommand>.ErrorMessageJson(resultCommand));
+    //     
+    //     var result = await mediator.Send(resultCommand.Value);
+    //
+    //     if (!result.IsSuccess) return StatusCode(500, ResultChecker<int>.ErrorMessageJson(result));
+    //     
+    //     var resultEntity = await mediator.Send(new GetSessionQuery(result.Value));
+    //
+    //     if (!resultEntity.IsSuccess) return StatusCode(500, ResultChecker<SessionDto>.ErrorMessageJson(resultEntity));
+    //     
+    //     var response = SessionToResponse(resultEntity.Value);
+    //     return Ok(response);
+    // }
     
     [HttpDelete("{sessionId:int}")]
     public async Task<IActionResult> SessionsDelete(int sessionId)

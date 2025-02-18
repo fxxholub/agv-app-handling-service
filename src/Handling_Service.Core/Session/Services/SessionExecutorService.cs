@@ -18,6 +18,7 @@ public class SessionExecutorService(
     ) : ISessionExecutorService
 {
     private int? _currentSessionId;
+    private HandlingMode? _currentHandlingMode;
     private string? _currentConnectionId;
 
     /// <summary>
@@ -56,6 +57,7 @@ public class SessionExecutorService(
             if (!ended.IsSuccess) return Result.Error(new ErrorList(["Error ending old session on session start."]));
             
             _currentSessionId = null;
+            _currentHandlingMode = null;
         }
         
         // retrieve create session service
@@ -77,6 +79,7 @@ public class SessionExecutorService(
         
         // set the current session and connection
         _currentSessionId = sessionId;
+        _currentHandlingMode = handlingMode;
         _currentConnectionId = connectionId;
 
         return Result.Success();
@@ -114,6 +117,7 @@ public class SessionExecutorService(
 
         // release session
         _currentSessionId = null;
+        _currentHandlingMode = null;
 
         return Result.Success();
     }
@@ -165,6 +169,7 @@ public class SessionExecutorService(
                 _currentConnectionId = null;
                 // release session
                 _currentSessionId = null;
+                _currentHandlingMode = null;
                 
                 break;
             case Lifespan.Extended:
@@ -204,6 +209,17 @@ public class SessionExecutorService(
     {
         var result = Result.Success(_currentSessionId == sessionId);
         return Task.FromResult(result);
+    }
+    
+    /// <summary>
+    /// Returns Handling mode of current session, if one exists, if not returns null
+    /// </summary>
+    /// <returns>
+    /// HandlingMode 
+    /// </returns>
+    public HandlingMode? CurrentHandlingMode()
+    {
+        return _currentHandlingMode;
     }
 
     private Lifespan HandlingModeLifespanMap(HandlingMode handlingMode)

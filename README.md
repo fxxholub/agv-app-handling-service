@@ -52,11 +52,7 @@ b) if you use Docker container ID
     {
       "type": 1,
       "target": "StartSession",
-      "arguments": [
-        {
-          "handlingMode": "Manual"
-        }
-      ],
+      "arguments": ["Manual"],
       "invocationId": "1234"
     }
     ```

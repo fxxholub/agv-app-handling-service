@@ -46,18 +46,18 @@ public class HandlingHub(
     
     // Session Actions ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public async Task StartSession(StartSessionModel request)
+    public async Task StartSession(HandlingMode handlingMode)
     {
-        var result = await mediator.Send(new StartSessionCommand(Context.ConnectionId, request.HandlingMode));
+        var result = await mediator.Send(new StartSessionCommand(Context.ConnectionId, handlingMode));
         
         if (result.IsSuccess)
         {
             var agvMode = "";
-            if (request.HandlingMode == HandlingMode.Autonomous)
+            if (handlingMode == HandlingMode.Autonomous)
             {
                 agvMode = "automatic";
             }
-            else if (request.HandlingMode == HandlingMode.Manual)
+            else if (handlingMode == HandlingMode.Manual)
             {
                 agvMode = "manual";
             }

@@ -52,6 +52,18 @@ public class ProcessProviderService : IProcessProviderService
         {
             AddProcessToMode(confProcess, HandlingMode.Autonomous);
         }
+        
+        // Load Automatic processes
+        foreach (var confProcess in config.Automatic)
+        {
+            AddProcessToMode(confProcess, HandlingMode.Automatic);
+        }
+
+        // Load Linefollow processes
+        foreach (var confProcess in config.Linefollow)
+        {
+            AddProcessToMode(confProcess, HandlingMode.Linefollow);
+        }
     }
 
     public IEnumerable<Process> GetProcesses(HandlingMode handlingMode)

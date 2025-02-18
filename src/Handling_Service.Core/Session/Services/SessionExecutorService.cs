@@ -216,6 +216,8 @@ public class SessionExecutorService(
                 return Lifespan.Extended;
             case HandlingMode.Automatic:
                 return Lifespan.Extended;
+            case HandlingMode.Linefollow:
+                return Lifespan.Extended;
             default:
                 return Lifespan.Exclusive;
         }

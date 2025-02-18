@@ -8,6 +8,6 @@ public class PathHandler(IPublisher publisher) : INotificationHandler<Path>
 {
     public async Task Handle(Path message, CancellationToken cancellationToken)
     {
-        await publisher.PublishAgvMode(message.path);
+        await publisher.PublishPath(message.path);
     }
 }

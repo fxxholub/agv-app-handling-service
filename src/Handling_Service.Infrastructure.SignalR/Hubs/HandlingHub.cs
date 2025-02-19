@@ -57,6 +57,10 @@ public class HandlingHub(
             {
                 agvMode = "automatic";
             }
+            if (handlingMode == HandlingMode.Automatic)
+            {
+                agvMode = "automatic";
+            }
             else if (handlingMode == HandlingMode.Manual)
             {
                 agvMode = "manual";
@@ -70,11 +74,6 @@ public class HandlingHub(
     public async Task EndSession()
     {
         var result = await mediator.Send(new EndSessionCommand(Context.ConnectionId));
-        
-        if (result.IsSuccess)
-        {
-            await mediator.Publish(new AgvMode(""));
-        }
         
         ResultChecker<bool>.Check(result);
     }

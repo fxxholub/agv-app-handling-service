@@ -1,4 +1,6 @@
-# Handling Service
+# Agv App Handling Service
+
+This project is an integral part of [AGV App](https://github.com/fxxholub/agv-app.git).
 
 Handling service is a ROS2 programs __management__ and __messaging__ application.
 
